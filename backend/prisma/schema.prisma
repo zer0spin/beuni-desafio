@@ -1,0 +1,152 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ORGANIZAÇÕES E USUÁRIOS (Multi-tenancy)
+// ============================================================================
+
+model Organizacao {
+  id        String   @id @default(cuid())
+  nome      String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relacionamentos
+  usuarios      Usuario[]
+  colaboradores Colaborador[]
+
+  @@map("organizacoes")
+}
+
+model Usuario {
+  id        String   @id @default(cuid())
+  nome      String
+  email     String   @unique
+  senhaHash String   @map("senha_hash")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relacionamentos (Multi-tenancy)
+  organizationId String      @map("organization_id")
+  organizacao    Organizacao @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@map("usuarios")
+}
+
+// ============================================================================
+// COLABORADORES E ENDEREÇOS
+// ============================================================================
+
+model Colaborador {
+  id              String   @id @default(cuid())
+  nomeCompleto    String   @map("nome_completo")
+  dataNascimento  DateTime @map("data_nascimento") @db.Date
+  cargo           String
+  departamento    String
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relacionamentos (Multi-tenancy)
+  organizationId String      @map("organization_id")
+  organizacao    Organizacao @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // Relacionamento com endereço
+  addressId String   @unique @map("address_id")
+  endereco  Endereco @relation(fields: [addressId], references: [id], onDelete: Cascade)
+
+  // Relacionamento com envios de brinde
+  enviosBrinde EnvioBrinde[]
+
+  @@map("colaboradores")
+}
+
+model Endereco {
+  id          String  @id @default(cuid())
+  cep         String  @db.VarChar(8)
+  logradouro  String
+  numero      String
+  complemento String?
+  bairro      String
+  cidade      String
+  uf          String  @db.VarChar(2)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relacionamento um-para-um com colaborador
+  colaborador Colaborador?
+
+  @@map("enderecos")
+}
+
+// ============================================================================
+// LÓGICA DE NEGÓCIO - ENVIO DE BRINDES
+// ============================================================================
+
+enum StatusEnvioBrinde {
+  PENDENTE              // Aniversário ainda não se aproximou
+  PRONTO_PARA_ENVIO     // 7 dias úteis antes - logística pode processar
+  ENVIADO               // Brinde foi enviado pela equipe
+  ENTREGUE              // Confirmação de entrega (futuro)
+  CANCELADO             // Por algum motivo foi cancelado
+
+  @@map("status_envio_brinde")
+}
+
+model EnvioBrinde {
+  id                    String             @id @default(cuid())
+  anoAniversario        Int                @map("ano_aniversario") // Ano do aniversário (ex: 2024)
+  status                StatusEnvioBrinde  @default(PENDENTE)
+  dataGatilhoEnvio      DateTime?          @map("data_gatilho_envio") // Data que ficou "pronto para envio"
+  dataEnvioRealizado    DateTime?          @map("data_envio_realizado") // Data que foi efetivamente enviado
+  observacoes           String?            // Notas adicionais sobre o envio
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+
+  // Relacionamento com colaborador
+  colaboradorId String      @map("colaborador_id")
+  colaborador   Colaborador @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
+
+  // Índice composto para garantir unicidade: um colaborador só pode ter um envio por ano
+  @@unique([colaboradorId, anoAniversario])
+  @@map("envios_brinde")
+}
+
+// ============================================================================
+// AUDITORIA E LOG (Para tracking de mudanças - futuro)
+// ============================================================================
+
+model LogAuditoria {
+  id        String   @id @default(cuid())
+  entidade  String   // Nome da tabela/entidade afetada
+  entidadeId String  @map("entidade_id") // ID da entidade afetada
+  acao      String   // CREATE, UPDATE, DELETE
+  dadosAnteriores Json? @map("dados_anteriores") // Estado anterior (para UPDATE/DELETE)
+  dadosNovos      Json? @map("dados_novos") // Estado novo (para CREATE/UPDATE)
+  usuarioId String? @map("usuario_id") // Quem fez a mudança
+  timestamp DateTime @default(now())
+  ipAddress String? @map("ip_address")
+  userAgent String? @map("user_agent")
+
+  @@map("logs_auditoria")
+}
+
+// ============================================================================
+// ÍNDICES PARA PERFORMANCE
+// ============================================================================
+
+// Índices para consultas comuns
+// - Buscar colaboradores por organização
+// - Buscar colaboradores por mês de aniversário
+// - Buscar envios por status
+// - Buscar envios por ano
+
+// Os índices já estão definidos nos respectivos modelos
