@@ -1,0 +1,26 @@
+# docker-compose.override.yml
+# Development overrides - automatically applied by Docker Compose
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile # Use development Dockerfile if available, or the same
+      target: development
+    container_name: beuni-backend
+    restart: unless-stopped
+    command: npm run start:dev # Override CMD for development with hot reload
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile # The Dockerfile we created will work
+      args:
+        # Pass the correct URL for build if needed
+        NEXT_PUBLIC_API_URL: http://backend:3001
+    command: npm run dev # Override CMD for development with hot reload
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules

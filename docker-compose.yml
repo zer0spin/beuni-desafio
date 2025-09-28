@@ -1,0 +1,109 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: beuni-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: beuni_db
+      POSTGRES_USER: beuni_user
+      POSTGRES_PASSWORD: beuni_password_2024
+      TZ: America/Sao_Paulo
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - beuni-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beuni_user -d beuni_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for Cache (CEP API cache and rate limiting)
+  redis:
+    image: redis:7-alpine
+    container_name: beuni-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - beuni-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Backend API (NestJS)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development 
+    container_name: beuni-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://beuni_user:beuni_password_2024@postgres:5432/beuni_db
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: beuni_jwt_secret_key_2024_super_secure
+      JWT_EXPIRES_IN: 7d
+      PORT: 3001
+      VIACEP_API_URL: https://viacep.com.br/ws
+      CORS_ORIGIN: http://localhost:3000
+      RATE_LIMIT_LOGIN: 5
+      RATE_LIMIT_CEP: 30
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - beuni-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: beuni-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: beuni_nextauth_secret_2024
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - beuni-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  beuni-network:
+    driver: bridge
