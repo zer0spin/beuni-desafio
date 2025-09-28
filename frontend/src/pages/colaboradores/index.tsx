@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Users, Plus, Calendar } from 'lucide-react';
+import { Users, Plus, Calendar, Edit, Eye } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import api, { getUser } from '../../lib/api';
@@ -105,10 +105,13 @@ export default function ColaboradoresPage() {
               >
                 ← Dashboard
               </Link>
-              <button className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm font-medium rounded-lg hover:from-orange-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200">
+              <Link
+                href="/colaboradores/novo"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm font-medium rounded-lg hover:from-orange-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200"
+              >
                 <Plus className="h-5 w-5 mr-2" />
                 Novo Colaborador
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -128,10 +131,13 @@ export default function ColaboradoresPage() {
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum colaborador cadastrado</h3>
               <p className="text-gray-500 text-sm mb-6">Comece adicionando o primeiro colaborador da sua organização</p>
-              <button className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm font-medium rounded-lg hover:from-orange-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200">
+              <Link
+                href="/colaboradores/novo"
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm font-medium rounded-lg hover:from-orange-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200"
+              >
                 <Plus className="h-5 w-5 mr-2" />
                 Adicionar Primeiro Colaborador
-              </button>
+              </Link>
             </div>
           </div>
         ) : (
@@ -184,6 +190,9 @@ export default function ColaboradoresPage() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Status
                       </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        Ações
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -208,6 +217,17 @@ export default function ColaboradoresPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           {getStatusBadge(colaborador.status_envio_atual || 'PENDENTE')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex space-x-2">
+                            <Link
+                              href={`/colaboradores/editar/${colaborador.id}`}
+                              className="inline-flex items-center px-3 py-1 bg-orange-100 text-orange-700 rounded-md hover:bg-orange-200 transition-colors"
+                            >
+                              <Edit className="h-4 w-4 mr-1" />
+                              Editar
+                            </Link>
+                          </div>
                         </td>
                       </tr>
                     ))}
