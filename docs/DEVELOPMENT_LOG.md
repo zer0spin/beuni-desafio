@@ -485,4 +485,165 @@ npm run test:sonarqube   # SonarQube format
 3. **Network inspection** revela problemas escondidos
 4. **Incremental fixes** são mais seguros
 
+---
+
+### **[SESSÃO 4] - Correção de Problemas de Integração e CSS**
+**Data:** 28/09/2025 - Tarde
+**Duração:** ~1 hora
+**Foco:** Resolução de erros de build, comunicação entre serviços e styling
+
+#### **PROBLEMA 1: Erros de build no Docker backend**
+- **Erro:** 13 erros de módulos não encontrados (`@nestjs/schedule`, `bcryptjs`, `date-fns`, etc.)
+- **Causa:** Dependências não instaladas após mudanças no package.json
+- **Solução:**
+  ```bash
+  npm install @nestjs/schedule @nestjs/cache-manager cache-manager-redis-yet @nestjs/axios bcryptjs date-fns cache-manager @types/bcryptjs
+  ```
+- **Status:** ✅ **RESOLVIDO** - Todas as dependências instaladas e backend compilando
+
+#### **PROBLEMA 2: Configuração incorreta do Throttler (Rate Limiting)**
+- **Erro:** `Type '{ name: string; ttl: number; limit: number; }[]' has no properties in common with type 'ThrottlerModuleOptions'`
+- **Causa:** Incompatibilidade na sintaxe do throttler entre versões
+- **Soluções aplicadas:**
+  1. Simplificação da configuração: `return { ttl: 60000, limit: 100 }`
+  2. Correção dos decoradores: `@Throttle(5, 60)` em vez de objetos complexos
+- **Status:** ✅ **RESOLVIDO** - Rate limiting funcionando corretamente
+
+#### **PROBLEMA 3: Prisma Client não inicializado**
+- **Erro:** `@prisma/client did not initialize yet. Please run "prisma generate"`
+- **Causa:** Cliente Prisma não gerado após mudanças no schema
+- **Soluções aplicadas:**
+  1. `npx prisma generate` dentro do container
+  2. `npx prisma migrate deploy` para aplicar migrações
+  3. `npm run prisma:seed` para popular banco com dados de teste
+- **Status:** ✅ **RESOLVIDO** - Banco funcionando com dados de demonstração
+
+#### **PROBLEMA 4: Rotas do Frontend retornando 404**
+- **Erro:** Página root (`/`) não encontrada
+- **Causa:** Ausência da página `index.tsx`
+- **Soluções aplicadas:**
+  1. Criação de `src/pages/index.tsx` com redirecionamento inteligente
+  2. Criação de `src/pages/register.tsx` para página de cadastro
+  3. Adição do tipo `RegisterCredentials` em types/index.ts
+- **Status:** ✅ **RESOLVIDO** - Todas as rotas funcionando (200 OK)
+
+#### **PROBLEMA 5: Dependência lucide-react não encontrada**
+- **Erro:** `Module not found: Can't resolve 'lucide-react'`
+- **Causa:** Biblioteca de ícones não instalada
+- **Solução:**
+  ```bash
+  npm install lucide-react
+  docker-compose restart frontend
+  ```
+- **Status:** ✅ **RESOLVIDO** - Ícones carregando corretamente
+
+#### **PROBLEMA 6: CSS/Tailwind não carregando nas páginas**
+- **Erro:** Páginas renderizando HTML puro sem estilos
+- **Causas identificadas:**
+  1. Ausência do arquivo `postcss.config.js`
+  2. Plugins do Tailwind não instalados
+  3. Modo de desenvolvimento do Next.js não gerando CSS separado
+- **Soluções aplicadas:**
+  1. Criação de `postcss.config.js`:
+     ```javascript
+     module.exports = {
+       plugins: {
+         tailwindcss: {},
+         autoprefixer: {},
+       },
+     }
+     ```
+  2. Instalação dos plugins: `@tailwindcss/forms`, `@tailwindcss/typography`, `@tailwindcss/aspect-ratio`
+  3. Correção de classes CSS: `danger-*` → `error-*` para consistência
+  4. Build de produção para gerar CSS: `npm run build` (criou arquivo CSS de 25KB)
+  5. Criação de `_document.tsx` para carregamento de fontes
+- **Status:** ✅ **RESOLVIDO** - CSS carregando perfeitamente em produção
+
+#### **PROBLEMA 7: Comunicação Frontend-Backend falhando**
+- **Erro:** `net::ERR_EMPTY_RESPONSE` e "erro de conexão"
+- **Causa:** Banco sem dados para autenticação
+- **Soluções aplicadas:**
+  1. Configuração do axios para usar variáveis de ambiente
+  2. Seed do banco com usuário de teste: `ana.rh@beunidemo.com / 123456`
+  3. Criação de 5 colaboradores e 10 registros de envio de brinde
+- **Status:** ✅ **RESOLVIDO** - API respondendo com dados válidos
+
+### **🎯 Resultados da Sessão 4**
+
+#### **Status Final dos Serviços:**
+| Serviço | URL | Status | Descrição |
+|---------|-----|--------|-----------|
+| **Frontend** | http://localhost:3000 | 🟢 **FUNCIONANDO** | Landing page + CSS completo |
+| **Backend API** | http://localhost:3001 | 🟢 **FUNCIONANDO** | 13+ endpoints ativos |
+| **Swagger Docs** | http://localhost:3001/api/docs | 🟢 **FUNCIONANDO** | Documentação automática |
+| **PostgreSQL** | localhost:5433 | 🟢 **HEALTHY** | Banco populado com dados |
+| **Redis** | localhost:6379 | 🟢 **HEALTHY** | Cache funcionando |
+
+#### **Páginas Funcionais:**
+- ✅ **/** - Redireciona automaticamente baseado na autenticação
+- ✅ **/login** - Página de login com CSS styling completo
+- ✅ **/register** - Formulário de cadastro funcional
+- ✅ **/dashboard** - Dashboard protegido (requer autenticação)
+
+#### **Funcionalidades Testadas:**
+- ✅ **Autenticação:** Login funcionando com JWT
+- ✅ **Database:** Queries funcionando, dados populados
+- ✅ **CSS/Styling:** Tailwind carregando, componentes estilizados
+- ✅ **API Communication:** Frontend ↔ Backend comunicando
+- ✅ **Routing:** Todas as rotas retornando HTTP 200
+- ✅ **Container Health:** Todos os 4 containers saudáveis
+
+#### **Arquivos Criados/Modificados:**
+```
+frontend/
+├── postcss.config.js                    # [NOVO] Config PostCSS/Tailwind
+├── src/pages/_document.tsx              # [NOVO] Document customizado
+├── src/pages/index.tsx                  # [NOVO] Página inicial com redirect
+├── src/pages/register.tsx               # [NOVO] Página de cadastro
+├── src/types/index.ts                   # [MODIFICADO] Adicionado RegisterCredentials
+├── src/lib/api.ts                       # [MODIFICADO] Config de env vars
+├── src/styles/globals.css               # [MODIFICADO] Correção classes CSS
+├── next.config.js                       # [MODIFICADO] Temporarily disabled standalone
+└── package.json                         # [MODIFICADO] Novas dependências
+
+backend/
+├── src/config/throttler.config.ts       # [MODIFICADO] Sintaxe throttler corrigida
+├── src/modules/auth/auth.controller.ts  # [MODIFICADO] Decorador @Throttle
+├── src/modules/cep/cep.controller.ts    # [MODIFICADO] Decorador @Throttle
+└── package.json                         # [MODIFICADO] Dependências adicionadas
+```
+
+#### **Comandos Executados:**
+```bash
+# Resolução de dependências
+npm install @nestjs/schedule @nestjs/cache-manager cache-manager-redis-yet
+npm install @nestjs/axios bcryptjs date-fns cache-manager @types/bcryptjs
+npm install lucide-react @tailwindcss/forms @tailwindcss/typography @tailwindcss/aspect-ratio
+
+# Configuração do banco
+npx prisma generate
+npx prisma migrate deploy
+npm run prisma:seed
+
+# Build e teste CSS
+npm run build
+npm start
+
+# Reinicialização de containers
+docker-compose restart backend
+docker-compose restart frontend
+docker-compose build --no-cache backend
+```
+
+### **🏆 Conquistas Técnicas**
+
+1. **100% Container Health** - Todos os 4 serviços funcionando
+2. **Frontend-Backend Integration** - Comunicação completa funcionando
+3. **CSS/Styling Resolution** - Tailwind CSS totalmente funcional
+4. **Database Seeding** - Dados de demonstração populados
+5. **Production Build** - CSS otimizado gerado (25KB)
+6. **Error-Free Compilation** - Zero erros de build/runtime
+7. **Authentication Flow** - Login JWT funcionando end-to-end
+8. **Professional UI** - Landing page + formulários estilizados
+
 *Este log serve como evidência do processo de desenvolvimento e pode ser usado para demonstrar metodologia, troubleshooting skills e conhecimento técnico.*

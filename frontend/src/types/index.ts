@@ -35,6 +35,14 @@ export interface RegisterData {
   password: string;
 }
 
+export interface RegisterCredentials {
+  nome: string;
+  email: string;
+  organizacao: string;
+  password: string;
+  confirmPassword: string;
+}
+
 // Colaborador Types
 export interface Endereco {
   logradouro: string;
