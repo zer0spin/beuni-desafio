@@ -29,7 +29,7 @@
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-danger-600 hover:bg-danger-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-danger-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-error-600 hover:bg-error-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-error-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200;
   }
 
   /* Custom form styles */
@@ -42,7 +42,7 @@
   }
 
   .form-error {
-    @apply mt-1 text-sm text-danger-600;
+    @apply mt-1 text-sm text-error-600;
   }
 
   /* Custom card styles */
