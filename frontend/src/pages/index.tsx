@@ -59,13 +59,13 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-yellow-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
                 <Gift className="h-6 w-6 text-white" />
               </div>
               <span className="text-2xl font-bold text-gray-900">Beuni</span>
@@ -79,7 +79,7 @@ export default function HomePage() {
               </button>
               <button
                 onClick={() => router.push('/login')}
-                className="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg hover:from-blue-600 hover:to-purple-700 font-medium transition-all duration-200"
+                className="px-6 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-lg hover:from-orange-600 hover:to-red-700 font-medium transition-all duration-200"
               >
                 Começar Agora
               </button>
@@ -93,7 +93,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
             Gerencie aniversários dos
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-600">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600">
               {' '}colaboradores{' '}
             </span>
             automaticamente
@@ -105,7 +105,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => router.push('/login')}
-              className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-semibold rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-200 flex items-center justify-center"
+              className="px-8 py-4 bg-gradient-to-r from-orange-500 to-red-600 text-white text-lg font-semibold rounded-xl hover:from-orange-600 hover:to-red-700 transition-all duration-200 flex items-center justify-center"
             >
               Começar Gratuitamente
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -133,8 +133,8 @@ export default function HomePage() {
           </div>
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div key={index} className="text-center p-8 rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300">
-                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div key={index} className="text-center p-8 rounded-2xl border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all duration-300">
+                <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                   <feature.icon className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">{feature.title}</h3>
@@ -169,7 +169,7 @@ export default function HomePage() {
             <div className="bg-white rounded-2xl p-8 shadow-xl">
               <div className="flex items-center mb-6">
                 <div className="flex-shrink-0">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center">
                     <Star className="h-6 w-6 text-white" />
                   </div>
                 </div>
@@ -197,17 +197,17 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-blue-500 to-purple-600">
+      <section className="py-20 bg-gradient-to-r from-orange-500 to-red-600">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-white mb-6">
             Pronto para começar?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-orange-100 mb-8">
             Experimente gratuitamente por 30 dias. Não é necessário cartão de crédito.
           </p>
           <button
             onClick={() => router.push('/login')}
-            className="px-8 py-4 bg-white text-blue-600 text-lg font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200 inline-flex items-center"
+            className="px-8 py-4 bg-white text-orange-600 text-lg font-semibold rounded-xl hover:bg-gray-50 transition-all duration-200 inline-flex items-center"
           >
             Começar Agora Mesmo
             <ChevronRight className="ml-2 h-5 w-5" />
@@ -220,7 +220,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
                 <Gift className="h-5 w-5 text-white" />
               </div>
               <span className="text-xl font-bold text-white">Beuni</span>

@@ -8,31 +8,31 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary brand colors
+        // Primary brand colors (Beuni Orange)
         primary: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+          50: '#fff7ed',
+          100: '#ffedd5',
+          200: '#fed7aa',
+          300: '#fdba74',
+          400: '#fb923c',
+          500: '#f97316',
+          600: '#ea580c',
+          700: '#c2410c',
+          800: '#9a3412',
+          900: '#7c2d12',
         },
-        // Secondary colors
+        // Secondary colors (Beuni Warm Browns)
         secondary: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
+          50: '#faf5f0',
+          100: '#f5e6d3',
+          200: '#e7d2ae',
+          300: '#d4b896',
+          400: '#c1a082',
+          500: '#a8876b',
+          600: '#8b6f56',
+          700: '#6d5746',
+          800: '#4a3f38',
+          900: '#2d2926',
         },
         // Success, warning, error colors
         success: {
