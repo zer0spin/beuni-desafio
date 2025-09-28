@@ -20,7 +20,7 @@ export class AuthController {
 
   @Post('login')
   @UseGuards(ThrottlerGuard)
-  @Throttle({ login: { limit: 5, ttl: 60000 } }) // 5 attempts per minute
+  @Throttle(5, 60) // 5 attempts per minute
   @ApiOperation({ summary: 'Login de usuário' })
   @ApiBody({ type: LoginDto })
   @ApiResponse({

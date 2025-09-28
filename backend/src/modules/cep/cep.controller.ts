@@ -20,7 +20,7 @@ export class CepController {
   constructor(private readonly cepService: CepService) {}
 
   @Get(':cep')
-  @Throttle({ cep: { limit: 30, ttl: 60000 } }) // 30 requests per minute
+  @Throttle(30, 60) // 30 requests per minute
   @ApiOperation({ summary: 'Consultar endereço por CEP' })
   @ApiParam({
     name: 'cep',
