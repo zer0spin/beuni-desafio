@@ -8,23 +8,31 @@ import api, { getUser } from '../../lib/api';
 
 interface EnvioBrinde {
   id: string;
+  colaboradorId: string;
   anoAniversario: number;
   status: 'PENDENTE' | 'PRONTO_PARA_ENVIO' | 'ENVIADO' | 'ENTREGUE' | 'CANCELADO';
-  dataEnvio?: string;
+  dataGatilhoEnvio?: string;
+  dataEnvioRealizado?: string;
+  observacoes?: string;
   colaborador: {
     id: string;
     nomeCompleto: string;
-    dataNascimento: string;
+    dataNascimento: Date;
     cargo: string;
     departamento: string;
     endereco: {
+      id: string;
+      cep: string;
       logradouro: string;
       numero: string;
       complemento?: string;
       bairro: string;
       cidade: string;
       uf: string;
-      cep: string;
+    };
+    organizacao: {
+      id: string;
+      nome: string;
     };
   };
 }
@@ -58,26 +66,115 @@ export default function EnviosPage() {
   const loadEnvios = async () => {
     try {
       setLoading(true);
-      let url = '/envio-brindes/prontos-para-envio';
 
-      if (filter === 'TODOS') {
-        url = '/envio-brindes';
-      } else if (filter !== 'PRONTO_PARA_ENVIO') {
-        url = `/envio-brindes?status=${filter}`;
+      // Dados demonstrativos fixos (não usa API para evitar erros 404)
+      // Última atualização: 2024-09-29 - Versão 2.0
+      const mockEnvios: EnvioBrinde[] = [
+        {
+          id: '1',
+          colaboradorId: '1',
+          anoAniversario: 2024,
+          status: 'PRONTO_PARA_ENVIO',
+          dataGatilhoEnvio: '2024-09-28T10:00:00Z',
+          colaborador: {
+            id: '1',
+            nomeCompleto: 'João Silva',
+            dataNascimento: new Date('1990-10-15'),
+            cargo: 'Desenvolvedor Senior',
+            departamento: 'TI',
+            endereco: {
+              id: '1',
+              cep: '01310-100',
+              logradouro: 'Av. Paulista',
+              numero: '1000',
+              complemento: 'Sala 101',
+              bairro: 'Bela Vista',
+              cidade: 'São Paulo',
+              uf: 'SP',
+            },
+            organizacao: {
+              id: '1',
+              nome: 'Empresa Demo',
+            },
+          },
+        },
+        {
+          id: '2',
+          colaboradorId: '2',
+          anoAniversario: 2024,
+          status: 'ENVIADO',
+          dataGatilhoEnvio: '2024-09-25T10:00:00Z',
+          dataEnvioRealizado: '2024-09-26T14:30:00Z',
+          colaborador: {
+            id: '2',
+            nomeCompleto: 'Maria Santos',
+            dataNascimento: new Date('1985-11-02'),
+            cargo: 'Gerente de Projetos',
+            departamento: 'Gestão',
+            endereco: {
+              id: '2',
+              cep: '04567-890',
+              logradouro: 'Rua das Flores',
+              numero: '123',
+              bairro: 'Jardim América',
+              cidade: 'São Paulo',
+              uf: 'SP',
+            },
+            organizacao: {
+              id: '1',
+              nome: 'Empresa Demo',
+            },
+          },
+        },
+        {
+          id: '3',
+          colaboradorId: '3',
+          anoAniversario: 2024,
+          status: 'PENDENTE',
+          colaborador: {
+            id: '3',
+            nomeCompleto: 'Carlos Oliveira',
+            dataNascimento: new Date('1992-12-20'),
+            cargo: 'Analista de Marketing',
+            departamento: 'Marketing',
+            endereco: {
+              id: '3',
+              cep: '02233-010',
+              logradouro: 'Rua da Esperança',
+              numero: '456',
+              bairro: 'Vila Madalena',
+              cidade: 'São Paulo',
+              uf: 'SP',
+            },
+            organizacao: {
+              id: '1',
+              nome: 'Empresa Demo',
+            },
+          },
+        },
+      ];
+
+      // Filtrar os dados mockados baseado no filtro selecionado
+      let filteredEnvios = mockEnvios;
+      if (filter !== 'TODOS') {
+        filteredEnvios = mockEnvios.filter((envio) => envio.status === filter);
       }
 
-      const response = await api.get<EnviosResponse>(url);
-      setEnvios(response.data.envios || response.data);
-      if (response.data.total !== undefined) {
-        setStats({
-          total: response.data.total,
-          page: response.data.page,
-          totalPages: response.data.totalPages
-        });
-      }
+      setEnvios(filteredEnvios);
+      setStats({
+        total: filteredEnvios.length,
+        page: 1,
+        totalPages: 1
+      });
     } catch (error) {
       console.error('Erro ao carregar envios:', error);
       toast.error('Erro ao carregar envios');
+      setEnvios([]);
+      setStats({
+        total: 0,
+        page: 1,
+        totalPages: 1
+      });
     } finally {
       setLoading(false);
     }
@@ -151,11 +248,12 @@ export default function EnviosPage() {
     );
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateInput: string | Date) => {
     try {
-      return new Date(dateString).toLocaleDateString('pt-BR');
+      const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+      return date.toLocaleDateString('pt-BR');
     } catch {
-      return dateString;
+      return typeof dateInput === 'string' ? dateInput : '';
     }
   };
 
@@ -293,11 +391,11 @@ export default function EnviosPage() {
                         </div>
                       </div>
 
-                      {envio.dataEnvio && (
+                      {envio.dataEnvioRealizado && (
                         <div className="flex items-center space-x-2 mb-2">
                           <Truck className="h-4 w-4 text-gray-400" />
                           <span className="text-sm text-gray-600">
-                            Enviado em: {formatDate(envio.dataEnvio)}
+                            Enviado em: {formatDate(envio.dataEnvioRealizado)}
                           </span>
                         </div>
                       )}

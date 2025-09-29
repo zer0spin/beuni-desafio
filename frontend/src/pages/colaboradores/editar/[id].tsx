@@ -13,8 +13,12 @@ interface FormData {
   departamento: string;
   endereco: {
     cep: string;
+    logradouro: string;
     numero: string;
     complemento: string;
+    bairro: string;
+    cidade: string;
+    uf: string;
   };
 }
 
@@ -90,8 +94,12 @@ export default function EditarColaboradorPage() {
         departamento: data.departamento,
         endereco: {
           cep: '',
+          logradouro: data.endereco.logradouro,
           numero: '',
           complemento: '',
+          bairro: data.endereco.bairro,
+          cidade: data.endereco.cidade,
+          uf: data.endereco.uf,
         },
       });
 
@@ -146,11 +154,37 @@ export default function EditarColaboradorPage() {
       setCepLoading(true);
       try {
         const response = await api.get(`/cep/${cep}`);
-        setCepData(response.data);
+        const data = response.data;
+        setCepData(data);
+
+        // Auto-fill address fields
+        setFormData(prev => ({
+          ...prev,
+          endereco: {
+            ...prev.endereco,
+            cep: cep,
+            logradouro: data.logradouro,
+            bairro: data.bairro,
+            cidade: data.cidade,
+            uf: data.uf,
+          },
+        }));
       } catch (error) {
         console.error('Erro ao buscar CEP:', error);
         toast.error('CEP não encontrado');
         setCepData(null);
+        // Clear address fields when CEP not found
+        setFormData(prev => ({
+          ...prev,
+          endereco: {
+            ...prev.endereco,
+            cep: cep,
+            logradouro: '',
+            bairro: '',
+            cidade: '',
+            uf: '',
+          },
+        }));
       } finally {
         setCepLoading(false);
       }
@@ -162,8 +196,31 @@ export default function EditarColaboradorPage() {
         cidade: colaborador.endereco.cidade,
         uf: colaborador.endereco.uf,
       });
+      setFormData(prev => ({
+        ...prev,
+        endereco: {
+          ...prev.endereco,
+          cep: '',
+          logradouro: colaborador.endereco.logradouro,
+          bairro: colaborador.endereco.bairro,
+          cidade: colaborador.endereco.cidade,
+          uf: colaborador.endereco.uf,
+        },
+      }));
     } else {
       setCepData(null);
+      // Clear address fields when CEP is incomplete
+      setFormData(prev => ({
+        ...prev,
+        endereco: {
+          ...prev.endereco,
+          cep: cep,
+          logradouro: '',
+          bairro: '',
+          cidade: '',
+          uf: '',
+        },
+      }));
     }
   };
 
@@ -174,8 +231,9 @@ export default function EditarColaboradorPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!cepData) {
-      toast.error('Por favor, insira um CEP válido');
+    // Validate address fields - either CEP found or manual entry complete
+    if (!cepData && (!formData.endereco.logradouro || !formData.endereco.bairro || !formData.endereco.cidade || !formData.endereco.uf)) {
+      toast.error('Por favor, preencha todos os campos de endereço ou insira um CEP válido');
       return;
     }
 
@@ -413,6 +471,73 @@ export default function EditarColaboradorPage() {
                   onChange={handleInputChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                   placeholder="Apto 101, Bloco A"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
+              <div>
+                <label htmlFor="endereco.logradouro" className="block text-sm font-medium text-gray-700 mb-2">
+                  Logradouro
+                </label>
+                <input
+                  type="text"
+                  id="endereco.logradouro"
+                  name="endereco.logradouro"
+                  value={formData.endereco.logradouro}
+                  onChange={handleInputChange}
+                  disabled={!!cepData && !!formData.endereco.cep}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  placeholder="Rua das Flores"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="endereco.bairro" className="block text-sm font-medium text-gray-700 mb-2">
+                  Bairro
+                </label>
+                <input
+                  type="text"
+                  id="endereco.bairro"
+                  name="endereco.bairro"
+                  value={formData.endereco.bairro}
+                  onChange={handleInputChange}
+                  disabled={!!cepData && !!formData.endereco.cep}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  placeholder="Centro"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="endereco.cidade" className="block text-sm font-medium text-gray-700 mb-2">
+                  Cidade
+                </label>
+                <input
+                  type="text"
+                  id="endereco.cidade"
+                  name="endereco.cidade"
+                  value={formData.endereco.cidade}
+                  onChange={handleInputChange}
+                  disabled={!!cepData && !!formData.endereco.cep}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  placeholder="São Paulo"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="endereco.uf" className="block text-sm font-medium text-gray-700 mb-2">
+                  Estado (UF)
+                </label>
+                <input
+                  type="text"
+                  id="endereco.uf"
+                  name="endereco.uf"
+                  value={formData.endereco.uf}
+                  onChange={handleInputChange}
+                  disabled={!!cepData && !!formData.endereco.cep}
+                  maxLength={2}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed uppercase"
+                  placeholder="SP"
                 />
               </div>
             </div>
