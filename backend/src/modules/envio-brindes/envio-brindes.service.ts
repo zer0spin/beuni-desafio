@@ -94,6 +94,65 @@ export class EnvioBrindesService {
   }
 
   /**
+   * Buscar envios com filtros e paginação
+   */
+  async buscarEnvios(
+    organizationId: string,
+    options: {
+      status?: string;
+      ano?: number;
+      page?: number;
+      limit?: number;
+    } = {}
+  ) {
+    const { status, ano, page = 1, limit = 10 } = options;
+    const anoConsulta = ano || getYear(new Date());
+    const skip = (page - 1) * limit;
+    const take = Math.min(limit, 100); // Máximo 100 itens por página
+
+    const where: any = {
+      anoAniversario: anoConsulta,
+      colaborador: {
+        organizationId,
+      },
+    };
+
+    if (status) {
+      where.status = status;
+    }
+
+    const [envios, total] = await Promise.all([
+      this.prisma.envioBrinde.findMany({
+        where,
+        include: {
+          colaborador: {
+            include: {
+              endereco: true,
+              organizacao: true,
+            },
+          },
+        },
+        orderBy: [
+          { status: 'asc' },
+          { dataGatilhoEnvio: 'desc' },
+          { createdAt: 'desc' },
+        ],
+        skip,
+        take,
+      }),
+      this.prisma.envioBrinde.count({ where }),
+    ]);
+
+    return {
+      envios,
+      total,
+      page,
+      limit: take,
+      totalPages: Math.ceil(total / take),
+    };
+  }
+
+  /**
    * Buscar todos os envios com status "Pronto para Envio"
    */
   async buscarEnviosProntosParaEnvio() {

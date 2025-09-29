@@ -2,6 +2,8 @@ import {
   Controller,
   Get,
   Post,
+  Put,
+  Delete,
   Body,
   Param,
   Query,
@@ -18,6 +20,7 @@ import {
 
 import { ColaboradoresService } from './colaboradores.service';
 import { CreateColaboradorDto } from './dto/create-colaborador.dto';
+import { UpdateColaboradorDto } from './dto/update-colaborador.dto';
 import { ColaboradorResponseDto } from './dto/colaborador-response.dto';
 import { ListColaboradoresDto } from './dto/list-colaboradores.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -114,6 +117,50 @@ export class ColaboradoresController {
     );
   }
 
+  @Get('estatisticas/departamentos')
+  @ApiOperation({ summary: 'Estatísticas por departamento' })
+  @ApiQuery({
+    name: 'ano',
+    required: false,
+    type: Number,
+    description: 'Ano para consulta (padrão: ano atual)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Estatísticas de colaboradores por departamento',
+  })
+  async getEstatisticasDepartamentos(
+    @Query('ano') ano: number,
+    @Request() req
+  ) {
+    return this.colaboradoresService.getEstatisticasDepartamentos(
+      req.user.organizationId,
+      ano,
+    );
+  }
+
+  @Get('estatisticas/aniversarios-mes')
+  @ApiOperation({ summary: 'Estatísticas de aniversários por mês' })
+  @ApiQuery({
+    name: 'ano',
+    required: false,
+    type: Number,
+    description: 'Ano para consulta (padrão: ano atual)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Distribuição de aniversários por mês do ano',
+  })
+  async getAniversariosPorMes(
+    @Query('ano') ano: number,
+    @Request() req
+  ) {
+    return this.colaboradoresService.getAniversariosPorMes(
+      req.user.organizationId,
+      ano,
+    );
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Buscar colaborador por ID' })
   @ApiResponse({
@@ -127,5 +174,46 @@ export class ColaboradoresController {
   })
   async findOne(@Param('id') id: string, @Request() req) {
     return this.colaboradoresService.findOne(id, req.user.organizationId);
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Atualizar colaborador' })
+  @ApiResponse({
+    status: 200,
+    description: 'Colaborador atualizado com sucesso',
+    type: ColaboradorResponseDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Colaborador não encontrado',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Dados inválidos ou CEP não encontrado',
+  })
+  async update(
+    @Param('id') id: string,
+    @Body() updateColaboradorDto: UpdateColaboradorDto,
+    @Request() req,
+  ): Promise<ColaboradorResponseDto> {
+    return this.colaboradoresService.update(
+      id,
+      updateColaboradorDto,
+      req.user.organizationId,
+    );
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Remover colaborador' })
+  @ApiResponse({
+    status: 200,
+    description: 'Colaborador removido com sucesso',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Colaborador não encontrado',
+  })
+  async remove(@Param('id') id: string, @Request() req) {
+    return this.colaboradoresService.remove(id, req.user.organizationId);
   }
 }

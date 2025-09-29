@@ -28,6 +28,52 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class EnvioBrindesController {
   constructor(private readonly envioBrindesService: EnvioBrindesService) {}
 
+  @Get()
+  @ApiOperation({
+    summary: 'Listar envios de brindes',
+    description: 'Retorna todos os envios de brindes da organização com filtros opcionais.'
+  })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    type: String,
+    description: 'Filtrar por status (PENDENTE, PRONTO_PARA_ENVIO, ENVIADO, ENTREGUE, CANCELADO)',
+  })
+  @ApiQuery({
+    name: 'ano',
+    required: false,
+    type: Number,
+    description: 'Filtrar por ano (padrão: ano atual)',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Página (padrão: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Itens por página (padrão: 10, máximo: 100)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de envios de brindes',
+  })
+  async buscarEnvios(
+    @Query('status') status: string,
+    @Query('ano') ano: number,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Request() req,
+  ) {
+    return this.envioBrindesService.buscarEnvios(
+      req.user.organizationId,
+      { status, ano, page, limit }
+    );
+  }
+
   @Get('prontos-para-envio')
   @ApiOperation({
     summary: 'Listar envios prontos para envio',

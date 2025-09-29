@@ -44,6 +44,9 @@ export default function RelatoriosPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<EstatisticasRelatorio | null>(null);
   const [anoSelecionado, setAnoSelecionado] = useState(new Date().getFullYear());
+  const [filtroStatus, setFiltroStatus] = useState<string>('TODOS');
+  const [filtroDepartamento, setFiltroDepartamento] = useState<string>('TODOS');
+  const [departamentos, setDepartamentos] = useState<string[]>([]);
 
   useEffect(() => {
     const user = getUser();
@@ -53,21 +56,22 @@ export default function RelatoriosPage() {
     }
 
     loadRelatorios();
-  }, [anoSelecionado]);
+  }, [anoSelecionado, filtroStatus, filtroDepartamento]);
 
   const loadRelatorios = async () => {
     try {
       setLoading(true);
 
-      // Carregar estatísticas gerais
-      const [colaboradoresRes, estatisticasRes, proximosRes] = await Promise.all([
+      // Carregar todas as estatísticas em paralelo
+      const [colaboradoresRes, estatisticasRes, proximosRes, departamentosRes, enviosPorMesRes] = await Promise.all([
         api.get('/colaboradores?limit=1'),
-        api.get('/envio-brindes/estatisticas'),
+        api.get(`/envio-brindes/estatisticas?ano=${anoSelecionado}`),
         api.get('/colaboradores/aniversariantes-proximos'),
+        api.get(`/colaboradores/estatisticas/departamentos?ano=${anoSelecionado}`),
+        api.get(`/colaboradores/estatisticas/aniversarios-mes?ano=${anoSelecionado}`),
       ]);
 
-      // Simular dados mais completos para o relatório
-      const mockStats: EstatisticasRelatorio = {
+      const statsData: EstatisticasRelatorio = {
         totalColaboradores: colaboradoresRes.data.total || 0,
         aniversariantesEsteAno: colaboradoresRes.data.total || 0,
         enviosPorStatus: {
@@ -77,31 +81,16 @@ export default function RelatoriosPage() {
           ENTREGUE: estatisticasRes.data?.porStatus?.ENTREGUE || 0,
           CANCELADO: estatisticasRes.data?.porStatus?.CANCELADO || 0,
         },
-        enviosPorMes: [
-          { mes: 1, nomeDoMes: 'Janeiro', total: 12, enviados: 10, pendentes: 2 },
-          { mes: 2, nomeDoMes: 'Fevereiro', total: 8, enviados: 8, pendentes: 0 },
-          { mes: 3, nomeDoMes: 'Março', total: 15, enviados: 12, pendentes: 3 },
-          { mes: 4, nomeDoMes: 'Abril', total: 9, enviados: 9, pendentes: 0 },
-          { mes: 5, nomeDoMes: 'Maio', total: 11, enviados: 8, pendentes: 3 },
-          { mes: 6, nomeDoMes: 'Junho', total: 13, enviados: 13, pendentes: 0 },
-          { mes: 7, nomeDoMes: 'Julho', total: 7, enviados: 5, pendentes: 2 },
-          { mes: 8, nomeDoMes: 'Agosto', total: 14, enviados: 11, pendentes: 3 },
-          { mes: 9, nomeDoMes: 'Setembro', total: 10, enviados: 10, pendentes: 0 },
-          { mes: 10, nomeDoMes: 'Outubro', total: 16, enviados: 14, pendentes: 2 },
-          { mes: 11, nomeDoMes: 'Novembro', total: 12, enviados: 9, pendentes: 3 },
-          { mes: 12, nomeDoMes: 'Dezembro', total: 18, enviados: 15, pendentes: 3 },
-        ],
-        departamentos: [
-          { nome: 'TI', totalColaboradores: 25, enviosPendentes: 3, enviosRealizados: 22 },
-          { nome: 'RH', totalColaboradores: 8, enviosPendentes: 1, enviosRealizados: 7 },
-          { nome: 'Financeiro', totalColaboradores: 12, enviosPendentes: 2, enviosRealizados: 10 },
-          { nome: 'Marketing', totalColaboradores: 15, enviosPendentes: 1, enviosRealizados: 14 },
-          { nome: 'Vendas', totalColaboradores: 30, enviosPendentes: 4, enviosRealizados: 26 },
-        ],
+        enviosPorMes: enviosPorMesRes.data || [],
+        departamentos: departamentosRes.data || [],
         proximosAniversarios: proximosRes.data || [],
       };
 
-      setStats(mockStats);
+      // Extrair departamentos únicos para filtro
+      const deptsUnicos = [...new Set(departamentosRes.data?.map((d: any) => d.nome) || [])];
+      setDepartamentos(deptsUnicos);
+
+      setStats(statsData);
     } catch (error) {
       console.error('Erro ao carregar relatórios:', error);
       toast.error('Erro ao carregar relatórios');
@@ -195,15 +184,41 @@ export default function RelatoriosPage() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Filter className="h-4 w-4 text-gray-600" />
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <Filter className="h-4 w-4 text-gray-600" />
+                  <select
+                    value={anoSelecionado}
+                    onChange={(e) => setAnoSelecionado(Number(e.target.value))}
+                    className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  >
+                    {[2024, 2023, 2022].map(ano => (
+                      <option key={ano} value={ano}>{ano}</option>
+                    ))}
+                  </select>
+                </div>
+
                 <select
-                  value={anoSelecionado}
-                  onChange={(e) => setAnoSelecionado(Number(e.target.value))}
+                  value={filtroStatus}
+                  onChange={(e) => setFiltroStatus(e.target.value)}
                   className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
-                  {[2024, 2023, 2022].map(ano => (
-                    <option key={ano} value={ano}>{ano}</option>
+                  <option value="TODOS">Todos os Status</option>
+                  <option value="PENDENTE">Pendentes</option>
+                  <option value="PRONTO_PARA_ENVIO">Prontos</option>
+                  <option value="ENVIADO">Enviados</option>
+                  <option value="ENTREGUE">Entregues</option>
+                  <option value="CANCELADO">Cancelados</option>
+                </select>
+
+                <select
+                  value={filtroDepartamento}
+                  onChange={(e) => setFiltroDepartamento(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                >
+                  <option value="TODOS">Todos os Departamentos</option>
+                  {departamentos.map(dept => (
+                    <option key={dept} value={dept}>{dept}</option>
                   ))}
                 </select>
               </div>

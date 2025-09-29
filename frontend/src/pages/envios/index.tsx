@@ -14,12 +14,14 @@ interface EnvioBrinde {
   dataGatilhoEnvio?: string;
   dataEnvioRealizado?: string;
   observacoes?: string;
+  createdAt: string;
   colaborador: {
     id: string;
     nomeCompleto: string;
-    dataNascimento: Date;
+    dataNascimento: string;
     cargo: string;
     departamento: string;
+    organizationId: string;
     endereco: {
       id: string;
       cep: string;
@@ -67,104 +69,23 @@ export default function EnviosPage() {
     try {
       setLoading(true);
 
-      // Dados demonstrativos fixos (não usa API para evitar erros 404)
-      // Última atualização: 2024-09-29 - Versão 2.0
-      const mockEnvios: EnvioBrinde[] = [
-        {
-          id: '1',
-          colaboradorId: '1',
-          anoAniversario: 2024,
-          status: 'PRONTO_PARA_ENVIO',
-          dataGatilhoEnvio: '2024-09-28T10:00:00Z',
-          colaborador: {
-            id: '1',
-            nomeCompleto: 'João Silva',
-            dataNascimento: new Date('1990-10-15'),
-            cargo: 'Desenvolvedor Senior',
-            departamento: 'TI',
-            endereco: {
-              id: '1',
-              cep: '01310-100',
-              logradouro: 'Av. Paulista',
-              numero: '1000',
-              complemento: 'Sala 101',
-              bairro: 'Bela Vista',
-              cidade: 'São Paulo',
-              uf: 'SP',
-            },
-            organizacao: {
-              id: '1',
-              nome: 'Empresa Demo',
-            },
-          },
-        },
-        {
-          id: '2',
-          colaboradorId: '2',
-          anoAniversario: 2024,
-          status: 'ENVIADO',
-          dataGatilhoEnvio: '2024-09-25T10:00:00Z',
-          dataEnvioRealizado: '2024-09-26T14:30:00Z',
-          colaborador: {
-            id: '2',
-            nomeCompleto: 'Maria Santos',
-            dataNascimento: new Date('1985-11-02'),
-            cargo: 'Gerente de Projetos',
-            departamento: 'Gestão',
-            endereco: {
-              id: '2',
-              cep: '04567-890',
-              logradouro: 'Rua das Flores',
-              numero: '123',
-              bairro: 'Jardim América',
-              cidade: 'São Paulo',
-              uf: 'SP',
-            },
-            organizacao: {
-              id: '1',
-              nome: 'Empresa Demo',
-            },
-          },
-        },
-        {
-          id: '3',
-          colaboradorId: '3',
-          anoAniversario: 2024,
-          status: 'PENDENTE',
-          colaborador: {
-            id: '3',
-            nomeCompleto: 'Carlos Oliveira',
-            dataNascimento: new Date('1992-12-20'),
-            cargo: 'Analista de Marketing',
-            departamento: 'Marketing',
-            endereco: {
-              id: '3',
-              cep: '02233-010',
-              logradouro: 'Rua da Esperança',
-              numero: '456',
-              bairro: 'Vila Madalena',
-              cidade: 'São Paulo',
-              uf: 'SP',
-            },
-            organizacao: {
-              id: '1',
-              nome: 'Empresa Demo',
-            },
-          },
-        },
-      ];
-
-      // Filtrar os dados mockados baseado no filtro selecionado
-      let filteredEnvios = mockEnvios;
+      // Construir parâmetros da query
+      const params = new URLSearchParams();
       if (filter !== 'TODOS') {
-        filteredEnvios = mockEnvios.filter((envio) => envio.status === filter);
+        params.append('status', filter);
       }
+      params.append('ano', '2024');
+      params.append('page', '1');
+      params.append('limit', '50');
 
-      setEnvios(filteredEnvios);
+      const response = await api.get(`/envio-brindes?${params.toString()}`);
+      const data = response.data;
+
+      setEnvios(data.envios || []);
       setStats({
-        total: filteredEnvios.length,
-        page: 1,
-        totalPages: 1
+        total: data.total || 0,
+        page: data.page || 1,
+        totalPages: data.totalPages || 1
       });
     } catch (error) {
       console.error('Erro ao carregar envios:', error);
@@ -250,7 +171,15 @@ export default function EnviosPage() {
 
   const formatDate = (dateInput: string | Date) => {
     try {
+      if (!dateInput) return '';
       const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+      if (isNaN(date.getTime())) {
+        // Se a data for inválida, tenta retornar o string original se for dd/MM/yyyy
+        if (typeof dateInput === 'string' && dateInput.includes('/')) {
+          return dateInput;
+        }
+        return '';
+      }
       return date.toLocaleDateString('pt-BR');
     } catch {
       return typeof dateInput === 'string' ? dateInput : '';

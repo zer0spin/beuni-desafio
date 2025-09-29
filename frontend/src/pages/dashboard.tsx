@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Users, Calendar, Package, TrendingUp } from 'lucide-react';
+import { Users, Calendar, Package, TrendingUp, Gift, BarChart3, Settings, Bell, Search, Filter } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import api, { getUser, removeAuthToken, endpoints } from '@/lib/api';
@@ -72,177 +72,264 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-yellow-50">
-      {/* Header */}
-      <header className="bg-white shadow">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50">
+      {/* Modern Header */}
+      <header className="bg-white/80 backdrop-blur-md border-b border-orange-100 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Dashboard Beuni
-              </h1>
-              <p className="text-gray-600">
-                Bem-vindo, {user.nome} - {user.organizacao.nome}
-              </p>
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <Gift className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-orange-600 bg-clip-text text-transparent">
+                    Beuni Dashboard
+                  </h1>
+                  <p className="text-sm text-gray-500">
+                    {user.nome} - {user.organizacao.nome}
+                  </p>
+                </div>
+              </div>
             </div>
-            <button
-              onClick={handleLogout}
-              className="btn-secondary"
-            >
-              Sair
-            </button>
+
+            <div className="flex items-center space-x-4">
+              <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                <Search className="h-5 w-5" />
+              </button>
+              <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+              </button>
+              <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                <Settings className="h-5 w-5" />
+              </button>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+              >
+                Sair
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="card">
-              <div className="card-body">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Users className="h-8 w-8 text-primary-600" />
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Total de Colaboradores
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        {isLoading ? '...' : stats.totalColaboradores}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-body">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Calendar className="h-8 w-8 text-orange-600" />
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Aniversários Próximo Mês
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        {isLoading ? '...' : stats.aniversariantesProximoMes}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-body">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <Package className="h-8 w-8 text-warning-600" />
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Envios Pendentes
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        {isLoading ? '...' : stats.enviosPendentes}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="card">
-              <div className="card-body">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <TrendingUp className="h-8 w-8 text-success-600" />
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Envios Realizados
-                      </dt>
-                      <dd className="text-lg font-semibold text-gray-900">
-                        {isLoading ? '...' : stats.enviosRealizados}
-                      </dd>
-                    </dl>
-                  </div>
+      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl p-8 text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white/10 rounded-full"></div>
+            <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 bg-white/5 rounded-full"></div>
+            <div className="relative z-10">
+              <h2 className="text-3xl font-bold mb-2">Olá, {user.nome.split(' ')[0]}! 👋</h2>
+              <p className="text-orange-100 text-lg">
+                Aqui está um resumo dos aniversários da sua empresa hoje.
+              </p>
+              <div className="mt-6 flex items-center space-x-4">
+                <div className="bg-white/20 px-4 py-2 rounded-lg">
+                  <span className="text-sm font-medium">Hoje: {new Date().toLocaleDateString('pt-BR')}</span>
                 </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Quick Actions */}
-          <div className="mt-8">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Users className="h-6 w-6 text-blue-600" />
+                </div>
+              </div>
+              <div className="ml-4 flex-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Total de Colaboradores
+                </dt>
+                <dd className="text-2xl font-bold text-gray-900">
+                  {isLoading ? (
+                    <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                  ) : (
+                    stats.totalColaboradores
+                  )}
+                </dd>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-orange-600" />
+                </div>
+              </div>
+              <div className="ml-4 flex-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Aniversários Próximo Mês
+                </dt>
+                <dd className="text-2xl font-bold text-gray-900">
+                  {isLoading ? (
+                    <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                  ) : (
+                    stats.aniversariantesProximoMes
+                  )}
+                </dd>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
+                  <Package className="h-6 w-6 text-yellow-600" />
+                </div>
+              </div>
+              <div className="ml-4 flex-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Envios Pendentes
+                </dt>
+                <dd className="text-2xl font-bold text-gray-900">
+                  {isLoading ? (
+                    <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                  ) : (
+                    stats.enviosPendentes
+                  )}
+                </dd>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="h-6 w-6 text-green-600" />
+                </div>
+              </div>
+              <div className="ml-4 flex-1">
+                <dt className="text-sm font-medium text-gray-500">
+                  Envios Realizados
+                </dt>
+                <dd className="text-2xl font-bold text-gray-900">
+                  {isLoading ? (
+                    <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                  ) : (
+                    stats.enviosRealizados
+                  )}
+                </dd>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">
               Ações Rápidas
             </h2>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <button
-                onClick={() => router.push('/colaboradores')}
-                className="card hover:shadow-md transition-shadow duration-200"
-              >
-                <div className="card-body text-left">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Gerenciar Colaboradores
-                  </h3>
-                  <p className="text-gray-600">
-                    Visualizar, adicionar e editar colaboradores
-                  </p>
+            <span className="text-sm text-gray-500">Acesse rapidamente as principais funcionalidades</span>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <button
+              onClick={() => router.push('/colaboradores')}
+              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-orange-200 transition-all duration-200 text-left"
+            >
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                  <Users className="h-6 w-6 text-blue-600" />
                 </div>
-              </button>
-
-              <button
-                onClick={() => router.push('/colaboradores/novo')}
-                className="card hover:shadow-md transition-shadow duration-200"
-              >
-                <div className="card-body text-left">
-                  <h3 className="text-lg font-medium text-gray-900">
-                    Cadastrar Colaborador
+                <div className="ml-3">
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                    Colaboradores
                   </h3>
-                  <p className="text-gray-600">
-                    Adicionar novo colaborador ao sistema
-                  </p>
                 </div>
-              </button>
+              </div>
+              <p className="text-gray-600 text-sm">
+                Visualizar, adicionar e editar colaboradores da organização
+              </p>
+            </button>
 
-              <button
-                onClick={() => router.push('/envios')}
-                className="card hover:shadow-md transition-shadow duration-200"
-              >
-                <div className="card-body text-left">
-                  <h3 className="text-lg font-medium text-gray-900">
+            <button
+              onClick={() => router.push('/colaboradores/novo')}
+              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-green-200 transition-all duration-200 text-left"
+            >
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                  <Users className="h-6 w-6 text-green-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
+                    Novo Colaborador
+                  </h3>
+                </div>
+              </div>
+              <p className="text-gray-600 text-sm">
+                Adicionar novo colaborador ao sistema com dados completos
+              </p>
+            </button>
+
+            <button
+              onClick={() => router.push('/envios')}
+              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 text-left"
+            >
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                  <Package className="h-6 w-6 text-purple-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
                     Controle de Envios
                   </h3>
-                  <p className="text-gray-600">
-                    Acompanhar status dos envios de brindes
-                  </p>
                 </div>
-              </button>
+              </div>
+              <p className="text-gray-600 text-sm">
+                Acompanhar e gerenciar status dos envios de brindes
+              </p>
+            </button>
 
-              <button
-                onClick={() => router.push('/relatorios')}
-                className="card hover:shadow-md transition-shadow duration-200"
-              >
-                <div className="card-body text-left">
-                  <h3 className="text-lg font-medium text-gray-900">
+            <button
+              onClick={() => router.push('/calendario')}
+              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-orange-200 transition-all duration-200 text-left"
+            >
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                  <Calendar className="h-6 w-6 text-orange-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-orange-600 transition-colors">
+                    Calendário
+                  </h3>
+                </div>
+              </div>
+              <p className="text-gray-600 text-sm">
+                Visualize aniversários em formato de calendário mensal
+              </p>
+            </button>
+
+            <button
+              onClick={() => router.push('/relatorios')}
+              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-indigo-200 transition-all duration-200 text-left"
+            >
+              <div className="flex items-center mb-4">
+                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+                  <BarChart3 className="h-6 w-6 text-indigo-600" />
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
                     Relatórios
                   </h3>
-                  <p className="text-gray-600">
-                    Analise dados e estatísticas dos colaboradores
-                  </p>
                 </div>
-              </button>
-            </div>
+              </div>
+              <p className="text-gray-600 text-sm">
+                Analise dados, estatísticas e gere relatórios completos
+              </p>
+            </button>
           </div>
         </div>
       </main>
