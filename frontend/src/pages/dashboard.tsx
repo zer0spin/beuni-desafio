@@ -228,6 +228,20 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </button>
+
+              <button
+                onClick={() => router.push('/relatorios')}
+                className="card hover:shadow-md transition-shadow duration-200"
+              >
+                <div className="card-body text-left">
+                  <h3 className="text-lg font-medium text-gray-900">
+                    Relatórios
+                  </h3>
+                  <p className="text-gray-600">
+                    Analise dados e estatísticas dos colaboradores
+                  </p>
+                </div>
+              </button>
             </div>
           </div>
         </div>

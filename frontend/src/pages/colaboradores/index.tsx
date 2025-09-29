@@ -160,9 +160,12 @@ export default function ColaboradoresPage() {
                     </span>
                   </div>
                 </div>
-                <button className="text-sm text-orange-600 hover:text-orange-700 font-medium">
+                <Link
+                  href="/relatorios"
+                  className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                >
                   Ver relatórios →
-                </button>
+                </Link>
               </div>
             </div>
 
