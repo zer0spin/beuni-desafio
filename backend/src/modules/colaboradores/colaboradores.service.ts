@@ -5,6 +5,7 @@ import { ptBR } from 'date-fns/locale';
 import { PrismaService } from '../../shared/prisma.service';
 import { CepService } from '../cep/cep.service';
 import { CreateColaboradorDto } from './dto/create-colaborador.dto';
+import { UpdateColaboradorDto } from './dto/update-colaborador.dto';
 import { ColaboradorResponseDto } from './dto/colaborador-response.dto';
 import { ListColaboradoresDto } from './dto/list-colaboradores.dto';
 
