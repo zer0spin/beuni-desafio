@@ -98,12 +98,19 @@ export default function ColaboradoresPage() {
                 </div>
               </div>
             </div>
-            <div className="flex space-x-4">
+            <div className="flex space-x-3">
               <Link
                 href="/dashboard"
                 className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-colors"
               >
                 ← Dashboard
+              </Link>
+              <Link
+                href="/calendario"
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-100 to-red-100 text-orange-700 font-medium rounded-lg hover:from-orange-200 hover:to-red-200 hover:text-orange-800 transition-all duration-200 border border-orange-200 hover:border-orange-300"
+              >
+                <Calendar className="h-4 w-4 mr-2" />
+                📅 Calendário
               </Link>
               <Link
                 href="/colaboradores/novo"
@@ -144,7 +151,7 @@ export default function ColaboradoresPage() {
           <>
             {/* Stats Summary */}
             <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6 mb-8">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <Users className="h-5 w-5 text-orange-600" />
@@ -156,16 +163,48 @@ export default function ColaboradoresPage() {
                   <div className="flex items-center space-x-2">
                     <Calendar className="h-5 w-5 text-orange-600" />
                     <span className="text-sm text-gray-600">
-                      Próximos aniversários
+                      Visualizar aniversários
                     </span>
                   </div>
                 </div>
-                <Link
-                  href="/relatorios"
-                  className="text-sm text-orange-600 hover:text-orange-700 font-medium"
-                >
-                  Ver relatórios →
-                </Link>
+                <div className="flex items-center space-x-3">
+                  <Link
+                    href="/calendario"
+                    className="inline-flex items-center px-3 py-2 bg-gradient-to-r from-orange-500 to-red-600 text-white text-sm font-medium rounded-lg hover:from-orange-600 hover:to-red-700 transition-all duration-200"
+                  >
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Ver Calendário
+                  </Link>
+                  <Link
+                    href="/relatorios"
+                    className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                  >
+                    Relatórios →
+                  </Link>
+                </div>
+              </div>
+
+              {/* Calendar Quick Info */}
+              <div className="bg-gradient-to-r from-orange-50 to-red-50 rounded-lg p-4 border border-orange-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
+                      <Calendar className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900">📅 Calendário de Aniversários</h4>
+                      <p className="text-xs text-gray-600">Visualize todos os aniversários em formato mensal</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <Link
+                      href="/calendario"
+                      className="text-sm text-orange-600 hover:text-orange-700 font-medium hover:underline"
+                    >
+                      Abrir calendário completo →
+                    </Link>
+                  </div>
+                </div>
               </div>
             </div>
 

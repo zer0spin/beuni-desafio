@@ -227,6 +227,44 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Quick Calendar Access - Enhanced */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl p-6 text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full"></div>
+            <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-40 h-40 bg-white/5 rounded-full"></div>
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="flex-1">
+                <div className="flex items-center space-x-3 mb-3">
+                  <Calendar className="h-8 w-8 text-white" />
+                  <h3 className="text-2xl font-bold">📅 Calendário de Aniversários</h3>
+                </div>
+                <p className="text-orange-100 mb-2">
+                  Visualize todos os aniversários dos colaboradores em formato de calendário mensal
+                </p>
+                <div className="text-sm text-orange-200">
+                  • Exportar eventos para seu calendário pessoal • Filtrar por departamento • Acompanhar status de envios
+                </div>
+              </div>
+              <div className="ml-6 flex flex-col space-y-3">
+                <button
+                  onClick={() => router.push('/calendario')}
+                  className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-xl font-semibold transition-colors flex items-center space-x-2 backdrop-blur-sm"
+                >
+                  <Calendar className="h-5 w-5" />
+                  <span>Abrir Calendário</span>
+                </button>
+                <div className="text-center">
+                  <p className="text-sm text-orange-200">
+                    {stats.aniversariantesProximoMes > 0 && (
+                      <span>🎂 {stats.aniversariantesProximoMes} próximo{stats.aniversariantesProximoMes !== 1 ? 's' : ''}</span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Quick Actions */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
@@ -295,21 +333,31 @@ export default function DashboardPage() {
 
             <button
               onClick={() => router.push('/calendario')}
-              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-orange-200 transition-all duration-200 text-left"
+              className="group bg-gradient-to-br from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 rounded-2xl shadow-sm border border-orange-200 p-6 hover:shadow-lg hover:border-orange-300 transition-all duration-200 text-left relative overflow-hidden"
             >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center group-hover:bg-orange-200 transition-colors">
-                  <Calendar className="h-6 w-6 text-orange-600" />
+              <div className="absolute top-0 right-0 -mr-6 -mt-6 w-20 h-20 bg-orange-200/20 rounded-full"></div>
+              <div className="relative z-10">
+                <div className="flex items-center mb-4">
+                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center group-hover:from-orange-600 group-hover:to-red-700 transition-colors shadow-lg">
+                    <Calendar className="h-6 w-6 text-white" />
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-orange-700 transition-colors">
+                      📅 Calendário
+                    </h3>
+                  </div>
+                  {stats.aniversariantesProximoMes > 0 && (
+                    <div className="ml-auto">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                        {stats.aniversariantesProximoMes} próximo{stats.aniversariantesProximoMes !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <div className="ml-3">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-orange-600 transition-colors">
-                    Calendário
-                  </h3>
-                </div>
+                <p className="text-gray-600 text-sm">
+                  Visualize aniversários em formato de calendário, exporte eventos e filtre por departamento
+                </p>
               </div>
-              <p className="text-gray-600 text-sm">
-                Visualize aniversários em formato de calendário mensal
-              </p>
             </button>
 
             <button
