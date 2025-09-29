@@ -119,6 +119,49 @@ export class EnvioBrindesController {
     return this.envioBrindesService.marcarEnvioRealizado(id, body.observacoes);
   }
 
+  @Patch(':id/status')
+  @ApiOperation({
+    summary: 'Atualizar status do envio',
+    description: 'Atualiza o status de um envio de brinde para qualquer estado válido.'
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        status: {
+          type: 'string',
+          enum: ['PENDENTE', 'PRONTO_PARA_ENVIO', 'ENVIADO', 'ENTREGUE', 'CANCELADO'],
+          description: 'Novo status do envio',
+        },
+        observacoes: {
+          type: 'string',
+          description: 'Observações sobre a mudança (opcional)',
+        }
+      },
+      required: ['status']
+    }
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Status do envio atualizado',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Envio não encontrado',
+  })
+  async atualizarStatusEnvio(
+    @Param('id') id: string,
+    @Body() body: { status: string; observacoes?: string },
+    @Request() req,
+  ) {
+    return this.envioBrindesService.atualizarStatusEnvio(
+      id,
+      body.status,
+      req.user.organizationId,
+      body.observacoes
+    );
+  }
+
   @Get('estatisticas')
   @ApiOperation({
     summary: 'Obter estatísticas de envios da organização',

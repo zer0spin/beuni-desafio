@@ -252,16 +252,20 @@ export class ColaboradoresService {
       };
     }
 
+    // Preparar dados para update
+    const updateData: any = { ...colaboradorData };
+
     // Converter string de data para Date object se fornecida
-    if (colaboradorData.dataNascimento) {
-      colaboradorData.dataNascimento = new Date(colaboradorData.dataNascimento);
+    if (colaboradorData.data_nascimento) {
+      updateData.dataNascimento = new Date(colaboradorData.data_nascimento);
+      delete updateData.data_nascimento;
     }
 
     // Atualizar colaborador e endereço se necessário
     const colaboradorAtualizado = await this.prisma.colaborador.update({
       where: { id },
       data: {
-        ...colaboradorData,
+        ...updateData,
         ...(enderecoData && {
           endereco: {
             update: enderecoData,
@@ -296,11 +300,8 @@ export class ColaboradoresService {
     }
 
     // Soft delete - manter para histórico
-    await this.prisma.colaborador.update({
+    await this.prisma.colaborador.delete({
       where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
     });
 
     return { message: 'Colaborador removido com sucesso' };
@@ -392,7 +393,7 @@ export class ColaboradoresService {
 
       // Contar envios realizados para este mês
       const enviadosResult = await this.prisma.$queryRaw<[{ count: bigint }]>`
-        SELECT COUNT(*) as count FROM envio_brindes eb
+        SELECT COUNT(*) as count FROM envios_brinde eb
         JOIN colaboradores c ON eb.colaborador_id = c.id
         WHERE c.organization_id = ${organizationId}
         AND eb.ano_aniversario = ${anoConsulta}
@@ -404,7 +405,7 @@ export class ColaboradoresService {
 
       // Contar envios pendentes para este mês
       const pendentesResult = await this.prisma.$queryRaw<[{ count: bigint }]>`
-        SELECT COUNT(*) as count FROM envio_brindes eb
+        SELECT COUNT(*) as count FROM envios_brinde eb
         JOIN colaboradores c ON eb.colaborador_id = c.id
         WHERE c.organization_id = ${organizationId}
         AND eb.ano_aniversario = ${anoConsulta}

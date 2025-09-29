@@ -62,32 +62,69 @@ export default function RelatoriosPage() {
     try {
       setLoading(true);
 
-      // Carregar todas as estatísticas em paralelo
-      const [colaboradoresRes, estatisticasRes, proximosRes, departamentosRes, enviosPorMesRes] = await Promise.all([
-        api.get('/colaboradores?limit=1'),
-        api.get(`/envio-brindes/estatisticas?ano=${anoSelecionado}`),
-        api.get('/colaboradores/aniversariantes-proximos'),
-        api.get(`/colaboradores/estatisticas/departamentos?ano=${anoSelecionado}`),
-        api.get(`/colaboradores/estatisticas/aniversarios-mes?ano=${anoSelecionado}`),
-      ]);
-
+      // Inicializar dados padrão
       const statsData: EstatisticasRelatorio = {
-        totalColaboradores: colaboradoresRes.data.total || 0,
-        aniversariantesEsteAno: colaboradoresRes.data.total || 0,
+        totalColaboradores: 0,
+        aniversariantesEsteAno: 0,
         enviosPorStatus: {
-          PENDENTE: estatisticasRes.data?.porStatus?.PENDENTE || 0,
-          PRONTO_PARA_ENVIO: estatisticasRes.data?.porStatus?.PRONTO_PARA_ENVIO || 0,
-          ENVIADO: estatisticasRes.data?.porStatus?.ENVIADO || 0,
-          ENTREGUE: estatisticasRes.data?.porStatus?.ENTREGUE || 0,
-          CANCELADO: estatisticasRes.data?.porStatus?.CANCELADO || 0,
+          PENDENTE: 0,
+          PRONTO_PARA_ENVIO: 0,
+          ENVIADO: 0,
+          ENTREGUE: 0,
+          CANCELADO: 0,
         },
-        enviosPorMes: enviosPorMesRes.data || [],
-        departamentos: departamentosRes.data || [],
-        proximosAniversarios: proximosRes.data || [],
+        enviosPorMes: [],
+        departamentos: [],
+        proximosAniversarios: [],
       };
 
+      // Carregar dados de forma sequencial com tratamento de erro individual
+      try {
+        const colaboradoresRes = await api.get('/colaboradores?limit=1');
+        statsData.totalColaboradores = colaboradoresRes.data.total || 0;
+        statsData.aniversariantesEsteAno = colaboradoresRes.data.total || 0;
+      } catch (error) {
+        console.error('Erro ao carregar colaboradores:', error);
+      }
+
+      try {
+        const estatisticasRes = await api.get(`/envio-brindes/estatisticas?ano=${anoSelecionado}`);
+        if (estatisticasRes.data?.porStatus) {
+          statsData.enviosPorStatus = {
+            PENDENTE: estatisticasRes.data.porStatus.PENDENTE || 0,
+            PRONTO_PARA_ENVIO: estatisticasRes.data.porStatus.PRONTO_PARA_ENVIO || 0,
+            ENVIADO: estatisticasRes.data.porStatus.ENVIADO || 0,
+            ENTREGUE: estatisticasRes.data.porStatus.ENTREGUE || 0,
+            CANCELADO: estatisticasRes.data.porStatus.CANCELADO || 0,
+          };
+        }
+      } catch (error) {
+        console.error('Erro ao carregar estatísticas de envios:', error);
+      }
+
+      try {
+        const proximosRes = await api.get('/colaboradores/aniversariantes-proximos');
+        statsData.proximosAniversarios = proximosRes.data || [];
+      } catch (error) {
+        console.error('Erro ao carregar próximos aniversários:', error);
+      }
+
+      try {
+        const departamentosRes = await api.get(`/colaboradores/estatisticas/departamentos?ano=${anoSelecionado}`);
+        statsData.departamentos = departamentosRes.data || [];
+      } catch (error) {
+        console.error('Erro ao carregar estatísticas de departamentos:', error);
+      }
+
+      try {
+        const enviosPorMesRes = await api.get(`/colaboradores/estatisticas/aniversarios-mes?ano=${anoSelecionado}`);
+        statsData.enviosPorMes = enviosPorMesRes.data || [];
+      } catch (error) {
+        console.error('Erro ao carregar estatísticas por mês:', error);
+      }
+
       // Extrair departamentos únicos para filtro
-      const deptsUnicos = [...new Set(departamentosRes.data?.map((d: any) => d.nome) || [])];
+      const deptsUnicos = [...new Set(statsData.departamentos?.map((d: any) => d.nome) || [])];
       setDepartamentos(deptsUnicos);
 
       setStats(statsData);

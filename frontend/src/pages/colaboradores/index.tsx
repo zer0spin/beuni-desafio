@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Users, Plus, Calendar, Edit, Eye } from 'lucide-react';
+import { Users, Plus, Calendar, Edit, Eye, Settings } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import api, { getUser } from '../../lib/api';
@@ -34,6 +34,7 @@ export default function ColaboradoresPage() {
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, page: 1, totalPages: 0 });
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   useEffect(() => {
     const user = getUser();
@@ -78,6 +79,105 @@ export default function ColaboradoresPage() {
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
         {config.label}
       </span>
+    );
+  };
+
+  const updateColaboradorStatus = async (colaboradorId: string, newStatus: string) => {
+    try {
+      setUpdatingStatus(colaboradorId);
+
+      // Primeiro buscar o ID do envio de brinde do colaborador
+      const enviosResponse = await api.get(`/envio-brindes?colaboradorId=${colaboradorId}&ano=${new Date().getFullYear()}`);
+      const envio = enviosResponse.data.envios?.[0];
+
+      if (!envio) {
+        toast.error('Envio de brinde não encontrado para este colaborador');
+        return;
+      }
+
+      // Atualizar status do envio
+      await api.patch(`/envio-brindes/${envio.id}/status`, {
+        status: newStatus,
+        observacoes: `Status atualizado para ${getStatusLabel(newStatus)} via interface web`
+      });
+
+      toast.success('Status atualizado com sucesso!');
+
+      // Recarregar lista de colaboradores
+      loadColaboradores();
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+      toast.error('Erro ao atualizar status do colaborador');
+    } finally {
+      setUpdatingStatus(null);
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    const labels = {
+      'PENDENTE': 'Pendente',
+      'PRONTO_PARA_ENVIO': 'Pronto para Envio',
+      'ENVIADO': 'Enviado',
+      'ENTREGUE': 'Entregue',
+      'CANCELADO': 'Cancelado'
+    };
+    return labels[status as keyof typeof labels] || status;
+  };
+
+  const StatusDropdown = ({ colaborador }: { colaborador: Colaborador }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const currentStatus = colaborador.status_envio_atual || 'PENDENTE';
+
+    const statusOptions = [
+      { value: 'PENDENTE', label: 'Pendente', color: 'yellow' },
+      { value: 'PRONTO_PARA_ENVIO', label: 'Pronto para Envio', color: 'blue' },
+      { value: 'ENVIADO', label: 'Enviado', color: 'green' },
+      { value: 'ENTREGUE', label: 'Entregue', color: 'emerald' },
+      { value: 'CANCELADO', label: 'Cancelado', color: 'red' }
+    ];
+
+    const currentOption = statusOptions.find(opt => opt.value === currentStatus);
+
+    return (
+      <div className="relative">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          disabled={updatingStatus === colaborador.id}
+          className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-sm disabled:opacity-50"
+        >
+          {getStatusBadge(currentStatus)}
+          <Settings className="h-3 w-3 text-gray-400" />
+        </button>
+
+        {isOpen && (
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+            <div className="py-1">
+              {statusOptions.map(option => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    if (option.value !== currentStatus) {
+                      updateColaboradorStatus(colaborador.id, option.value);
+                    }
+                    setIsOpen(false);
+                  }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors ${
+                    option.value === currentStatus ? 'bg-orange-50 text-orange-700' : 'text-gray-700'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2">
+                    <span className={`w-2 h-2 rounded-full bg-${option.color}-500`}></span>
+                    <span>{option.label}</span>
+                    {option.value === currentStatus && (
+                      <span className="ml-auto text-orange-600">✓</span>
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     );
   };
 
@@ -258,7 +358,7 @@ export default function ColaboradoresPage() {
                           {colaborador.data_nascimento}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          {getStatusBadge(colaborador.status_envio_atual || 'PENDENTE')}
+                          <StatusDropdown colaborador={colaborador} />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div className="flex space-x-2">

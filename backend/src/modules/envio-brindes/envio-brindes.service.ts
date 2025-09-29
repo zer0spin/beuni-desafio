@@ -189,6 +189,61 @@ export class EnvioBrindesService {
   }
 
   /**
+   * Atualizar status de um envio de brinde
+   */
+  async atualizarStatusEnvio(
+    envioBrindeId: string,
+    novoStatus: string,
+    organizationId: string,
+    observacoes?: string
+  ) {
+    // Verificar se o envio existe e pertence à organização
+    const envio = await this.prisma.envioBrinde.findFirst({
+      where: {
+        id: envioBrindeId,
+        colaborador: {
+          organizationId
+        }
+      },
+      include: {
+        colaborador: true
+      }
+    });
+
+    if (!envio) {
+      throw new Error('Envio não encontrado');
+    }
+
+    // Preparar dados para atualização
+    const updateData: any = {
+      status: novoStatus,
+      observacoes,
+    };
+
+    // Se o status for ENVIADO, adicionar data de envio
+    if (novoStatus === 'ENVIADO') {
+      updateData.dataEnvioRealizado = new Date();
+    }
+
+    // Se o status for PRONTO_PARA_ENVIO, adicionar data do gatilho
+    if (novoStatus === 'PRONTO_PARA_ENVIO') {
+      updateData.dataGatilhoEnvio = new Date();
+    }
+
+    return this.prisma.envioBrinde.update({
+      where: { id: envioBrindeId },
+      data: updateData,
+      include: {
+        colaborador: {
+          include: {
+            endereco: true
+          }
+        }
+      }
+    });
+  }
+
+  /**
    * Buscar estatísticas de envios por organização
    */
   async buscarEstatisticasEnvios(organizationId: string, ano?: number) {

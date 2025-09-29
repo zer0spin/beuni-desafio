@@ -54,7 +54,7 @@ export default function CalendarioPage() {
       setLoading(true);
 
       // Buscar todos os colaboradores primeiro
-      const response = await api.get('/colaboradores?limit=1000'); // Aumentar limite
+      const response = await api.get('/colaboradores?limit=100'); // Usar limite razoável
 
       // Verificar se a resposta possui dados válidos
       if (!response.data || !response.data.colaboradores) {
