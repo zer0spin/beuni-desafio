@@ -5,6 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../../shared/prisma.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 export interface JwtPayload {
   sub: string; // user id
@@ -154,6 +155,28 @@ export class AuthService {
       email: user.email,
       organizationId: user.organizationId,
       organizacao: user.organizacao,
+    };
+  }
+
+  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const updatedUser = await this.prisma.usuario.update({
+      where: { id: userId },
+      data: {
+        nome: updateProfileDto.name,
+      },
+      include: {
+        organizacao: {
+          select: { id: true, nome: true },
+        },
+      },
+    });
+
+    return {
+      id: updatedUser.id,
+      nome: updatedUser.nome,
+      email: updatedUser.email,
+      organizationId: updatedUser.organizationId,
+      organizacao: updatedUser.organizacao,
     };
   }
 }

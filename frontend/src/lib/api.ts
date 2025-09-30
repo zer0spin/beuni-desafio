@@ -116,6 +116,8 @@ export const endpoints = {
   login: '/auth/login',
   register: '/auth/register',
   profile: '/auth/profile',
+  updateProfile: '/auth/profile',
+  updateOrganizacao: (id: string) => `/organizacoes/${id}`,
 
   // Colaboradores
   colaboradores: '/colaboradores',

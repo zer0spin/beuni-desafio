@@ -267,7 +267,10 @@ export default function Layout({ children }: LayoutProps) {
                   <Bell className="h-5 w-5" />
                   <span className="absolute top-1 right-1 h-2 w-2 bg-beuni-orange-500 rounded-full"></span>
                 </button>
-                <button className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors">
+                <button 
+                  onClick={() => router.push('/configuracoes')}
+                  className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors"
+                >
                   <Settings className="h-5 w-5" />
                 </button>
               </div>
