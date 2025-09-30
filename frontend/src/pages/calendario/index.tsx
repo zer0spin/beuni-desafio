@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { Calendar, Users, ChevronLeft, ChevronRight, Gift, Download, Filter, ArrowLeft } from 'lucide-react';
+import { Calendar, Users, ChevronLeft, ChevronRight, Gift, Download, Filter } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
+import Layout from '@/components/Layout';
 import api, { getUser } from '../../lib/api';
 
 interface Colaborador {
@@ -133,7 +133,8 @@ export default function CalendarioPage() {
 
           try {
             // Tentar diferentes formatos de data
-            let diaAniv: number, mesAniv: number;
+            let diaAniv = 0;
+            let mesAniv = 0;
 
             // Formato dd/MM/yyyy
             if (c.data_nascimento.includes('/')) {
@@ -291,74 +292,62 @@ export default function CalendarioPage() {
 
   const diasSemana = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
+  // Render
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-yellow-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-orange-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+    <Layout>
+      <div className="p-6 lg:p-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900">Calendário de Aniversários</h1>
-                  <p className="text-sm text-gray-600">Visualize os aniversários dos colaboradores por mês</p>
-                </div>
-              </div>
+              <h1 className="text-3xl font-bold text-beuni-text flex items-center">
+                <Calendar className="h-8 w-8 mr-3 text-beuni-orange-600" />
+                Calendário de Aniversários
+              </h1>
+              <p className="text-beuni-text/60 mt-1">
+                Visualize e gerencie os aniversários dos colaboradores
+              </p>
             </div>
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={exportCalendar}
-                className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Exportar ICS
-              </button>
-              <Link
-                href="/dashboard"
-                className="inline-flex items-center px-4 py-2 text-gray-700 hover:text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Dashboard
-              </Link>
-            </div>
+            <button
+              onClick={exportCalendar}
+              className="flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg"
+            >
+              <Download className="h-4 w-4 mr-2" />
+              Exportar ICS
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Filtros e Navegação */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-4 mb-6">
+        {/* Filtros e Navegação */}
+        <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6 mb-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             {/* Navegação do mês */}
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => navigateMonth('prev')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-beuni-orange-50 rounded-xl transition-all hover:scale-110"
               >
-                <ChevronLeft className="h-5 w-5 text-gray-600" />
+                <ChevronLeft className="h-5 w-5 text-beuni-orange-600" />
               </button>
-              <h2 className="text-xl font-semibold text-gray-900 min-w-[200px] text-center">
+              <h2 className="text-2xl font-bold text-beuni-text min-w-[200px] text-center">
                 {nomesMeses[dataAtual.getMonth()]} {dataAtual.getFullYear()}
               </h2>
               <button
                 onClick={() => navigateMonth('next')}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-beuni-orange-50 rounded-xl transition-all hover:scale-110"
               >
-                <ChevronRight className="h-5 w-5 text-gray-600" />
+                <ChevronRight className="h-5 w-5 text-beuni-orange-600" />
               </button>
             </div>
 
             {/* Filtros */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <Filter className="h-4 w-4 text-gray-600" />
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2 bg-beuni-cream px-3 py-2 rounded-xl">
+                <Filter className="h-4 w-4 text-beuni-orange-600" />
                 <select
                   value={filtroStatus}
                   onChange={(e) => setFiltroStatus(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="bg-transparent border-none focus:ring-0 text-beuni-text font-medium cursor-pointer"
                 >
                   <option value="TODOS">Todos os Status</option>
                   <option value="PENDENTE">Pendentes</option>
@@ -371,7 +360,7 @@ export default function CalendarioPage() {
               <select
                 value={filtroDepartamento}
                 onChange={(e) => setFiltroDepartamento(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="px-4 py-2 border border-beuni-orange-200 bg-white rounded-xl focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 font-medium text-beuni-text"
               >
                 <option value="TODOS">Todos os Departamentos</option>
                 {departamentos.map(dept => (
@@ -385,42 +374,38 @@ export default function CalendarioPage() {
         {/* Calendário */}
         {loading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beuni-orange-600"></div>
           </div>
         ) : diasCalendario.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-8 text-center">
-            <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Calendário não disponível</h3>
-            <p className="text-gray-500 mb-4">
-              Não foi possível carregar os dados do calendário. Isso pode acontecer se:
+          <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-8 text-center">
+            <Calendar className="h-16 w-16 text-beuni-orange-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-beuni-text mb-2">Calendário não disponível</h3>
+            <p className="text-beuni-text/60 mb-4">
+              Não foi possível carregar os dados do calendário.
             </p>
-            <ul className="text-sm text-gray-600 mb-6 space-y-1 text-left max-w-md mx-auto">
-              <li>• Não há colaboradores cadastrados</li>
-              <li>• Há problemas de conexão com o servidor</li>
-              <li>• Os filtros aplicados não retornaram resultados</li>
-            </ul>
+            <div className="bg-beuni-cream rounded-xl p-4 mb-6 max-w-md mx-auto">
+              <p className="text-sm text-beuni-text/70 font-medium mb-2">Possíveis causas:</p>
+              <ul className="text-sm text-beuni-text/60 space-y-1 text-left">
+                <li>• Não há colaboradores cadastrados</li>
+                <li>• Problemas de conexão com o servidor</li>
+                <li>• Os filtros aplicados não retornaram resultados</li>
+              </ul>
+            </div>
             <div className="flex justify-center space-x-4">
-              <Link
-                href="/colaboradores"
-                className="inline-flex items-center px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors"
-              >
-                <Users className="h-4 w-4 mr-2" />
-                Ver Colaboradores
-              </Link>
               <button
                 onClick={loadColaboradores}
-                className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white font-semibold rounded-xl hover:from-beuni-orange-600 hover:to-beuni-orange-700 transition-all shadow-md"
               >
                 Recarregar
               </button>
             </div>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm border border-orange-100 overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 overflow-hidden">
             {/* Cabeçalho dos dias da semana */}
-            <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-200">
+            <div className="grid grid-cols-7 bg-gradient-to-r from-beuni-orange-50 to-beuni-cream border-b border-beuni-orange-200">
               {diasSemana.map(dia => (
-                <div key={dia} className="p-3 text-center text-sm font-medium text-gray-700">
+                <div key={dia} className="p-4 text-center text-sm font-bold text-beuni-text uppercase tracking-wide">
                   {dia}
                 </div>
               ))}
@@ -431,39 +416,39 @@ export default function CalendarioPage() {
               {diasCalendario.map((diaInfo, index) => (
                 <div
                   key={index}
-                  className={`min-h-[120px] p-2 border-r border-b border-gray-100 ${
-                    !diaInfo.isCurrentMonth ? 'bg-gray-50 text-gray-400' : ''
-                  } ${diaInfo.isToday ? 'bg-orange-50 ring-2 ring-orange-200' : ''}`}
+                  className={`min-h-[130px] p-3 border-r border-b border-beuni-orange-100 transition-all hover:bg-beuni-cream/30 ${
+                    !diaInfo.isCurrentMonth ? 'bg-gray-50/50 text-gray-400' : 'bg-white'
+                  } ${diaInfo.isToday ? 'bg-gradient-to-br from-beuni-orange-50 to-yellow-50 ring-2 ring-beuni-orange-300 shadow-sm' : ''}`}
                 >
-                  <div className={`text-sm font-medium mb-2 ${
-                    diaInfo.isToday ? 'text-orange-600 font-bold' : 'text-gray-900'
+                  <div className={`text-sm font-bold mb-2 ${
+                    diaInfo.isToday ? 'text-beuni-orange-600 text-lg' : 'text-beuni-text/70'
                   }`}>
                     {diaInfo.dia}
                   </div>
 
                   {diaInfo.aniversariantes.length > 0 && (
-                    <div className="space-y-1">
+                    <div className="space-y-2">
                       {diaInfo.aniversariantes.slice(0, 2).map(colaborador => (
                         <div
                           key={colaborador.id}
-                          className="bg-orange-100 border-l-2 border-orange-500 p-1 rounded text-xs"
+                          className="bg-gradient-to-r from-beuni-orange-100 to-yellow-100 border-l-3 border-beuni-orange-500 p-2 rounded-lg text-xs shadow-sm hover:shadow-md transition-all"
                         >
-                          <div className="flex items-center space-x-1">
-                            <Gift className="h-3 w-3 text-orange-600 flex-shrink-0" />
-                            <span className="font-medium text-orange-900 truncate">
+                          <div className="flex items-center space-x-1 mb-1">
+                            <Gift className="h-3 w-3 text-beuni-orange-600 flex-shrink-0" />
+                            <span className="font-bold text-beuni-text truncate">
                               {colaborador.nome_completo}
                             </span>
                           </div>
-                          <div className="text-orange-700 truncate text-xs">
+                          <div className="text-beuni-text/70 truncate text-xs font-medium">
                             {colaborador.cargo}
                           </div>
-                          <div className="mt-1">
+                          <div className="mt-1.5">
                             {getStatusBadge(colaborador.status_envio_atual)}
                           </div>
                         </div>
                       ))}
                       {diaInfo.aniversariantes.length > 2 && (
-                        <div className="text-xs text-gray-500 text-center">
+                        <div className="text-xs text-beuni-text/60 text-center font-semibold bg-beuni-cream rounded-lg py-1">
                           +{diaInfo.aniversariantes.length - 2} mais
                         </div>
                       )}
@@ -477,21 +462,24 @@ export default function CalendarioPage() {
 
         {/* Lista de aniversariantes do mês */}
         {colaboradores.length > 0 && (
-          <div className="mt-8 bg-white rounded-xl shadow-sm border border-orange-100 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Users className="h-5 w-5 mr-2 text-orange-600" />
-              Aniversariantes de {nomesMeses[dataAtual.getMonth()]} ({colaboradores.filter(c => {
-                try {
-                  const partes = c.data_nascimento.split('/');
-                  if (partes.length === 3) {
-                    const mesAniv = parseInt(partes[1]);
-                    return mesAniv === (dataAtual.getMonth() + 1);
+          <div className="mt-8 bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
+            <h3 className="text-xl font-bold text-beuni-text mb-6 flex items-center">
+              <Users className="h-6 w-6 mr-2 text-beuni-orange-600" />
+              Aniversariantes de {nomesMeses[dataAtual.getMonth()]}
+              <span className="ml-2 px-3 py-1 bg-beuni-orange-100 text-beuni-orange-700 rounded-full text-sm font-bold">
+                {colaboradores.filter(c => {
+                  try {
+                    const partes = c.data_nascimento.split('/');
+                    if (partes.length === 3) {
+                      const mesAniv = parseInt(partes[1]);
+                      return mesAniv === (dataAtual.getMonth() + 1);
+                    }
+                    return false;
+                  } catch {
+                    return false;
                   }
-                  return false;
-                } catch {
-                  return false;
-                }
-              }).length})
+                }).length}
+              </span>
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {colaboradores.filter(c => {
@@ -506,17 +494,20 @@ export default function CalendarioPage() {
                   return false;
                 }
               }).map(colaborador => (
-                <div key={colaborador.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h4 className="font-medium text-gray-900">{colaborador.nome_completo}</h4>
+                <div key={colaborador.id} className="bg-gradient-to-br from-white to-beuni-cream border border-beuni-orange-200 rounded-xl p-5 hover:shadow-lg transition-all hover:scale-105">
+                  <div className="flex items-start justify-between mb-3">
+                    <h4 className="font-bold text-beuni-text">{colaborador.nome_completo}</h4>
                     {getStatusBadge(colaborador.status_envio_atual)}
                   </div>
-                  <p className="text-sm text-gray-600">{colaborador.cargo} - {colaborador.departamento}</p>
-                  <p className="text-sm text-orange-600 font-medium mt-1">
-                    🎂 {colaborador.data_nascimento}
+                  <p className="text-sm text-beuni-text/70 font-medium mb-2">
+                    {colaborador.cargo} • {colaborador.departamento}
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {colaborador.endereco.cidade}, {colaborador.endereco.uf}
+                  <p className="text-sm text-beuni-orange-600 font-bold mt-2 flex items-center">
+                    <Gift className="h-4 w-4 mr-1" />
+                    {colaborador.data_nascimento}
+                  </p>
+                  <p className="text-xs text-beuni-text/60 mt-2 font-medium">
+                    📍 {colaborador.endereco.cidade}, {colaborador.endereco.uf}
                   </p>
                 </div>
               ))}
@@ -524,6 +515,6 @@ export default function CalendarioPage() {
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   );
 }

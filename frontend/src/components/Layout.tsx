@@ -245,11 +245,17 @@ export default function Layout({ children }: LayoutProps) {
                 <Menu className="h-6 w-6" />
               </button>
 
-              {/* Organization Name */}
+              {/* Organization Name - Destaque Maior */}
               <div className="hidden lg:block">
-                <p className="text-sm text-beuni-text/70">
-                  <span className="font-semibold text-beuni-text">{user.organizacao.nome}</span>
-                </p>
+                <div className="flex items-center space-x-3 bg-gradient-to-r from-beuni-cream to-beuni-orange-50 px-5 py-2.5 rounded-xl border border-beuni-orange-200 shadow-sm">
+                  <div className="w-8 h-8 bg-gradient-to-br from-beuni-orange-500 to-beuni-orange-600 rounded-lg flex items-center justify-center shadow-md">
+                    <Gift className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-xs text-beuni-text/60 font-semibold uppercase tracking-wide">Organização</p>
+                    <p className="text-base font-bold text-beuni-text">{user.organizacao.nome}</p>
+                  </div>
+                </div>
               </div>
 
               {/* Right Actions */}

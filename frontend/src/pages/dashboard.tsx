@@ -34,6 +34,15 @@ export default function DashboardPage() {
     loadDashboardData();
   }, []);
 
+  const parseBrDate = (dateStr?: string) => {
+    if (!dateStr) return null;
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return null;
+    const [dd, mm, yyyy] = parts.map(Number);
+    if (!dd || !mm || !yyyy) return null;
+    return new Date(yyyy, mm - 1, dd);
+  };
+
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
@@ -231,12 +240,15 @@ export default function DashboardPage() {
                       onClick={() => router.push(`/colaboradores/editar/${person.id}`)}
                     >
                       <div className="w-12 h-12 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold">
-                        {person.nome ? person.nome.charAt(0) : '?'}
+                        {person.nome_completo ? person.nome_completo.charAt(0) : '?'}
                       </div>
                       <div className="ml-4 flex-1">
-                        <p className="font-semibold text-beuni-text">{person.nome || 'Nome não disponível'}</p>
+                        <p className="font-semibold text-beuni-text">{person.nome_completo || 'Nome não disponível'}</p>
                         <p className="text-sm text-beuni-text/60">
-                          {person.data_nascimento ? new Date(person.data_nascimento).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' }) : 'Data não disponível'}
+                          {person.data_nascimento ? (() => {
+                            const d = parseBrDate(person.data_nascimento);
+                            return d ? d.toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' }) : '-';
+                          })() : 'Data não disponível'}
                         </p>
                       </div>
                       <div className="text-2xl">🎂</div>

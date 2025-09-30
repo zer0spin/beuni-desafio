@@ -6,7 +6,7 @@ FROM node:18-alpine AS base
 RUN apk add --no-cache openssl
 
 WORKDIR /app
-COPY package*.json ./
+COPY package.json package-lock.json ./
 RUN npm ci
 
 # ----- 2. ESTÁGIO DE BUILD (usado para produção) -----

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { ArrowLeft, Save, User, MapPin, Building, Trash2 } from 'lucide-react';
+import { Save, User, MapPin, Building, Trash2, Briefcase, Users as UsersIcon } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import Layout from './Layout';
 import api from '../lib/api';
 
 const CARGOS = [
@@ -298,64 +298,61 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
 
   if (loading && mode === 'edit') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-yellow-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
-      </div>
+      <Layout>
+        <div className="flex items-center justify-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beuni-orange-600"></div>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-yellow-50">
-      <div className="bg-white shadow-sm border-b border-orange-100">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-lg flex items-center justify-center">
-                <User className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">{pageTitle}</h1>
-                <p className="text-sm text-gray-600">{pageDescription}</p>
-              </div>
+    <Layout>
+      <div className="p-6 lg:p-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-beuni-text flex items-center">
+                <User className="h-8 w-8 mr-3 text-beuni-orange-600" />
+                {pageTitle}
+              </h1>
+              <p className="text-beuni-text/60 mt-1">{pageDescription}</p>
             </div>
-            <div className="flex items-center space-x-3">
-              {mode === 'edit' && (
-                <button
-                  onClick={handleDelete}
-                  disabled={deleteLoading}
-                  className="inline-flex items-center px-4 py-2 text-red-700 hover:text-red-900 font-medium rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {deleteLoading ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600 mr-2"></div>
-                  ) : (
-                    <Trash2 className="h-5 w-5 mr-2" />
-                  )}
-                  {deleteLoading ? 'Excluindo...' : 'Excluir'}
-                </button>
-              )}
-              <Link
-                href="/colaboradores"
-                className="inline-flex items-center px-4 py-2 text-gray-700 hover:text-gray-900 font-medium rounded-lg hover:bg-gray-100 transition-colors"
+            {mode === 'edit' && (
+              <button
+                onClick={handleDelete}
+                disabled={deleteLoading}
+                className="inline-flex items-center px-4 py-2.5 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold rounded-xl hover:from-red-600 hover:to-red-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ArrowLeft className="h-5 w-5 mr-2" />
-                Voltar
-              </Link>
-            </div>
+                {deleteLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Excluindo...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="h-5 w-5 mr-2" />
+                    Excluir Colaborador
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
-      </div>
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
-            <div className="flex items-center space-x-2 mb-6">
-              <User className="h-5 w-5 text-orange-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Dados Pessoais</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Dados Pessoais */}
+          <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
+            <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-beuni-orange-100">
+              <div className="w-10 h-10 bg-gradient-to-br from-beuni-orange-500 to-beuni-orange-600 rounded-xl flex items-center justify-center shadow-md">
+                <User className="h-6 w-6 text-white" />
+              </div>
+              <h2 className="text-xl font-bold text-beuni-text">Dados Pessoais</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="nome_completo" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="nome_completo" className="block text-sm font-bold text-beuni-text mb-2 uppercase tracking-wide">
                   Nome Completo *
                 </label>
                 <input
@@ -365,13 +362,13 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
                   required
                   value={formData.nome_completo}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-3 border-2 border-beuni-orange-200 rounded-xl focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 font-medium transition-all"
                   placeholder="Digite o nome completo"
                 />
               </div>
 
               <div>
-                <label htmlFor="data_nascimento" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="data_nascimento" className="block text-sm font-bold text-beuni-text mb-2 uppercase tracking-wide">
                   Data de Nascimento *
                 </label>
                 <input
@@ -381,21 +378,25 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
                   required
                   value={formData.data_nascimento}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                  className="w-full px-4 py-3 border-2 border-beuni-orange-200 rounded-xl focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 font-medium transition-all"
                 />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
-            <div className="flex items-center space-x-2 mb-6">
-              <Building className="h-5 w-5 text-orange-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Dados Profissionais</h2>
+          {/* Dados Profissionais */}
+          <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
+            <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-beuni-orange-100">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-md">
+                <Briefcase className="h-6 w-6 text-white" />
+              </div>
+              <h2 className="text-xl font-bold text-beuni-text">Dados Profissionais</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label htmlFor="cargo" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="cargo" className="block text-sm font-bold text-beuni-text mb-2 uppercase tracking-wide flex items-center">
+                  <Briefcase className="h-4 w-4 mr-1 text-beuni-orange-600" />
                   Cargo *
                 </label>
                 <select
@@ -404,17 +405,19 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
                   required
                   value={formData.cargo}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
+                  className="w-full px-4 py-3 border-2 border-beuni-orange-200 rounded-xl focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 font-semibold bg-white transition-all cursor-pointer hover:border-beuni-orange-400"
                 >
-                  <option value="">Selecione um cargo</option>
+                  <option value="" className="text-beuni-text/60">Selecione um cargo...</option>
                   {CARGOS.map(cargo => (
-                    <option key={cargo} value={cargo}>{cargo}</option>
+                    <option key={cargo} value={cargo} className="font-medium">{cargo}</option>
                   ))}
                 </select>
+                <p className="text-xs text-beuni-text/50 mt-1 font-medium">{CARGOS.length} cargos disponíveis</p>
               </div>
 
               <div>
-                <label htmlFor="departamento" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="departamento" className="block text-sm font-bold text-beuni-text mb-2 uppercase tracking-wide flex items-center">
+                  <UsersIcon className="h-4 w-4 mr-1 text-beuni-orange-600" />
                   Departamento *
                 </label>
                 <select
@@ -423,21 +426,25 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
                   required
                   value={formData.departamento}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 bg-white"
+                  className="w-full px-4 py-3 border-2 border-beuni-orange-200 rounded-xl focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 font-semibold bg-white transition-all cursor-pointer hover:border-beuni-orange-400"
                 >
-                  <option value="">Selecione um departamento</option>
+                  <option value="" className="text-beuni-text/60">Selecione um departamento...</option>
                   {DEPARTAMENTOS.map(departamento => (
-                    <option key={departamento} value={departamento}>{departamento}</option>
+                    <option key={departamento} value={departamento} className="font-medium">{departamento}</option>
                   ))}
                 </select>
+                <p className="text-xs text-beuni-text/50 mt-1 font-medium">{DEPARTAMENTOS.length} departamentos disponíveis</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-6">
-            <div className="flex items-center space-x-2 mb-6">
-              <MapPin className="h-5 w-5 text-orange-600" />
-              <h2 className="text-lg font-semibold text-gray-900">Endereço</h2>
+          {/* Endereço */}
+          <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
+            <div className="flex items-center space-x-3 mb-6 pb-4 border-b border-beuni-orange-100">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center shadow-md">
+                <MapPin className="h-6 w-6 text-white" />
+              </div>
+              <h2 className="text-xl font-bold text-beuni-text">Endereço de Entrega</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -570,33 +577,35 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
             )}
           </div>
 
-          <div className="flex justify-end space-x-4">
-            <Link
-              href="/colaboradores"
-              className="px-6 py-3 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors"
+          {/* Botões de Ação */}
+          <div className="flex justify-end space-x-4 pt-6">
+            <button
+              type="button"
+              onClick={() => router.push('/colaboradores')}
+              className="px-6 py-3 text-beuni-text/70 border-2 border-beuni-orange-200 rounded-xl hover:bg-beuni-cream font-bold transition-all"
             >
               Cancelar
-            </Link>
+            </button>
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-red-600 text-white font-medium rounded-lg hover:from-orange-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white font-bold rounded-xl hover:from-beuni-orange-600 hover:to-beuni-orange-700 focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:ring-offset-2 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
-                <React.Fragment>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
                   {submitLoadingText}
-                </React.Fragment>
+                </>
               ) : (
-                <React.Fragment>
+                <>
                   <Save className="h-5 w-5 mr-2" />
                   {submitButtonText}
-                </React.Fragment>
+                </>
               )}
             </button>
           </div>
         </form>
       </div>
-    </div>
+    </Layout>
   );
 }

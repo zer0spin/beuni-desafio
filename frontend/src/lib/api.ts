@@ -130,4 +130,7 @@ export const endpoints = {
   marcarEnviado: (id: string) => `/envio-brindes/${id}/marcar-enviado`,
   estatisticas: '/envio-brindes/estatisticas',
   simularProcessamento: '/envio-brindes/simular-processamento',
+
+  // Relatórios
+  relatorios: '/envio-brindes/relatorios',
 };
