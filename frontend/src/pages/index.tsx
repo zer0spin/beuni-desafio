@@ -154,11 +154,14 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             {/* Logo à esquerda */}
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                <Gift className="h-6 w-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-beuni-text">beuni</span>
+            <div className="flex items-center">
+              <Image
+                src="/images/logos/logo-beuni.png"
+                alt="Beuni Logo"
+                width={120}
+                height={40}
+                className="h-10 w-auto"
+              />
             </div>
 
             {/* Menu de navegação centralizado */}
@@ -621,11 +624,14 @@ export default function HomePage() {
           <div className="grid md:grid-cols-4 gap-8 mb-12">
             {/* Logo e descrição */}
             <div className="md:col-span-1">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-xl flex items-center justify-center">
-                  <Gift className="h-6 w-6 text-white" />
-                </div>
-                <span className="text-2xl font-bold text-white">beuni</span>
+              <div className="mb-6">
+                <Image
+                  src="/images/logos/logo-beuni.png"
+                  alt="Beuni Logo"
+                  width={120}
+                  height={40}
+                  className="h-10 w-auto brightness-0 invert"
+                />
               </div>
               <p className="text-gray-400 mb-6 text-sm">
                 A beuni nasceu de uma simples vontade: aproximar ainda mais pessoas através de experiências incríveis e tecnologia.

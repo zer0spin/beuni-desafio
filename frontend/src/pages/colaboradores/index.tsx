@@ -38,7 +38,7 @@ export default function ColaboradoresPage() {
   };
 
   const filteredColaboradores = colaboradores.filter((col) =>
-    col.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    col.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     col.departamento?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     col.cargo?.toLowerCase().includes(searchTerm.toLowerCase())
   );

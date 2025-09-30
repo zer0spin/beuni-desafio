@@ -75,14 +75,17 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex-1 flex flex-col min-h-0">
           {/* Logo */}
           <div className="flex items-center h-16 px-4 border-b border-beuni-orange-100">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0">
+            {sidebarOpen ? (
+              <img
+                src="/images/logos/logo-beuni.png"
+                alt="Beuni Logo"
+                className="h-8 w-auto"
+              />
+            ) : (
+              <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0 mx-auto">
                 <Gift className="h-6 w-6 text-white" />
               </div>
-              {sidebarOpen && (
-                <span className="text-xl font-bold text-beuni-text">beuni</span>
-              )}
-            </div>
+            )}
           </div>
 
           {/* Navigation */}
@@ -162,12 +165,11 @@ export default function Layout({ children }: LayoutProps) {
             <div className="flex flex-col h-full">
               {/* Logo */}
               <div className="flex items-center justify-between h-16 px-4 border-b border-beuni-orange-100">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-xl flex items-center justify-center shadow-lg">
-                    <Gift className="h-6 w-6 text-white" />
-                  </div>
-                  <span className="text-xl font-bold text-beuni-text">beuni</span>
-                </div>
+                <img
+                  src="/images/logos/logo-beuni.png"
+                  alt="Beuni Logo"
+                  className="h-8 w-auto"
+                />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2 text-beuni-text/60 hover:bg-beuni-orange-50 rounded-lg"

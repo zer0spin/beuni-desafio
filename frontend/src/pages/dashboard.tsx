@@ -44,20 +44,33 @@ export default function DashboardPage() {
         api.get<EstatisticasEnvio>(endpoints.estatisticas),
       ]);
 
+      // Filtrar colaboradores com aniversário no próximo mês
+      const today = new Date();
+      const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+
+      const upcomingBirthdays = proximosRes.data.filter((p: any) => {
+        if (!p.data_nascimento) return false;
+        const birthday = new Date(p.data_nascimento);
+        const birthdayThisYear = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
+        return birthdayThisYear >= today && birthdayThisYear <= nextMonth;
+      });
+
+      const birthdaysToday = proximosRes.data.filter((p: any) => {
+        if (!p.data_nascimento) return false;
+        const birthday = new Date(p.data_nascimento);
+        return birthday.getDate() === today.getDate() && birthday.getMonth() === today.getMonth();
+      });
+
       setStats({
         totalColaboradores: colaboradoresRes.data.total,
-        aniversariantesProximoMes: proximosRes.data.length,
+        aniversariantesProximoMes: upcomingBirthdays.length,
         enviosPendentes: statsRes.data.porStatus?.PENDENTE || 0,
         enviosRealizados: statsRes.data.porStatus?.ENVIADO || 0,
         enviosEmTransito: statsRes.data.porStatus?.EM_TRANSITO || 0,
-        aniversariantesHoje: proximosRes.data.filter((p: any) => {
-          const today = new Date();
-          const birthday = new Date(p.data_nascimento);
-          return birthday.getDate() === today.getDate() && birthday.getMonth() === today.getMonth();
-        }).length,
+        aniversariantesHoje: birthdaysToday.length,
       });
 
-      setRecentBirthdays(proximosRes.data.slice(0, 5));
+      setRecentBirthdays(upcomingBirthdays.slice(0, 5));
     } catch (error) {
       console.error('Erro ao carregar dados do dashboard:', error);
     } finally {
@@ -186,12 +199,12 @@ export default function DashboardPage() {
                       onClick={() => router.push(`/colaboradores/editar/${person.id}`)}
                     >
                       <div className="w-12 h-12 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold">
-                        {person.nome.charAt(0)}
+                        {person.nome ? person.nome.charAt(0) : '?'}
                       </div>
                       <div className="ml-4 flex-1">
-                        <p className="font-semibold text-beuni-text">{person.nome}</p>
+                        <p className="font-semibold text-beuni-text">{person.nome || 'Nome não disponível'}</p>
                         <p className="text-sm text-beuni-text/60">
-                          {new Date(person.data_nascimento).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}
+                          {person.data_nascimento ? new Date(person.data_nascimento).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' }) : 'Data não disponível'}
                         </p>
                       </div>
                       <div className="text-2xl">🎂</div>
