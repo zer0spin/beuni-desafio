@@ -1,55 +1,63 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { Users, Calendar, Package, TrendingUp, Gift, BarChart3, Settings, Bell, Search, Filter } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import {
+  Users,
+  Calendar,
+  Package,
+  TrendingUp,
+  Gift,
+  ArrowRight,
+  TrendingDown,
+  Clock,
+  CheckCircle,
+  AlertCircle
+} from 'lucide-react';
 
-import api, { getUser, removeAuthToken, endpoints } from '@/lib/api';
-import type { User, ColaboradoresResponse, EstatisticasEnvio } from '@/types';
+import Layout from '@/components/Layout';
+import api, { endpoints } from '@/lib/api';
+import type { ColaboradoresResponse, EstatisticasEnvio } from '@/types';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState({
     totalColaboradores: 0,
     aniversariantesProximoMes: 0,
     enviosPendentes: 0,
     enviosRealizados: 0,
+    enviosEmTransito: 0,
+    aniversariantesHoje: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [recentBirthdays, setRecentBirthdays] = useState<any[]>([]);
 
   useEffect(() => {
-    const currentUser = getUser();
-    if (!currentUser) {
-      router.push('/login');
-      return;
-    }
-    setUser(currentUser);
     loadDashboardData();
-  }, [router]);
+  }, []);
 
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
 
-      // Load colaboradores stats
-      const colaboradoresResponse = await api.get<ColaboradoresResponse>(
-        endpoints.colaboradores + '?limit=1'
-      );
-
-      // Load upcoming birthdays
-      const proximosResponse = await api.get(endpoints.colaboradoresProximos);
-
-      // Load delivery statistics
-      const statsResponse = await api.get<EstatisticasEnvio>(
-        endpoints.estatisticas
-      );
+      const [colaboradoresRes, proximosRes, statsRes] = await Promise.all([
+        api.get<ColaboradoresResponse>(endpoints.colaboradores + '?limit=1'),
+        api.get(endpoints.colaboradoresProximos),
+        api.get<EstatisticasEnvio>(endpoints.estatisticas),
+      ]);
 
       setStats({
-        totalColaboradores: colaboradoresResponse.data.total,
-        aniversariantesProximoMes: proximosResponse.data.length,
-        enviosPendentes: statsResponse.data.porStatus?.PENDENTE || 0,
-        enviosRealizados: statsResponse.data.porStatus?.ENVIADO || 0,
+        totalColaboradores: colaboradoresRes.data.total,
+        aniversariantesProximoMes: proximosRes.data.length,
+        enviosPendentes: statsRes.data.porStatus?.PENDENTE || 0,
+        enviosRealizados: statsRes.data.porStatus?.ENVIADO || 0,
+        enviosEmTransito: statsRes.data.porStatus?.EM_TRANSITO || 0,
+        aniversariantesHoje: proximosRes.data.filter((p: any) => {
+          const today = new Date();
+          const birthday = new Date(p.data_nascimento);
+          return birthday.getDate() === today.getDate() && birthday.getMonth() === today.getMonth();
+        }).length,
       });
+
+      setRecentBirthdays(proximosRes.data.slice(0, 5));
     } catch (error) {
       console.error('Erro ao carregar dados do dashboard:', error);
     } finally {
@@ -57,333 +65,230 @@ export default function DashboardPage() {
     }
   };
 
-  const handleLogout = () => {
-    removeAuthToken();
-    toast.success('Logout realizado com sucesso!');
-    router.push('/login');
-  };
-
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="loading-spinner h-8 w-8" />
+  const StatCard = ({ title, value, icon: Icon, color, trend, trendValue }: any) => (
+    <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6 hover:shadow-md transition-all duration-300">
+      <div className="flex items-start justify-between mb-4">
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${color}`}>
+          <Icon className="h-6 w-6 text-white" />
+        </div>
+        {trend && (
+          <div className={`flex items-center text-xs font-medium ${
+            trend === 'up' ? 'text-green-600' : 'text-red-600'
+          }`}>
+            {trend === 'up' ? <TrendingUp className="h-3 w-3 mr-1" /> : <TrendingDown className="h-3 w-3 mr-1" />}
+            {trendValue}
+          </div>
+        )}
       </div>
-    );
-  }
+      <div>
+        <p className="text-sm font-medium text-beuni-text/70 mb-1">{title}</p>
+        {isLoading ? (
+          <div className="h-8 bg-beuni-orange-100 rounded animate-pulse w-20"></div>
+        ) : (
+          <p className="text-3xl font-bold text-beuni-text">{value}</p>
+        )}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-beuni-cream">
-      {/* Header moderno conforme PRD */}
-      <header className="bg-white/90 backdrop-blur-md border-b border-beuni-orange-100 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+    <Layout>
+      <div className="p-6 lg:p-8">
+        {/* Welcome Banner */}
+        <div className="mb-8 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-3xl p-8 text-white relative overflow-hidden shadow-lg">
+          <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white/10 rounded-full"></div>
+          <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 bg-white/5 rounded-full"></div>
+          <div className="relative z-10">
+            <div className="flex items-center mb-3">
+              <Gift className="h-8 w-8 mr-3" />
+              <h1 className="text-3xl font-bold">Dashboard Beuni</h1>
+            </div>
+            <p className="text-beuni-orange-100 text-lg mb-4">
+              Bem-vindo! Gerencie aniversários e envios de brindes em um só lugar.
+            </p>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <Gift className="h-7 w-7 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-beuni-text">
-                    Beuni Dashboard
-                  </h1>
-                  <p className="text-sm text-beuni-text/70">
-                    {user.nome} - {user.organizacao.nome}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-3">
-              <button className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors">
-                <Search className="h-5 w-5" />
-              </button>
-              <button className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-beuni-orange-500 rounded-full"></span>
-              </button>
-              <button className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors">
-                <Settings className="h-5 w-5" />
-              </button>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-beuni-brown-800 hover:text-white hover:bg-beuni-brown-800 rounded-xl transition-colors font-medium border border-beuni-brown-200"
-              >
-                Sair
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Welcome Section com identidade BeUni */}
-        <div className="mb-8">
-          <div className="bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl p-8 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white/10 rounded-full"></div>
-            <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 bg-white/5 rounded-full"></div>
-            <div className="relative z-10">
-              <h2 className="text-3xl font-bold mb-2">Olá, {user.nome.split(' ')[0]}! 🎉</h2>
-              <p className="text-beuni-orange-100 text-lg">
-                Transformando cada aniversário em um momento especial de reconhecimento.
-              </p>
-              <div className="mt-6 flex items-center space-x-4">
-                <div className="bg-white/20 px-4 py-2 rounded-xl backdrop-blur-sm">
-                  <span className="text-sm font-medium">Hoje: {new Date().toLocaleDateString('pt-BR')}</span>
-                </div>
-                <div className="bg-white/20 px-4 py-2 rounded-xl backdrop-blur-sm">
-                  <span className="text-sm font-medium">📊 Dashboard Executivo</span>
-                </div>
+              <div className="bg-white/20 px-4 py-2 rounded-xl backdrop-blur-sm">
+                <span className="text-sm font-medium">📅 {new Date().toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Stats Cards com identidade BeUni */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          <div className="bg-white rounded-2xl shadow-soft border border-beuni-orange-100 p-6 hover:shadow-medium transition-all duration-300 hover:border-beuni-orange-200">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center shadow-sm">
-                  <Users className="h-7 w-7 text-blue-600" />
-                </div>
-              </div>
-              <div className="ml-4 flex-1">
-                <dt className="text-sm font-semibold text-beuni-text/70 mb-1">
-                  Total de Colaboradores
-                </dt>
-                <dd className="text-2xl font-bold text-beuni-text">
-                  {isLoading ? (
-                    <div className="h-8 bg-beuni-orange-100 rounded animate-pulse w-16"></div>
-                  ) : (
-                    stats.totalColaboradores
-                  )}
-                </dd>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-soft border border-beuni-orange-100 p-6 hover:shadow-medium transition-all duration-300 hover:border-beuni-orange-200">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-14 h-14 bg-gradient-to-br from-beuni-orange-100 to-beuni-orange-200 rounded-2xl flex items-center justify-center shadow-sm">
-                  <Calendar className="h-7 w-7 text-beuni-orange-600" />
-                </div>
-              </div>
-              <div className="ml-4 flex-1">
-                <dt className="text-sm font-semibold text-beuni-text/70 mb-1">
-                  Aniversários Próximo Mês
-                </dt>
-                <dd className="text-2xl font-bold text-beuni-text">
-                  {isLoading ? (
-                    <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
-                  ) : (
-                    stats.aniversariantesProximoMes
-                  )}
-                </dd>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
-                  <Package className="h-6 w-6 text-yellow-600" />
-                </div>
-              </div>
-              <div className="ml-4 flex-1">
-                <dt className="text-sm font-medium text-gray-500">
-                  Envios Pendentes
-                </dt>
-                <dd className="text-2xl font-bold text-gray-900">
-                  {isLoading ? (
-                    <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
-                  ) : (
-                    stats.enviosPendentes
-                  )}
-                </dd>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
-                </div>
-              </div>
-              <div className="ml-4 flex-1">
-                <dt className="text-sm font-medium text-gray-500">
-                  Envios Realizados
-                </dt>
-                <dd className="text-2xl font-bold text-gray-900">
-                  {isLoading ? (
-                    <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
-                  ) : (
-                    stats.enviosRealizados
-                  )}
-                </dd>
-              </div>
-            </div>
-          </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatCard
+            title="Total de Colaboradores"
+            value={stats.totalColaboradores}
+            icon={Users}
+            color="bg-gradient-to-br from-blue-500 to-blue-600"
+            trend="up"
+            trendValue="+12%"
+          />
+          <StatCard
+            title="Aniversários Próximo Mês"
+            value={stats.aniversariantesProximoMes}
+            icon={Calendar}
+            color="bg-gradient-to-br from-beuni-orange-500 to-beuni-orange-600"
+          />
+          <StatCard
+            title="Envios Pendentes"
+            value={stats.enviosPendentes}
+            icon={Clock}
+            color="bg-gradient-to-br from-yellow-500 to-yellow-600"
+          />
+          <StatCard
+            title="Envios Realizados"
+            value={stats.enviosRealizados}
+            icon={CheckCircle}
+            color="bg-gradient-to-br from-green-500 to-green-600"
+            trend="up"
+            trendValue="+8%"
+          />
         </div>
 
-        {/* Quick Calendar Access - Enhanced */}
-        <div className="mb-8">
-          <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl p-6 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 -mr-10 -mt-10 w-32 h-32 bg-white/10 rounded-full"></div>
-            <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-40 h-40 bg-white/5 rounded-full"></div>
-            <div className="relative z-10 flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3 mb-3">
-                  <Calendar className="h-8 w-8 text-white" />
-                  <h3 className="text-2xl font-bold">📅 Calendário de Aniversários</h3>
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Próximos Aniversariantes */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center">
+                  <Calendar className="h-6 w-6 text-beuni-orange-600 mr-2" />
+                  <h2 className="text-xl font-bold text-beuni-text">Próximos Aniversariantes</h2>
                 </div>
-                <p className="text-orange-100 mb-2">
-                  Visualize todos os aniversários dos colaboradores em formato de calendário mensal
-                </p>
-                <div className="text-sm text-orange-200">
-                  • Exportar eventos para seu calendário pessoal • Filtrar por departamento • Acompanhar status de envios
-                </div>
-              </div>
-              <div className="ml-6 flex flex-col space-y-3">
                 <button
                   onClick={() => router.push('/calendario')}
-                  className="bg-white/20 hover:bg-white/30 px-6 py-3 rounded-xl font-semibold transition-colors flex items-center space-x-2 backdrop-blur-sm"
+                  className="text-sm font-medium text-beuni-orange-600 hover:text-beuni-orange-700 flex items-center"
                 >
-                  <Calendar className="h-5 w-5" />
-                  <span>Abrir Calendário</span>
+                  Ver todos
+                  <ArrowRight className="h-4 w-4 ml-1" />
                 </button>
-                <div className="text-center">
-                  <p className="text-sm text-orange-200">
-                    {stats.aniversariantesProximoMes > 0 && (
-                      <span>🎂 {stats.aniversariantesProximoMes} próximo{stats.aniversariantesProximoMes !== 1 ? 's' : ''}</span>
-                    )}
-                  </p>
-                </div>
               </div>
+
+              {isLoading ? (
+                <div className="space-y-4">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="flex items-center p-4 bg-beuni-cream rounded-xl animate-pulse">
+                      <div className="w-12 h-12 bg-beuni-orange-200 rounded-full"></div>
+                      <div className="ml-4 flex-1">
+                        <div className="h-4 bg-beuni-orange-200 rounded w-1/3 mb-2"></div>
+                        <div className="h-3 bg-beuni-orange-100 rounded w-1/4"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : recentBirthdays.length > 0 ? (
+                <div className="space-y-3">
+                  {recentBirthdays.map((person) => (
+                    <div
+                      key={person.id}
+                      className="flex items-center p-4 bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl transition-colors cursor-pointer"
+                      onClick={() => router.push(`/colaboradores/editar/${person.id}`)}
+                    >
+                      <div className="w-12 h-12 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold">
+                        {person.nome.charAt(0)}
+                      </div>
+                      <div className="ml-4 flex-1">
+                        <p className="font-semibold text-beuni-text">{person.nome}</p>
+                        <p className="text-sm text-beuni-text/60">
+                          {new Date(person.data_nascimento).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long' })}
+                        </p>
+                      </div>
+                      <div className="text-2xl">🎂</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Calendar className="h-12 w-12 text-beuni-text/30 mx-auto mb-3" />
+                  <p className="text-beuni-text/60">Nenhum aniversariante próximo</p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="space-y-6">
+            {/* Aniversariantes Hoje */}
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
+              <div className="flex items-center mb-3">
+                <Gift className="h-6 w-6 mr-2" />
+                <h3 className="font-bold text-lg">Hoje</h3>
+              </div>
+              <p className="text-4xl font-bold mb-2">{stats.aniversariantesHoje}</p>
+              <p className="text-purple-100 text-sm">Aniversariantes hoje 🎉</p>
+            </div>
+
+            {/* Envios em Trânsito */}
+            <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
+              <div className="flex items-center mb-3">
+                <Package className="h-6 w-6 text-blue-600 mr-2" />
+                <h3 className="font-bold text-beuni-text">Em Trânsito</h3>
+              </div>
+              <p className="text-3xl font-bold text-beuni-text mb-2">{stats.enviosEmTransito}</p>
+              <p className="text-sm text-beuni-text/60">Brindes em transporte</p>
             </div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              Ações Rápidas
-            </h2>
-            <span className="text-sm text-gray-500">Acesse rapidamente as principais funcionalidades</span>
-          </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            <button
-              onClick={() => router.push('/colaboradores')}
-              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-orange-200 transition-all duration-200 text-left"
-            >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                  <Users className="h-6 w-6 text-blue-600" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                    Colaboradores
-                  </h3>
-                </div>
-              </div>
-              <p className="text-gray-600 text-sm">
-                Visualizar, adicionar e editar colaboradores da organização
-              </p>
-            </button>
-
+        <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
+          <h2 className="text-xl font-bold text-beuni-text mb-6">Ações Rápidas</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <button
               onClick={() => router.push('/colaboradores/novo')}
-              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-green-200 transition-all duration-200 text-left"
+              className="flex items-center p-4 bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl transition-colors group"
             >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
-                  <Users className="h-6 w-6 text-green-600" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-green-600 transition-colors">
-                    Novo Colaborador
-                  </h3>
-                </div>
+              <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Users className="h-5 w-5 text-white" />
               </div>
-              <p className="text-gray-600 text-sm">
-                Adicionar novo colaborador ao sistema com dados completos
-              </p>
+              <div className="ml-3 text-left">
+                <p className="font-semibold text-beuni-text text-sm">Novo Colaborador</p>
+                <p className="text-xs text-beuni-text/60">Adicionar ao sistema</p>
+              </div>
             </button>
 
             <button
-              onClick={() => router.push('/envios')}
-              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-purple-200 transition-all duration-200 text-left"
+              onClick={() => router.push('/colaboradores')}
+              className="flex items-center p-4 bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl transition-colors group"
             >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-                  <Package className="h-6 w-6 text-purple-600" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors">
-                    Controle de Envios
-                  </h3>
-                </div>
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Users className="h-5 w-5 text-white" />
               </div>
-              <p className="text-gray-600 text-sm">
-                Acompanhar e gerenciar status dos envios de brindes
-              </p>
+              <div className="ml-3 text-left">
+                <p className="font-semibold text-beuni-text text-sm">Ver Colaboradores</p>
+                <p className="text-xs text-beuni-text/60">Lista completa</p>
+              </div>
             </button>
 
             <button
               onClick={() => router.push('/calendario')}
-              className="group bg-gradient-to-br from-orange-50 to-red-50 hover:from-orange-100 hover:to-red-100 rounded-2xl shadow-sm border border-orange-200 p-6 hover:shadow-lg hover:border-orange-300 transition-all duration-200 text-left relative overflow-hidden"
+              className="flex items-center p-4 bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl transition-colors group"
             >
-              <div className="absolute top-0 right-0 -mr-6 -mt-6 w-20 h-20 bg-orange-200/20 rounded-full"></div>
-              <div className="relative z-10">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center group-hover:from-orange-600 group-hover:to-red-700 transition-colors shadow-lg">
-                    <Calendar className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-orange-700 transition-colors">
-                      📅 Calendário
-                    </h3>
-                  </div>
-                  {stats.aniversariantesProximoMes > 0 && (
-                    <div className="ml-auto">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                        {stats.aniversariantesProximoMes} próximo{stats.aniversariantesProximoMes !== 1 ? 's' : ''}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <p className="text-gray-600 text-sm">
-                  Visualize aniversários em formato de calendário, exporte eventos e filtre por departamento
-                </p>
+              <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Calendar className="h-5 w-5 text-white" />
+              </div>
+              <div className="ml-3 text-left">
+                <p className="font-semibold text-beuni-text text-sm">Calendário</p>
+                <p className="text-xs text-beuni-text/60">Visualizar datas</p>
               </div>
             </button>
 
             <button
-              onClick={() => router.push('/relatorios')}
-              className="group bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-indigo-200 transition-all duration-200 text-left"
+              onClick={() => router.push('/envios')}
+              className="flex items-center p-4 bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl transition-colors group"
             >
-              <div className="flex items-center mb-4">
-                <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
-                  <BarChart3 className="h-6 w-6 text-indigo-600" />
-                </div>
-                <div className="ml-3">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                    Relatórios
-                  </h3>
-                </div>
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Package className="h-5 w-5 text-white" />
               </div>
-              <p className="text-gray-600 text-sm">
-                Analise dados, estatísticas e gere relatórios completos
-              </p>
+              <div className="ml-3 text-left">
+                <p className="font-semibold text-beuni-text text-sm">Controlar Envios</p>
+                <p className="text-xs text-beuni-text/60">Gerenciar entregas</p>
+              </div>
             </button>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </Layout>
   );
 }
