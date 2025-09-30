@@ -8,31 +8,58 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary brand colors (Beuni Orange)
-        primary: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
+        // Paleta BeUni conforme PRD
+        'beuni-orange': {
+          50: '#fff7f0',
+          100: '#ffeee1',
+          200: '#ffd4b3',
+          300: '#ffbb85',
+          400: '#ff9f4d',
+          500: '#FF6600', // Laranja Primário (Destaque)
+          600: '#e55a00',
+          700: '#cc4e00',
+          800: '#b24200',
+          900: '#993600',
         },
-        // Secondary colors (Beuni Warm Browns)
-        secondary: {
-          50: '#faf5f0',
-          100: '#f5e6d3',
-          200: '#e7d2ae',
-          300: '#d4b896',
-          400: '#c1a082',
+        'beuni-brown': {
+          50: '#faf7f4',
+          100: '#f5f0e9',
+          200: '#ebe0d2',
+          300: '#ddc7af',
+          400: '#c9a584',
           500: '#a8876b',
-          600: '#8b6f56',
-          700: '#6d5746',
-          800: '#4a3f38',
-          900: '#2d2926',
+          600: '#8b6b4f',
+          700: '#6d5540',
+          800: '#592318', // Marrom Escuro (Texto e CTAs secundários)
+          900: '#4a1e14',
+        },
+        'beuni-cream': '#FBF8F3', // Branco "Off-white" (Fundo Principal)
+        'beuni-text': '#333333', // Cinza/Chumbo (Texto Corpo)
+        // Primary brand colors (mapeamento para compatibilidade)
+        primary: {
+          50: '#fff7f0',
+          100: '#ffeee1',
+          200: '#ffd4b3',
+          300: '#ffbb85',
+          400: '#ff9f4d',
+          500: '#FF6600',
+          600: '#e55a00',
+          700: '#cc4e00',
+          800: '#b24200',
+          900: '#993600',
+        },
+        // Secondary colors (mapeamento para compatibilidade)
+        secondary: {
+          50: '#faf7f4',
+          100: '#f5f0e9',
+          200: '#ebe0d2',
+          300: '#ddc7af',
+          400: '#c9a584',
+          500: '#a8876b',
+          600: '#8b6b4f',
+          700: '#6d5540',
+          800: '#592318',
+          900: '#4a1e14',
         },
         // Success, warning, error colors
         success: {
@@ -73,7 +100,9 @@ module.exports = {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        // Fonte Principal conforme PRD: moderna e de excelente legibilidade
+        // Similar à Circular Std ou Plus Jakarta Sans
+        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['Fira Code', 'monospace'],
       },
       fontSize: {

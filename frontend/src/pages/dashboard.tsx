@@ -72,41 +72,41 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50">
-      {/* Modern Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-orange-100 sticky top-0 z-50">
+    <div className="min-h-screen bg-beuni-cream">
+      {/* Header moderno conforme PRD */}
+      <header className="bg-white/90 backdrop-blur-md border-b border-beuni-orange-100 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <Gift className="h-6 w-6 text-white" />
+                <div className="w-12 h-12 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Gift className="h-7 w-7 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-orange-600 bg-clip-text text-transparent">
+                  <h1 className="text-2xl font-bold text-beuni-text">
                     Beuni Dashboard
                   </h1>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-beuni-text/70">
                     {user.nome} - {user.organizacao.nome}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+            <div className="flex items-center space-x-3">
+              <button className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors">
                 <Search className="h-5 w-5" />
               </button>
-              <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors relative">
+              <button className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors relative">
                 <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-beuni-orange-500 rounded-full"></span>
               </button>
-              <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+              <button className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors">
                 <Settings className="h-5 w-5" />
               </button>
               <button
                 onClick={handleLogout}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors font-medium"
+                className="px-4 py-2 text-beuni-brown-800 hover:text-white hover:bg-beuni-brown-800 rounded-xl transition-colors font-medium border border-beuni-brown-200"
               >
                 Sair
               </button>
@@ -117,41 +117,44 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Welcome Section */}
+        {/* Welcome Section com identidade BeUni */}
         <div className="mb-8">
-          <div className="bg-gradient-to-r from-orange-500 to-red-600 rounded-2xl p-8 text-white relative overflow-hidden">
+          <div className="bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl p-8 text-white relative overflow-hidden">
             <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white/10 rounded-full"></div>
             <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 bg-white/5 rounded-full"></div>
             <div className="relative z-10">
-              <h2 className="text-3xl font-bold mb-2">Olá, {user.nome.split(' ')[0]}! 👋</h2>
-              <p className="text-orange-100 text-lg">
-                Aqui está um resumo dos aniversários da sua empresa hoje.
+              <h2 className="text-3xl font-bold mb-2">Olá, {user.nome.split(' ')[0]}! 🎉</h2>
+              <p className="text-beuni-orange-100 text-lg">
+                Transformando cada aniversário em um momento especial de reconhecimento.
               </p>
               <div className="mt-6 flex items-center space-x-4">
-                <div className="bg-white/20 px-4 py-2 rounded-lg">
+                <div className="bg-white/20 px-4 py-2 rounded-xl backdrop-blur-sm">
                   <span className="text-sm font-medium">Hoje: {new Date().toLocaleDateString('pt-BR')}</span>
+                </div>
+                <div className="bg-white/20 px-4 py-2 rounded-xl backdrop-blur-sm">
+                  <span className="text-sm font-medium">📊 Dashboard Executivo</span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Stats Cards */}
+        {/* Stats Cards com identidade BeUni */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl shadow-soft border border-beuni-orange-100 p-6 hover:shadow-medium transition-all duration-300 hover:border-beuni-orange-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Users className="h-6 w-6 text-blue-600" />
+                <div className="w-14 h-14 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center shadow-sm">
+                  <Users className="h-7 w-7 text-blue-600" />
                 </div>
               </div>
               <div className="ml-4 flex-1">
-                <dt className="text-sm font-medium text-gray-500">
+                <dt className="text-sm font-semibold text-beuni-text/70 mb-1">
                   Total de Colaboradores
                 </dt>
-                <dd className="text-2xl font-bold text-gray-900">
+                <dd className="text-2xl font-bold text-beuni-text">
                   {isLoading ? (
-                    <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
+                    <div className="h-8 bg-beuni-orange-100 rounded animate-pulse w-16"></div>
                   ) : (
                     stats.totalColaboradores
                   )}
@@ -160,18 +163,18 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+          <div className="bg-white rounded-2xl shadow-soft border border-beuni-orange-100 p-6 hover:shadow-medium transition-all duration-300 hover:border-beuni-orange-200">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-orange-600" />
+                <div className="w-14 h-14 bg-gradient-to-br from-beuni-orange-100 to-beuni-orange-200 rounded-2xl flex items-center justify-center shadow-sm">
+                  <Calendar className="h-7 w-7 text-beuni-orange-600" />
                 </div>
               </div>
               <div className="ml-4 flex-1">
-                <dt className="text-sm font-medium text-gray-500">
+                <dt className="text-sm font-semibold text-beuni-text/70 mb-1">
                   Aniversários Próximo Mês
                 </dt>
-                <dd className="text-2xl font-bold text-gray-900">
+                <dd className="text-2xl font-bold text-beuni-text">
                   {isLoading ? (
                     <div className="h-8 bg-gray-200 rounded animate-pulse w-16"></div>
                   ) : (
