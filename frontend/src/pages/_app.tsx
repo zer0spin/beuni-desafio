@@ -1,6 +1,7 @@
 import type { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
+import Head from 'next/head';
 import '@/styles/globals.css';
 
 // Create a query client
@@ -17,6 +18,10 @@ const queryClient = new QueryClient({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
+      <Head>
+        <title>Beuni - Sistema de Brindes</title>
+        <link rel="icon" href="/images/logos/favicon.ico" />
+      </Head>
       <Component {...pageProps} />
       <Toaster
         position="top-right"
