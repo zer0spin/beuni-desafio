@@ -44,21 +44,53 @@ export default function DashboardPage() {
         api.get<EstatisticasEnvio>(endpoints.estatisticas),
       ]);
 
-      // Filtrar colaboradores com aniversário no próximo mês
+      // Filtrar colaboradores com aniversário nos próximos 30 dias
       const today = new Date();
-      const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, today.getDate());
+      today.setHours(0, 0, 0, 0); // Zera as horas para comparação apenas de data
+
+      const thirtyDaysFromNow = new Date(today);
+      thirtyDaysFromNow.setDate(today.getDate() + 30);
+
+      const parseBrDate = (dateStr?: string) => {
+        if (!dateStr) return null;
+        const parts = dateStr.split('/');
+        if (parts.length !== 3) return null;
+        const [dd, mm, yyyy] = parts.map(Number);
+        if (!dd || !mm || !yyyy) return null;
+        return new Date(yyyy, mm - 1, dd);
+      };
 
       const upcomingBirthdays = proximosRes.data.filter((p: any) => {
-        if (!p.data_nascimento) return false;
-        const birthday = new Date(p.data_nascimento);
-        const birthdayThisYear = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
-        return birthdayThisYear >= today && birthdayThisYear <= nextMonth;
+        if (!p.data_nascimento || !p.nome_completo) return false;
+
+        const birthday = parseBrDate(p.data_nascimento);
+        if (!birthday) return false;
+
+        const thisYearBirthday = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
+        const nextYearBirthday = new Date(today.getFullYear() + 1, birthday.getMonth(), birthday.getDate());
+
+        // Verifica se o aniversário está dentro dos próximos 30 dias (considerando virada de ano)
+        return (thisYearBirthday >= today && thisYearBirthday <= thirtyDaysFromNow) ||
+               (nextYearBirthday >= today && nextYearBirthday <= thirtyDaysFromNow);
+      }).sort((a: any, b: any) => {
+        // Ordena por data mais próxima
+        const dateA = parseBrDate(a.data_nascimento)!;
+        const dateB = parseBrDate(b.data_nascimento)!;
+        const birthdayA = new Date(today.getFullYear(), dateA.getMonth(), dateA.getDate());
+        const birthdayB = new Date(today.getFullYear(), dateB.getMonth(), dateB.getDate());
+
+        if (birthdayA < today) birthdayA.setFullYear(today.getFullYear() + 1);
+        if (birthdayB < today) birthdayB.setFullYear(today.getFullYear() + 1);
+
+        return birthdayA.getTime() - birthdayB.getTime();
       });
 
       const birthdaysToday = proximosRes.data.filter((p: any) => {
-        if (!p.data_nascimento) return false;
-        const birthday = new Date(p.data_nascimento);
-        return birthday.getDate() === today.getDate() && birthday.getMonth() === today.getMonth();
+        if (!p.data_nascimento || !p.nome_completo) return false;
+        const birthday = parseBrDate(p.data_nascimento);
+        return birthday &&
+          birthday.getDate() === today.getDate() &&
+          birthday.getMonth() === today.getMonth();
       });
 
       setStats({
@@ -66,7 +98,7 @@ export default function DashboardPage() {
         aniversariantesProximoMes: upcomingBirthdays.length,
         enviosPendentes: statsRes.data.porStatus?.PENDENTE || 0,
         enviosRealizados: statsRes.data.porStatus?.ENVIADO || 0,
-        enviosEmTransito: statsRes.data.porStatus?.EM_TRANSITO || 0,
+        enviosEmTransito: 0,
         aniversariantesHoje: birthdaysToday.length,
       });
 

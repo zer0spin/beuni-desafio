@@ -48,6 +48,7 @@ export default function Layout({ children }: LayoutProps) {
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Colaboradores', href: '/colaboradores', icon: Users },
     { name: 'Calendário', href: '/calendario', icon: Calendar },
+    { name: 'Catálogo', href: '/catalogo', icon: Gift },
     { name: 'Envios', href: '/envios', icon: Package },
     { name: 'Relatórios', href: '/relatorios', icon: BarChart3 },
   ];

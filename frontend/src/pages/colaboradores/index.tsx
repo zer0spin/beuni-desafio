@@ -9,6 +9,14 @@ import api, { endpoints } from '@/lib/api';
 import type { ColaboradoresResponse, Colaborador } from '@/types';
 
 export default function ColaboradoresPage() {
+  const parseBrDate = (dateStr?: string) => {
+    if (!dateStr) return null;
+    const parts = dateStr.split('/');
+    if (parts.length !== 3) return null;
+    const [dd, mm, yyyy] = parts.map(Number);
+    if (!dd || !mm || !yyyy) return null;
+    return new Date(yyyy, mm - 1, dd);
+  };
   const router = useRouter();
   const [colaboradores, setColaboradores] = useState<Colaborador[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +46,7 @@ export default function ColaboradoresPage() {
   };
 
   const filteredColaboradores = colaboradores.filter((col) =>
-    col.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    col.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     col.departamento?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     col.cargo?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -87,8 +95,8 @@ export default function ColaboradoresPage() {
                   <p className="text-sm text-beuni-text/60 mb-1">Aniversários Este Mês</p>
                   <p className="text-3xl font-bold text-beuni-text">
                     {colaboradores.filter(c => {
-                      const birthday = new Date(c.data_nascimento);
-                      return birthday.getMonth() === new Date().getMonth();
+                      const birthday = parseBrDate(c.data_nascimento);
+                      return birthday && birthday.getMonth() === new Date().getMonth();
                     }).length}
                   </p>
                 </div>
@@ -181,11 +189,11 @@ export default function ColaboradoresPage() {
                       <td className="px-6 py-4">
                         <div className="flex items-center">
                           <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                            {colaborador.nome.charAt(0)}
+                            {colaborador.nome_completo ? colaborador.nome_completo.charAt(0) : '?'}
                           </div>
                           <div className="ml-4">
-                            <p className="font-semibold text-beuni-text">{colaborador.nome}</p>
-                            <p className="text-sm text-beuni-text/60">{colaborador.email}</p>
+                            <p className="font-semibold text-beuni-text">{colaborador.nome_completo || 'Nome não disponível'}</p>
+                            <p className="text-sm text-beuni-text/60">{colaborador.email || '-'}</p>
                           </div>
                         </div>
                       </td>
@@ -197,7 +205,10 @@ export default function ColaboradoresPage() {
                         <div className="flex items-center">
                           <Calendar className="h-4 w-4 text-beuni-orange-600 mr-2" />
                           <span className="text-sm text-beuni-text">
-                            {new Date(colaborador.data_nascimento).toLocaleDateString('pt-BR')}
+                            {(() => {
+                              const d = parseBrDate(colaborador.data_nascimento);
+                              return d ? d.toLocaleDateString('pt-BR') : '-';
+                            })()}
                           </span>
                         </div>
                       </td>
