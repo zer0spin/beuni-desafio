@@ -26,9 +26,11 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterCredentials) => {
     setIsLoading(true);
     try {
-      // Remove o campo de organização dos dados antes de enviar
-      const { organizacao, ...registrationData } = data;
-      const response = await api.post<AuthResponse>(endpoints.register, registrationData);
+      const response = await api.post<AuthResponse>(endpoints.register, {
+        name: data.nome,
+        email: data.email,
+        password: data.password,
+      });
       const { access_token, user } = response.data;
 
       setAuthToken(access_token, user);

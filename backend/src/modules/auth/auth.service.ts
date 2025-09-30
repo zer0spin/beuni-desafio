@@ -91,16 +91,14 @@ export class AuthService {
     const saltRounds = 10;
     const senhaHash = await bcrypt.hash(registerDto.password, saltRounds);
 
-    // Create organization and user in a transaction
-    const result = await this.prisma.$transaction(async (tx) => {
-      // Create organization
-      const organizacao = await tx.organizacao.create({
-        data: {
-          nome: registerDto.organizationName,
-        },
-      });
-
-      // Create user
+      // Create organization and user in a transaction
+      const result = await this.prisma.$transaction(async (tx) => {
+        // Create organization
+        const organizacao = await tx.organizacao.create({
+          data: {
+            nome: `Organização ${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+          },
+        });      // Create user
       const user = await tx.usuario.create({
         data: {
           nome: registerDto.name,

@@ -31,14 +31,12 @@ export interface LoginCredentials {
 export interface RegisterData {
   name: string;
   email: string;
-  organizationName: string;
   password: string;
 }
 
 export interface RegisterCredentials {
   nome: string;
   email: string;
-  organizacao: string;
   password: string;
   confirmPassword: string;
 }

@@ -16,7 +16,7 @@ datasource db {
 
 model Organizacao {
   id        String   @id @default(cuid())
-  nome      String
+  nome      String   @default("Organização")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
