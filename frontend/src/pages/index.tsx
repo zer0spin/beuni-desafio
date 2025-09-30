@@ -39,18 +39,6 @@ export default function HomePage() {
   }, [testimonials.length]);
 
   // Seção "O que podemos fazer para você?"
-  const [activeTab, setActiveTab] = useState('colaboradores');
-  const solutionTabs = [
-    { id: 'tech', label: 'Profissionais de Tech', icon: Zap },
-    { id: 'eventos', label: 'Eventos', icon: Calendar },
-    { id: 'sustentabilidade', label: 'Sustentabilidade', icon: Heart },
-    { id: 'armazenamento', label: 'Armazenamento', icon: Package },
-    { id: 'plataforma', label: 'Plataforma', icon: TrendingUp },
-    { id: 'clientes', label: 'Clientes', icon: Star },
-    { id: 'colaboradores', label: 'Colaboradores', icon: Users },
-    { id: 'natal', label: 'Natal', icon: Gift }
-  ];
-
   const solutions = {
     tech: {
       title: "Kit para Profissionais de Tech",
@@ -102,6 +90,20 @@ export default function HomePage() {
     }
   };
 
+  type SolutionKey = keyof typeof solutions;
+
+  const [activeTab, setActiveTab] = useState<SolutionKey>('colaboradores');
+  const solutionTabs = [
+    { id: 'tech', label: 'Profissionais de Tech', icon: Zap },
+    { id: 'eventos', label: 'Eventos', icon: Calendar },
+    { id: 'sustentabilidade', label: 'Sustentabilidade', icon: Heart },
+    { id: 'armazenamento', label: 'Armazenamento', icon: Package },
+    { id: 'plataforma', label: 'Plataforma', icon: TrendingUp },
+    { id: 'clientes', label: 'Clientes', icon: Star },
+    { id: 'colaboradores', label: 'Colaboradores', icon: Users },
+    { id: 'natal', label: 'Natal', icon: Gift }
+  ];
+
   // Passo a Passo do processo
   const processSteps = [
     {
@@ -151,36 +153,34 @@ export default function HomePage() {
 
       {/* Header Fixo */}
       <header className="bg-white shadow-sm sticky top-0 z-50 transition-shadow duration-300">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            {/* Logo à esquerda */}
-            <div className="flex items-center">
-              <Image
-                src="/images/logos/logo-beuni.png"
-                alt="Beuni Logo"
-                width={120}
-                height={40}
-                className="h-10 w-auto"
-              />
-            </div>
+              <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between items-center py-6">
+                  {/* Logo à esquerda */}
+                  <div className="flex items-center">
+                    <Image
+                      src="/images/logos/logo-beuni.png"
+                      alt="Beuni Logo"
+                      width={140}
+                      height={45}
+                      className="h-12 w-auto"
+                    />
+                  </div>
 
-            {/* Menu de navegação centralizado */}
-            <nav className="hidden md:flex space-x-8">
-              <button className="text-beuni-text hover:text-beuni-orange-500 font-medium transition-colors">
-                Início
-              </button>
-              <button className="text-beuni-text hover:text-beuni-orange-500 font-medium transition-colors">
-                Serviços ▾
-              </button>
-              <button className="text-beuni-text hover:text-beuni-orange-500 font-medium transition-colors">
-                Sobre ▾
-              </button>
-              <button className="text-beuni-text hover:text-beuni-orange-500 font-medium transition-colors">
-                Contato
-              </button>
-            </nav>
-
-            {/* CTAs à direita */}
+                  {/* Menu de navegação centralizado */}
+                  <nav className="hidden md:flex space-x-10">
+                    <button className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
+                      Início
+                    </button>
+                    <button className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
+                      Serviços ▾
+                    </button>
+                    <button className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
+                      Sobre ▾
+                    </button>
+                    <button className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
+                      Contato
+                    </button>
+                  </nav>            {/* CTAs à direita */}
             <div className="flex space-x-3">
               <button
                 onClick={() => router.push('/login')}
@@ -200,35 +200,35 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 lg:py-32 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <section className="py-20 lg:py-36 relative overflow-hidden">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Conteúdo à esquerda */}
             <div className="text-left">
               {/* Badge de experts disponíveis */}
-              <div className="inline-flex items-center bg-white rounded-full px-4 py-2 shadow-md mb-6">
+              <div className="inline-flex items-center bg-white rounded-full px-5 py-3 shadow-lg mb-8">
                 <div className="flex -space-x-2 mr-3">
                   {experts.map((expert, index) => (
-                    <div key={index} className="w-8 h-8 bg-beuni-orange-100 rounded-full border-2 border-white flex items-center justify-center text-sm">
+                    <div key={index} className="w-10 h-10 bg-beuni-orange-100 rounded-full border-2 border-white flex items-center justify-center text-base">
                       {expert.avatar}
                     </div>
                   ))}
                 </div>
-                <span className="text-beuni-orange-600 font-semibold text-sm">
+                <span className="text-beuni-orange-600 font-semibold text-base">
                   🎯 beuni Experts
                 </span>
-                <span className="ml-2 text-beuni-text/70 text-sm">
+                <span className="ml-2 text-beuni-text/70 text-base">
                   • Disponíveis para novos projetos
                 </span>
               </div>
 
-              <h1 className="text-5xl lg:text-6xl font-bold text-beuni-text mb-6 leading-tight">
+              <h1 className="text-6xl lg:text-7xl font-bold text-beuni-text mb-8 leading-tight">
                 Eliminamos a complexidade de{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600">
                   comprar e enviar brindes personalizados
                 </span>
               </h1>
-              <p className="text-xl text-beuni-text/80 mb-8 max-w-2xl">
+              <p className="text-2xl text-beuni-text/80 mb-10 max-w-2xl leading-relaxed">
                 Com a beuni, você garante total visibilidade e controle dos seus brindes personalizados, tudo na nossa plataforma.
               </p>
 
@@ -245,17 +245,17 @@ export default function HomePage() {
                 <span className="text-sm text-beuni-text/70">de 120+ reviews</span>
               </div>
 
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-6">
                 <button
                   onClick={() => router.push('/login')}
-                  className="px-8 py-4 bg-beuni-brown-800 text-white text-lg font-semibold rounded-xl hover:bg-beuni-brown-900 transition-all duration-200 flex items-center justify-center shadow-lg"
+                  className="px-10 py-5 bg-beuni-brown-800 text-white text-xl font-semibold rounded-xl hover:bg-beuni-brown-900 transition-all duration-200 flex items-center justify-center shadow-lg"
                 >
                   Entrar na Plataforma
-                  <ArrowRight className="ml-2 h-5 w-5" />
+                  <ArrowRight className="ml-3 h-6 w-6" />
                 </button>
                 <button
                   onClick={() => router.push('/login')}
-                  className="px-8 py-4 border-2 border-beuni-orange-500 text-beuni-orange-600 text-lg font-semibold rounded-xl hover:bg-beuni-orange-50 transition-all duration-200 flex items-center justify-center"
+                  className="px-10 py-5 border-2 border-beuni-orange-500 text-beuni-orange-600 text-xl font-semibold rounded-xl hover:bg-beuni-orange-50 transition-all duration-200 flex items-center justify-center"
                 >
                   Fazer Orçamento
                 </button>
@@ -322,14 +322,14 @@ export default function HomePage() {
       </section>
 
       {/* Seção Cases - "Veja o que fazemos" */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-white">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-16">
             <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">CASES</span>
-            <h2 className="text-4xl font-bold text-beuni-text mb-4 mt-2">
+            <h2 className="text-5xl font-bold text-beuni-text mb-6 mt-3">
               Veja o que fazemos
             </h2>
-            <p className="text-xl text-beuni-text/80 max-w-3xl">
+            <p className="text-2xl text-beuni-text/80 max-w-3xl leading-relaxed">
               Atendemos a todas as suas necessidades de brindes.
             </p>
           </div>
@@ -348,14 +348,14 @@ export default function HomePage() {
       </section>
 
       {/* Seção "O que podemos fazer para você?" */}
-      <section className="py-20 bg-beuni-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-beuni-cream">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-16">
-            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">TIPOS DE BRINDES</span>
-            <h2 className="text-4xl font-bold text-beuni-text mb-4 mt-2">
+            <span className="text-beuni-orange-600 font-semibold text-base uppercase tracking-wide">TIPOS DE BRINDES</span>
+            <h2 className="text-5xl font-bold text-beuni-text mb-6 mt-3">
               O que podemos fazer para você?
             </h2>
-            <p className="text-xl text-beuni-text/80 max-w-3xl">
+            <p className="text-2xl text-beuni-text/80 max-w-4xl leading-relaxed">
               Uma gestão eficiente de brindes é essencial para qualquer organização. Na beuni, desenvolvemos uma plataforma que elimina a complexidade da compra, armazenamento e envio de brindes personalizados, oferecendo total visibilidade e controle.
             </p>
           </div>
@@ -365,7 +365,7 @@ export default function HomePage() {
             {solutionTabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => setActiveTab(tab.id as SolutionKey)}
                 className={`flex items-center space-x-2 px-5 py-2.5 rounded-full font-medium transition-all duration-200 text-sm ${
                   activeTab === tab.id
                     ? 'bg-beuni-orange-500 text-white shadow-lg'
@@ -379,20 +379,17 @@ export default function HomePage() {
           </div>
 
           {/* Cards de solução */}
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="md:col-span-2">
-              <div className="bg-white rounded-3xl p-8 shadow-lg border border-beuni-orange-100">
-                <div className="flex items-start justify-between mb-6">
-                  <div>
-                    <h3 className="text-3xl font-bold text-beuni-text mb-4">
-                      {solutions[activeTab].title}
-                    </h3>
-                    <p className="text-lg text-beuni-text/80 mb-6">
-                      {solutions[activeTab].description}
-                    </p>
-                  </div>
-                </div>
-                <div className="grid gap-3 mb-8">
+          <div className="bg-white rounded-3xl p-8 shadow-lg border border-beuni-orange-100">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              {/* Coluna de Texto */}
+              <div>
+                <h3 className="text-3xl font-bold text-beuni-text mb-4">
+                  {solutions[activeTab].title}
+                </h3>
+                <p className="text-lg text-beuni-text/80 mb-6">
+                  {solutions[activeTab].description}
+                </p>
+                <div className="grid gap-3">
                   {solutions[activeTab].features.map((feature, index) => (
                     <div key={index} className="flex items-center space-x-3">
                       <CheckCircle className="h-5 w-5 text-beuni-orange-500 flex-shrink-0" />
@@ -400,41 +397,17 @@ export default function HomePage() {
                     </div>
                   ))}
                 </div>
-                <div className="rounded-2xl overflow-hidden shadow-lg">
-                  <Image
-                    src={solutions[activeTab].image}
-                    alt={solutions[activeTab].title}
-                    width={800}
-                    height={400}
-                    className="w-full h-auto"
-                  />
-                </div>
               </div>
-            </div>
 
-            {/* Card de depoimento */}
-            <div className="space-y-6">
-              <div className="bg-white rounded-3xl p-6 shadow-lg border border-beuni-orange-100">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center">
-                    <Star className="h-5 w-5 text-white" />
-                  </div>
-                  <div className="ml-3">
-                    <div className="flex text-yellow-400 mb-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 fill-current" />
-                      ))}
-                    </div>
-                    <p className="text-xs text-beuni-text/60">5.0/5 - {testimonials[currentTestimonial].company}</p>
-                  </div>
-                </div>
-                <blockquote className="text-beuni-text italic mb-4 text-sm leading-relaxed">
-                  "{testimonials[currentTestimonial].text}"
-                </blockquote>
-                <div className="border-t pt-4">
-                  <p className="font-semibold text-beuni-text text-sm">{testimonials[currentTestimonial].name}</p>
-                  <p className="text-xs text-beuni-text/70">{testimonials[currentTestimonial].role}</p>
-                </div>
+              {/* Coluna de Imagem */}
+              <div className="rounded-2xl overflow-hidden shadow-lg">
+                <Image
+                  src={solutions[activeTab].image}
+                  alt={solutions[activeTab].title}
+                  width={800}
+                  height={400}
+                  className="w-full h-auto"
+                />
               </div>
             </div>
           </div>
@@ -515,14 +488,14 @@ export default function HomePage() {
       </section>
 
       {/* Seção Depoimentos */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-24 bg-white">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">DEPOIMENTOS</span>
-            <h2 className="text-4xl font-bold text-beuni-text mb-4 mt-2">
+            <span className="text-beuni-orange-600 font-semibold text-base uppercase tracking-wide">DEPOIMENTOS</span>
+            <h2 className="text-5xl font-bold text-beuni-text mb-6 mt-3">
               O que falam sobre a beuni
             </h2>
-            <p className="text-xl text-beuni-text/80 max-w-3xl mx-auto">
+            <p className="text-2xl text-beuni-text/80 max-w-4xl mx-auto leading-relaxed">
               Cada projeto na beuni é uma parceria em que colocamos nossa criatividade e expertise para transformar ideias em soluções memoráveis. Veja o que nossos clientes têm a dizer sobre suas jornadas conosco!
             </p>
           </div>
@@ -619,9 +592,9 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-beuni-text py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
+      <footer className="bg-beuni-text py-20">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-10 mb-16">
             {/* Logo e descrição */}
             <div className="md:col-span-1">
               <div className="mb-6">
