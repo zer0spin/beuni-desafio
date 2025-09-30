@@ -2,6 +2,15 @@
 node_modules/
 */node_modules/
 
+# Images
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.svg
+*.ico
+*.webp
+
 # Artificial Intelligence files
 ai/
 .claude/
