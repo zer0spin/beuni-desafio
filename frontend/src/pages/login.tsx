@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
-import { Eye, EyeOff, LogIn } from 'lucide-react';
+import { Eye, EyeOff, LogIn, Gift } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import api, { setAuthToken, endpoints } from '@/lib/api';
