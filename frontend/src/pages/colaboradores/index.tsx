@@ -136,10 +136,17 @@ export default function ColaboradoresPage() {
       { value: 'CANCELADO', label: 'Cancelado', color: 'red' }
     ];
 
-    const currentOption = statusOptions.find(opt => opt.value === currentStatus);
+    // Fechar dropdown ao clicar fora
+    useEffect(() => {
+      const handleClickOutside = () => setIsOpen(false);
+      if (isOpen) {
+        document.addEventListener('click', handleClickOutside);
+        return () => document.removeEventListener('click', handleClickOutside);
+      }
+    }, [isOpen]);
 
     return (
-      <div className="relative">
+      <div className="relative" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={() => setIsOpen(!isOpen)}
           disabled={updatingStatus === colaborador.id}
@@ -150,7 +157,7 @@ export default function ColaboradoresPage() {
         </button>
 
         {isOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
+          <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 z-50">
             <div className="py-1">
               {statusOptions.map(option => (
                 <button
@@ -161,15 +168,21 @@ export default function ColaboradoresPage() {
                     }
                     setIsOpen(false);
                   }}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition-colors ${
-                    option.value === currentStatus ? 'bg-orange-50 text-orange-700' : 'text-gray-700'
+                  className={`w-full text-left px-4 py-2.5 text-sm hover:bg-gray-100 transition-colors ${
+                    option.value === currentStatus ? 'bg-orange-50 text-orange-700 font-medium' : 'text-gray-700'
                   }`}
                 >
                   <div className="flex items-center space-x-2">
-                    <span className={`w-2 h-2 rounded-full bg-${option.color}-500`}></span>
+                    <span className={`w-2.5 h-2.5 rounded-full ${
+                      option.color === 'yellow' ? 'bg-yellow-500' :
+                      option.color === 'blue' ? 'bg-blue-500' :
+                      option.color === 'green' ? 'bg-green-500' :
+                      option.color === 'emerald' ? 'bg-emerald-500' :
+                      'bg-red-500'
+                    }`}></span>
                     <span>{option.label}</span>
                     {option.value === currentStatus && (
-                      <span className="ml-auto text-orange-600">✓</span>
+                      <span className="ml-auto text-orange-600 font-bold">✓</span>
                     )}
                   </div>
                 </button>
@@ -309,11 +322,11 @@ export default function ColaboradoresPage() {
             </div>
 
             {/* Colaboradores Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-orange-100 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border border-orange-100 overflow-visible">
               <div className="px-6 py-4 border-b border-gray-200">
                 <h3 className="text-lg font-medium text-gray-900">Lista de Colaboradores</h3>
               </div>
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto overflow-y-visible">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>

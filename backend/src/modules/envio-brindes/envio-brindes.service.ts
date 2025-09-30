@@ -103,9 +103,10 @@ export class EnvioBrindesService {
       ano?: number;
       page?: number;
       limit?: number;
+      colaboradorId?: string;
     } = {}
   ) {
-    const { status, ano, page = 1, limit = 10 } = options;
+    const { status, ano, page = 1, limit = 10, colaboradorId } = options;
     const anoConsulta = ano || getYear(new Date());
     const skip = (page - 1) * limit;
     const take = Math.min(limit, 100); // Máximo 100 itens por página
@@ -119,6 +120,10 @@ export class EnvioBrindesService {
 
     if (status) {
       where.status = status;
+    }
+
+    if (colaboradorId) {
+      where.colaboradorId = colaboradorId;
     }
 
     const [envios, total] = await Promise.all([

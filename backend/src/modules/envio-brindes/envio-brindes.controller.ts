@@ -57,20 +57,38 @@ export class EnvioBrindesController {
     type: Number,
     description: 'Itens por página (padrão: 10, máximo: 100)',
   })
+  @ApiQuery({
+    name: 'colaboradorId',
+    required: false,
+    type: String,
+    description: 'Filtrar por ID do colaborador',
+  })
   @ApiResponse({
     status: 200,
     description: 'Lista de envios de brindes',
   })
   async buscarEnvios(
     @Query('status') status: string,
-    @Query('ano') ano: number,
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
+    @Query('ano') ano: string,
+    @Query('page') page: string,
+    @Query('limit') limit: string,
+    @Query('colaboradorId') colaboradorId: string,
     @Request() req,
   ) {
+    // Converter query params para números
+    const anoNum = ano ? parseInt(ano, 10) : undefined;
+    const pageNum = page ? parseInt(page, 10) : 1;
+    const limitNum = limit ? parseInt(limit, 10) : 10;
+
     return this.envioBrindesService.buscarEnvios(
       req.user.organizationId,
-      { status, ano, page, limit }
+      {
+        status,
+        ano: anoNum,
+        page: pageNum,
+        limit: limitNum,
+        colaboradorId
+      }
     );
   }
 
@@ -195,12 +213,13 @@ export class EnvioBrindesController {
     }
   })
   async buscarEstatisticas(
-    @Query('ano') ano: number,
+    @Query('ano') ano: string,
     @Request() req,
   ) {
+    const anoNum = ano ? parseInt(ano, 10) : undefined;
     return this.envioBrindesService.buscarEstatisticasEnvios(
       req.user.organizationId,
-      ano,
+      anoNum,
     );
   }
 
@@ -226,7 +245,8 @@ export class EnvioBrindesController {
     status: 201,
     description: 'Registros criados para o novo ano',
   })
-  async criarRegistrosParaNovoAno(@Param('ano') ano: number) {
-    return this.envioBrindesService.criarRegistrosParaNovoAno(ano);
+  async criarRegistrosParaNovoAno(@Param('ano') ano: string) {
+    const anoNum = parseInt(ano, 10);
+    return this.envioBrindesService.criarRegistrosParaNovoAno(anoNum);
   }
 }
