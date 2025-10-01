@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { getUser, removeAuthToken } from '@/lib/api';
+import api, { endpoints } from '@/lib/api';
 import type { User } from '@/types';
 
 interface LayoutProps {
@@ -30,6 +31,7 @@ export default function Layout({ children }: LayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     const currentUser = getUser();
@@ -39,59 +41,70 @@ export default function Layout({ children }: LayoutProps) {
     }
     setUser(currentUser);
 
-    // Carregar notificações mockadas (pode ser substituído por chamada API real)
+    // Carregar notificações da API
     loadNotifications();
+    loadUnreadCount();
+
+    // Atualizar notificações a cada 5 minutos
+    const interval = setInterval(() => {
+      loadNotifications();
+      loadUnreadCount();
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
   }, [router]);
 
-  const loadNotifications = () => {
-    // Notificações simuladas - substituir por API real
-    const mockNotifications = [
-      {
-        id: 1,
-        title: 'Aniversários Hoje',
-        message: '15 colaboradores fazem aniversário hoje!',
-        type: 'birthday',
-        time: 'Agora',
-        unread: true,
-      },
-      {
-        id: 2,
-        title: 'Envios Pendentes',
-        message: '8 brindes prontos para envio',
-        type: 'shipment',
-        time: '30 min atrás',
-        unread: true,
-      },
-      {
-        id: 3,
-        title: 'Relatório Mensal',
-        message: 'Relatório de outubro disponível',
-        type: 'report',
-        time: '2h atrás',
-        unread: false,
-      },
-    ];
-    setNotifications(mockNotifications);
+  const loadNotifications = async () => {
+    try {
+      const response = await api.get(`${endpoints.notificacoes}?limit=5`);
+      setNotifications(response.data.slice(0, 5)); // Apenas as 5 mais recentes para o popup
+    } catch (error) {
+      console.error('Erro ao carregar notificações:', error);
+    }
   };
 
-  const markAllAsRead = () => {
-    setNotifications(notifications.map(n => ({ ...n, unread: false })));
+  const loadUnreadCount = async () => {
+    try {
+      const response = await api.get(endpoints.notificacoesNaoLidas);
+      setUnreadCount(response.data.count);
+    } catch (error) {
+      console.error('Erro ao carregar contador de notificações:', error);
+    }
   };
 
-  const getNotificationIcon = (type: string) => {
-    switch (type) {
-      case 'birthday':
+  const markAllAsRead = async () => {
+    try {
+      await api.post(endpoints.marcarTodasNotificacoesLidas);
+      setNotifications(notifications.map(n => ({ ...n, lida: true })));
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Erro ao marcar notificações como lidas:', error);
+    }
+  };
+
+  const getNotificationIcon = (tipo: string) => {
+    switch (tipo) {
+      case 'aniversario':
         return <Gift className="h-5 w-5 text-beuni-orange-500" />;
-      case 'shipment':
+      case 'envio':
         return <Package className="h-5 w-5 text-blue-500" />;
-      case 'report':
+      case 'sistema':
         return <BarChart3 className="h-5 w-5 text-green-500" />;
       default:
         return <Bell className="h-5 w-5 text-gray-500" />;
     }
   };
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const formatRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return 'agora';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m atrás`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h atrás`;
+    return `${Math.floor(diffInSeconds / 86400)}d atrás`;
+  };
 
   const handleLogout = () => {
     removeAuthToken();
@@ -386,15 +399,15 @@ export default function Layout({ children }: LayoutProps) {
                                 <div
                                   key={notification.id}
                                   className={`p-4 hover:bg-beuni-cream/50 transition-colors cursor-pointer ${
-                                    notification.unread ? 'bg-beuni-orange-50/30' : ''
+                                    !notification.lida ? 'bg-beuni-orange-50/30' : ''
                                   }`}
                                   onClick={() => {
                                     // Navegar ou executar ação baseada no tipo
-                                    if (notification.type === 'birthday') {
+                                    if (notification.tipo === 'aniversario') {
                                       router.push('/calendario');
-                                    } else if (notification.type === 'shipment') {
+                                    } else if (notification.tipo === 'envio') {
                                       router.push('/envios');
-                                    } else if (notification.type === 'report') {
+                                    } else if (notification.tipo === 'sistema') {
                                       router.push('/relatorios');
                                     }
                                     setNotificationsOpen(false);
@@ -402,22 +415,22 @@ export default function Layout({ children }: LayoutProps) {
                                 >
                                   <div className="flex items-start space-x-3">
                                     <div className="flex-shrink-0 mt-1">
-                                      {getNotificationIcon(notification.type)}
+                                      {getNotificationIcon(notification.tipo)}
                                     </div>
                                     <div className="flex-1 min-w-0">
                                       <div className="flex items-center justify-between mb-1">
                                         <p className="text-sm font-bold text-beuni-text">
-                                          {notification.title}
+                                          {notification.titulo}
                                         </p>
-                                        {notification.unread && (
+                                        {!notification.lida && (
                                           <span className="h-2 w-2 bg-beuni-orange-500 rounded-full flex-shrink-0" />
                                         )}
                                       </div>
                                       <p className="text-sm text-beuni-text/70 mb-1">
-                                        {notification.message}
+                                        {notification.descricao}
                                       </p>
                                       <p className="text-xs text-beuni-text/50 font-medium">
-                                        {notification.time}
+                                        {formatRelativeTime(notification.dataNotificacao)}
                                       </p>
                                     </div>
                                   </div>

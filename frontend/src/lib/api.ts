@@ -147,4 +147,10 @@ export const endpoints = {
 
   // Relatórios
   relatorios: '/envio-brindes/relatorios',
+
+  // Notificações
+  notificacoes: '/notificacoes',
+  notificacoesNaoLidas: '/notificacoes/count/nao-lidas',
+  marcarNotificacaoLida: (id: string) => `/notificacoes/${id}/marcar-como-lida`,
+  marcarTodasNotificacoesLidas: '/notificacoes/marcar-todas-como-lidas',
 };

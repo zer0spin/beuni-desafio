@@ -15,6 +15,7 @@ import { ColaboradoresModule } from './modules/colaboradores/colaboradores.modul
 import { CepModule } from './modules/cep/cep.module';
 import { EnvioBrindesModule } from './modules/envio-brindes/envio-brindes.module';
 import { OrganizacoesModule } from './modules/organizacoes/organizacoes.module';
+import { NotificacoesModule } from './modules/notificacoes/notificacoes.module';
 
 // Global services
 import { AppController } from './app.controller';
@@ -63,6 +64,7 @@ import { AppService } from './app.service';
     CepModule,
     EnvioBrindesModule,
     OrganizacoesModule,
+    NotificacoesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
