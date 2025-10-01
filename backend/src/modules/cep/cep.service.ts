@@ -80,8 +80,15 @@ export class CepService {
 
       return result;
     } catch (error) {
-      console.error('Erro ao consultar CEP:', error);
-      throw new BadRequestException('Erro ao consultar CEP. Tente novamente.');
+      // Log error securely without exposing sensitive information
+      if (process.env.NODE_ENV === 'development') {
+        console.error('[CEP Service] Error fetching CEP:', {
+          cep: cepLimpo,
+          error: error.message,
+        });
+      }
+      // Don't expose internal error details to client
+      throw new BadRequestException('Erro ao consultar CEP. Verifique o CEP e tente novamente.');
     }
   }
 

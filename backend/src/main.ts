@@ -1,10 +1,25 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Security headers with Helmet
+  app.use(helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles for Swagger UI
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Required for Swagger UI
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Disable for Swagger UI
+    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin for Swagger
+  }));
 
   // Global validation pipe with class-validator
   app.useGlobalPipes(
@@ -15,13 +30,18 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true, // Enable implicit type conversion
       },
+      disableErrorMessages: process.env.NODE_ENV === 'production', // Hide validation errors in production
     }),
   );
 
-  // CORS configuration
+  // CORS configuration with security enhancements
   app.enableCors({
-    origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['X-Total-Count'],
+    maxAge: 3600, // Cache preflight requests for 1 hour
   });
 
   // Swagger/OpenAPI Documentation

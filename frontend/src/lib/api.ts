@@ -86,15 +86,23 @@ export const apiCall = async <T = any>(
   }
 };
 
-// Auth helpers
+// Auth helpers with secure cookie configuration
 export const setAuthToken = (token: string, user: any) => {
-  Cookies.set('beuni_token', token, { expires: 7 }); // 7 days
-  Cookies.set('beuni_user', JSON.stringify(user), { expires: 7 });
+  const cookieOptions = {
+    expires: 7, // 7 days
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    sameSite: 'strict' as const, // CSRF protection
+    path: '/', // Cookie available for entire site
+  };
+
+  Cookies.set('beuni_token', token, cookieOptions);
+  Cookies.set('beuni_user', JSON.stringify(user), cookieOptions);
 };
 
 export const removeAuthToken = () => {
-  Cookies.remove('beuni_token');
-  Cookies.remove('beuni_user');
+  const cookieOptions = { path: '/' };
+  Cookies.remove('beuni_token', cookieOptions);
+  Cookies.remove('beuni_user', cookieOptions);
 };
 
 export const getAuthToken = (): string | undefined => {
@@ -105,7 +113,11 @@ export const getUser = (): any | null => {
   try {
     const userStr = Cookies.get('beuni_user');
     return userStr ? JSON.parse(userStr) : null;
-  } catch {
+  } catch (error) {
+    // Silent fail but log for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error parsing user cookie:', error);
+    }
     return null;
   }
 };

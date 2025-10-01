@@ -1,0 +1,58 @@
+{
+  "dashboard": {
+    "title": "Beuni Corporate Gifting - Security Dashboard",
+    "tags": ["security", "monitoring"],
+    "timezone": "browser",
+    "refresh": "1m",
+    "panels": [
+      {
+        "title": "Login Attempts",
+        "type": "graph",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(rate(login_attempts_total[5m])) by (status)",
+            "legendFormat": "{{status}}"
+          }
+        ]
+      },
+      {
+        "title": "Error Rates",
+        "type": "stat",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(rate(http_request_duration_seconds_count{status=~\"5..\"}[5m])) / sum(rate(http_request_duration_seconds_count[5m])) * 100",
+            "legendFormat": "Error Percentage"
+          }
+        ]
+      },
+      {
+        "title": "Access by IP",
+        "type": "table",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "topk(10, sum(rate(ip_access_total[1h])) by (ip))",
+            "format": "table"
+          }
+        ]
+      },
+      {
+        "title": "System Resource Usage",
+        "type": "gauge",
+        "datasource": "Prometheus",
+        "targets": [
+          {
+            "expr": "sum(node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes) * 100",
+            "legendFormat": "Memory Usage"
+          },
+          {
+            "expr": "avg(node_load1)",
+            "legendFormat": "Load Average"
+          }
+        ]
+      }
+    ]
+  }
+}
