@@ -94,6 +94,12 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [cepLoading, setCepLoading] = useState(false);
   const [cepData, setCepData] = useState<CepData | null>(null);
+  const [fieldStates, setFieldStates] = useState({
+    logradouro: { disabled: false, fromCep: false },
+    bairro: { disabled: false, fromCep: false },
+    cidade: { disabled: false, fromCep: false },
+    uf: { disabled: false, fromCep: false },
+  });
   const [formData, setFormData] = useState<FormData>({
     nome_completo: '',
     data_nascimento: '',
@@ -198,48 +204,70 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
         const data = response.data;
         setCepData(data);
 
+        // Determinar quais campos vieram preenchidos do CEP
+        const hasLogradouro = data.logradouro && data.logradouro.trim() !== '';
+        const hasBairro = data.bairro && data.bairro.trim() !== '';
+        const hasCidade = data.cidade && data.cidade.trim() !== '';
+        const hasUf = data.uf && data.uf.trim() !== '';
+
+        // Atualizar estados dos campos
+        setFieldStates({
+          logradouro: { disabled: hasLogradouro, fromCep: hasLogradouro },
+          bairro: { disabled: hasBairro, fromCep: hasBairro },
+          cidade: { disabled: hasCidade, fromCep: hasCidade },
+          uf: { disabled: hasUf, fromCep: hasUf },
+        });
+
+        // Preencher apenas os campos que vieram do CEP
         setFormData(prev => ({
           ...prev,
           endereco: {
             ...prev.endereco,
             cep: cep,
-            logradouro: data.logradouro,
-            bairro: data.bairro,
-            cidade: data.cidade,
-            uf: data.uf,
+            logradouro: hasLogradouro ? data.logradouro : prev.endereco.logradouro,
+            bairro: hasBairro ? data.bairro : prev.endereco.bairro,
+            cidade: hasCidade ? data.cidade : prev.endereco.cidade,
+            uf: hasUf ? data.uf : prev.endereco.uf,
           },
         }));
+
+        // Mensagem informativa para o usuário
+        const emptyFields = [];
+        if (!hasLogradouro) emptyFields.push('logradouro');
+        if (!hasBairro) emptyFields.push('bairro');
+        if (!hasCidade) emptyFields.push('cidade');
+        if (!hasUf) emptyFields.push('estado');
+
+        if (emptyFields.length > 0) {
+          toast.success(`CEP encontrado! Preencha manualmente: ${emptyFields.join(', ')}`);
+        } else {
+          toast.success('CEP encontrado! Endereço preenchido automaticamente');
+        }
       } catch (error) {
         console.error('Erro ao buscar CEP:', error);
-        toast.error('CEP não encontrado');
+        toast.error('CEP não encontrado. Preencha o endereço manualmente');
         setCepData(null);
-        setFormData(prev => ({
-          ...prev,
-          endereco: {
-            ...prev.endereco,
-            cep: cep,
-            logradouro: '',
-            bairro: '',
-            cidade: '',
-            uf: '',
-          },
-        }));
+
+        // Liberar todos os campos para edição manual
+        setFieldStates({
+          logradouro: { disabled: false, fromCep: false },
+          bairro: { disabled: false, fromCep: false },
+          cidade: { disabled: false, fromCep: false },
+          uf: { disabled: false, fromCep: false },
+        });
       } finally {
         setCepLoading(false);
       }
     } else {
       setCepData(null);
-      setFormData(prev => ({
-        ...prev,
-        endereco: {
-          ...prev.endereco,
-          cep: cep,
-          logradouro: '',
-          bairro: '',
-          cidade: '',
-          uf: '',
-        },
-      }));
+
+      // Resetar estados dos campos quando CEP incompleto
+      setFieldStates({
+        logradouro: { disabled: false, fromCep: false },
+        bairro: { disabled: false, fromCep: false },
+        cidade: { disabled: false, fromCep: false },
+        uf: { disabled: false, fromCep: false },
+      });
     }
   };
 
@@ -518,15 +546,19 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
               <div>
                 <label htmlFor="endereco.logradouro" className="block text-sm font-medium text-gray-700 mb-2">
-                  Logradouro
+                  Logradouro {!fieldStates.logradouro.fromCep && '*'}
+                  {fieldStates.logradouro.fromCep && (
+                    <span className="ml-2 text-xs text-green-600 font-semibold">✓ Preenchido pelo CEP</span>
+                  )}
                 </label>
                 <input
                   type="text"
                   id="endereco.logradouro"
                   name="endereco.logradouro"
+                  required={!fieldStates.logradouro.fromCep}
                   value={formData.endereco.logradouro}
                   onChange={handleInputChange}
-                  disabled={!!cepData}
+                  disabled={fieldStates.logradouro.disabled}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="Rua das Flores"
                 />
@@ -534,15 +566,19 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
 
               <div>
                 <label htmlFor="endereco.bairro" className="block text-sm font-medium text-gray-700 mb-2">
-                  Bairro
+                  Bairro {!fieldStates.bairro.fromCep && '*'}
+                  {fieldStates.bairro.fromCep && (
+                    <span className="ml-2 text-xs text-green-600 font-semibold">✓ Preenchido pelo CEP</span>
+                  )}
                 </label>
                 <input
                   type="text"
                   id="endereco.bairro"
                   name="endereco.bairro"
+                  required={!fieldStates.bairro.fromCep}
                   value={formData.endereco.bairro}
                   onChange={handleInputChange}
-                  disabled={!!cepData}
+                  disabled={fieldStates.bairro.disabled}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="Centro"
                 />
@@ -550,15 +586,19 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
 
               <div>
                 <label htmlFor="endereco.cidade" className="block text-sm font-medium text-gray-700 mb-2">
-                  Cidade
+                  Cidade {!fieldStates.cidade.fromCep && '*'}
+                  {fieldStates.cidade.fromCep && (
+                    <span className="ml-2 text-xs text-green-600 font-semibold">✓ Preenchido pelo CEP</span>
+                  )}
                 </label>
                 <input
                   type="text"
                   id="endereco.cidade"
                   name="endereco.cidade"
+                  required={!fieldStates.cidade.fromCep}
                   value={formData.endereco.cidade}
                   onChange={handleInputChange}
-                  disabled={!!cepData}
+                  disabled={fieldStates.cidade.disabled}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   placeholder="São Paulo"
                 />
@@ -566,15 +606,19 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
 
               <div>
                 <label htmlFor="endereco.uf" className="block text-sm font-medium text-gray-700 mb-2">
-                  Estado (UF)
+                  Estado (UF) {!fieldStates.uf.fromCep && '*'}
+                  {fieldStates.uf.fromCep && (
+                    <span className="ml-2 text-xs text-green-600 font-semibold">✓ Preenchido pelo CEP</span>
+                  )}
                 </label>
                 <input
                   type="text"
                   id="endereco.uf"
                   name="endereco.uf"
+                  required={!fieldStates.uf.fromCep}
                   value={formData.endereco.uf}
                   onChange={handleInputChange}
-                  disabled={!!cepData}
+                  disabled={fieldStates.uf.disabled}
                   maxLength={2}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:bg-gray-100 disabled:cursor-not-allowed uppercase"
                   placeholder="SP"
