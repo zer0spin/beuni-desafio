@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { addDays, isWeekend } from 'date-fns';
+import { addDays } from 'date-fns';
 import { HolidaysService } from './holidays.service';
 
 @Injectable()
@@ -30,8 +30,10 @@ export class BusinessDaysService {
    * Verifica se uma data é um dia útil (não é final de semana nem feriado)
    */
   isBusinessDay(date: Date): boolean {
-    // Verificar se é final de semana
-    if (isWeekend(date)) {
+    // Verificar se é final de semana usando UTC day
+    // 0 = Sunday, 6 = Saturday
+    const dayOfWeek = date.getUTCDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
       return false;
     }
 
