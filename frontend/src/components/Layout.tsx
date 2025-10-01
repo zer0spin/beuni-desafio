@@ -28,6 +28,8 @@ export default function Layout({ children }: LayoutProps) {
   const [user, setUser] = useState<User | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
     const currentUser = getUser();
@@ -36,7 +38,60 @@ export default function Layout({ children }: LayoutProps) {
       return;
     }
     setUser(currentUser);
+
+    // Carregar notificações mockadas (pode ser substituído por chamada API real)
+    loadNotifications();
   }, [router]);
+
+  const loadNotifications = () => {
+    // Notificações simuladas - substituir por API real
+    const mockNotifications = [
+      {
+        id: 1,
+        title: 'Aniversários Hoje',
+        message: '15 colaboradores fazem aniversário hoje!',
+        type: 'birthday',
+        time: 'Agora',
+        unread: true,
+      },
+      {
+        id: 2,
+        title: 'Envios Pendentes',
+        message: '8 brindes prontos para envio',
+        type: 'shipment',
+        time: '30 min atrás',
+        unread: true,
+      },
+      {
+        id: 3,
+        title: 'Relatório Mensal',
+        message: 'Relatório de outubro disponível',
+        type: 'report',
+        time: '2h atrás',
+        unread: false,
+      },
+    ];
+    setNotifications(mockNotifications);
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, unread: false })));
+  };
+
+  const getNotificationIcon = (type: string) => {
+    switch (type) {
+      case 'birthday':
+        return <Gift className="h-5 w-5 text-beuni-orange-500" />;
+      case 'shipment':
+        return <Package className="h-5 w-5 text-blue-500" />;
+      case 'report':
+        return <BarChart3 className="h-5 w-5 text-green-500" />;
+      default:
+        return <Bell className="h-5 w-5 text-gray-500" />;
+    }
+  };
+
+  const unreadCount = notifications.filter(n => n.unread).length;
 
   const handleLogout = () => {
     removeAuthToken();
@@ -263,11 +318,135 @@ export default function Layout({ children }: LayoutProps) {
                 <button className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors">
                   <Search className="h-5 w-5" />
                 </button>
-                <button className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors relative">
-                  <Bell className="h-5 w-5" />
-                  <span className="absolute top-1 right-1 h-2 w-2 bg-beuni-orange-500 rounded-full"></span>
-                </button>
-                <button 
+
+                {/* Notifications Button */}
+                <div className="relative">
+                  <button
+                    onClick={() => setNotificationsOpen(!notificationsOpen)}
+                    className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors relative"
+                  >
+                    <Bell className="h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute top-1 right-1 h-5 w-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center font-bold">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Notifications Popup */}
+                  {notificationsOpen && (
+                    <>
+                      {/* Backdrop */}
+                      <div
+                        className="fixed inset-0 z-40"
+                        onClick={() => setNotificationsOpen(false)}
+                      />
+
+                      {/* Popup */}
+                      <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-beuni-orange-100 z-50 max-h-[500px] flex flex-col">
+                        {/* Header */}
+                        <div className="px-6 py-4 border-b border-beuni-orange-100 bg-gradient-to-r from-beuni-cream to-beuni-orange-50">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-2">
+                              <Bell className="h-5 w-5 text-beuni-orange-600" />
+                              <h3 className="text-lg font-bold text-beuni-text">Notificações</h3>
+                              {unreadCount > 0 && (
+                                <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
+                                  {unreadCount}
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              onClick={() => setNotificationsOpen(false)}
+                              className="p-1 hover:bg-white/50 rounded-lg transition-colors"
+                            >
+                              <X className="h-5 w-5 text-beuni-text/60" />
+                            </button>
+                          </div>
+                          {unreadCount > 0 && (
+                            <button
+                              onClick={markAllAsRead}
+                              className="mt-2 text-sm text-beuni-orange-600 hover:text-beuni-orange-700 font-semibold"
+                            >
+                              Marcar todas como lidas
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Notifications List */}
+                        <div className="overflow-y-auto flex-1">
+                          {notifications.length === 0 ? (
+                            <div className="p-8 text-center">
+                              <Bell className="h-12 w-12 text-beuni-text/30 mx-auto mb-3" />
+                              <p className="text-beuni-text/60 font-medium">Nenhuma notificação</p>
+                            </div>
+                          ) : (
+                            <div className="divide-y divide-beuni-orange-100">
+                              {notifications.map((notification) => (
+                                <div
+                                  key={notification.id}
+                                  className={`p-4 hover:bg-beuni-cream/50 transition-colors cursor-pointer ${
+                                    notification.unread ? 'bg-beuni-orange-50/30' : ''
+                                  }`}
+                                  onClick={() => {
+                                    // Navegar ou executar ação baseada no tipo
+                                    if (notification.type === 'birthday') {
+                                      router.push('/calendario');
+                                    } else if (notification.type === 'shipment') {
+                                      router.push('/envios');
+                                    } else if (notification.type === 'report') {
+                                      router.push('/relatorios');
+                                    }
+                                    setNotificationsOpen(false);
+                                  }}
+                                >
+                                  <div className="flex items-start space-x-3">
+                                    <div className="flex-shrink-0 mt-1">
+                                      {getNotificationIcon(notification.type)}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center justify-between mb-1">
+                                        <p className="text-sm font-bold text-beuni-text">
+                                          {notification.title}
+                                        </p>
+                                        {notification.unread && (
+                                          <span className="h-2 w-2 bg-beuni-orange-500 rounded-full flex-shrink-0" />
+                                        )}
+                                      </div>
+                                      <p className="text-sm text-beuni-text/70 mb-1">
+                                        {notification.message}
+                                      </p>
+                                      <p className="text-xs text-beuni-text/50 font-medium">
+                                        {notification.time}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Footer */}
+                        {notifications.length > 0 && (
+                          <div className="px-6 py-3 border-t border-beuni-orange-100 bg-beuni-cream/30">
+                            <button
+                              onClick={() => {
+                                router.push('/notificacoes');
+                                setNotificationsOpen(false);
+                              }}
+                              className="w-full text-center text-sm font-semibold text-beuni-orange-600 hover:text-beuni-orange-700 transition-colors"
+                            >
+                              Ver todas as notificações
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                <button
                   onClick={() => router.push('/configuracoes')}
                   className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors"
                 >

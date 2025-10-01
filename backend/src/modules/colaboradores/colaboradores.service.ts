@@ -126,7 +126,7 @@ export class ColaboradoresService {
         skip,
         take: limit,
         orderBy: {
-          dataNascimento: 'asc',
+          nomeCompleto: 'asc',
         },
       }),
       this.prisma.colaborador.count({ where }),
