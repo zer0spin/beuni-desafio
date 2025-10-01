@@ -299,9 +299,11 @@ export class EnvioBrindesService {
     const aniversariantesEsteAno = await this.prisma.colaborador.count({
       where: {
         organizationId,
-        dataNascimento: {
-          not: null,
-        },
+        enviosBrinde: {
+          some: {
+            anoAniversario: ano
+          }
+        }
       },
     });
 
@@ -330,24 +332,40 @@ export class EnvioBrindesService {
       CANCELADO: 0,
     } as Record<string, number>);
 
-    // Buscar envios por mês
-    const enviosPorMes = await this.prisma.$queryRaw<Array<{
-      mes: number;
-      total: bigint;
-      enviados: bigint;
-      pendentes: bigint;
-    }>>`
-      SELECT
-        EXTRACT(MONTH FROM c.data_nascimento)::INTEGER as mes,
-        COUNT(*)::BIGINT as total,
-        COUNT(CASE WHEN eb.status IN ('ENVIADO', 'ENTREGUE') THEN 1 END)::BIGINT as enviados,
-        COUNT(CASE WHEN eb.status IN ('PENDENTE', 'PRONTO_PARA_ENVIO') THEN 1 END)::BIGINT as pendentes
-      FROM colaboradores c
-      LEFT JOIN envio_brindes eb ON c.id = eb.colaborador_id AND eb.ano_aniversario = ${ano}
-      WHERE c.organization_id = ${organizationId} AND c.data_nascimento IS NOT NULL
-      GROUP BY EXTRACT(MONTH FROM c.data_nascimento)
-      ORDER BY mes ASC
-    `;
+    // Buscar envios por mês usando Prisma
+    const colaboradoresComEnvios = await this.prisma.colaborador.findMany({
+      where: {
+        organizationId,
+        dataNascimento: {
+          not: null
+        }
+      },
+      include: {
+        enviosBrinde: {
+          where: {
+            anoAniversario: ano
+          }
+        }
+      }
+    });
+
+    const enviosPorMes = Array.from({ length: 12 }, (_, index) => {
+      const mes = index + 1;
+      const colaboradoresDoMes = colaboradoresComEnvios.filter(colab => {
+        const dataNasc = new Date(colab.dataNascimento);
+        return dataNasc.getMonth() + 1 === mes;
+      });
+
+      const enviosDoMes = colaboradoresDoMes.flatMap(c => c.enviosBrinde);
+
+      return {
+        mes,
+        total: colaboradoresDoMes.length,
+        enviados: enviosDoMes.filter(e => ['ENVIADO', 'ENTREGUE'].includes(e.status)).length,
+        pendentes: enviosDoMes.filter(e => ['PENDENTE', 'PRONTO_PARA_ENVIO'].includes(e.status)).length,
+      };
+    });
+;
 
     const mesesNomes = [
       'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',

@@ -52,7 +52,8 @@ export class HolidaysService {
    * Normaliza uma data para comparação (remove hora, minuto, segundo e ms)
    */
   private normalizeDate(date: Date): string {
-    return format(new Date(date.getFullYear(), date.getMonth(), date.getDate()), 'yyyy-MM-dd');
+    // Usar UTC para evitar problemas de fuso horário
+    return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate())).toISOString().split('T')[0];
   }
 
   /**
@@ -83,20 +84,17 @@ export class HolidaysService {
    */
   isHoliday(date: Date): boolean {
     const dateStr = this.normalizeDate(date);
-    const monthDay = format(date, 'MM-dd');
+    const year = parseInt(dateStr.substring(0, 4), 10);
+    const monthDay = dateStr.substring(5);
 
     // Verificar feriados fixos
-    const isFixedHoliday = this.fixedHolidays.some(h => h.monthDay === monthDay);
-    if (isFixedHoliday) {
+    if (this.fixedHolidays.some(h => h.monthDay === monthDay)) {
       return true;
     }
 
     // Verificar feriados móveis
-    const year = date.getFullYear();
     const movableHolidays = this.movableHolidaysByYear[year] || [];
-    const isMovableHoliday = movableHolidays.some(h => h.date === dateStr);
-
-    return isMovableHoliday;
+    return movableHolidays.some(h => h.date === dateStr);
   }
 
   /**
@@ -104,7 +102,8 @@ export class HolidaysService {
    */
   getHolidayName(date: Date): string | null {
     const dateStr = this.normalizeDate(date);
-    const monthDay = format(date, 'MM-dd');
+    const year = new Date(dateStr + 'T00:00:00Z').getUTCFullYear();
+    const monthDay = dateStr.substring(5);
 
     // Verificar feriados fixos
     const fixedHoliday = this.fixedHolidays.find(h => h.monthDay === monthDay);
@@ -113,10 +112,8 @@ export class HolidaysService {
     }
 
     // Verificar feriados móveis
-    const year = date.getFullYear();
     const movableHolidays = this.movableHolidaysByYear[year] || [];
     const movableHoliday = movableHolidays.find(h => h.date === dateStr);
-
     return movableHoliday?.name || null;
   }
 
