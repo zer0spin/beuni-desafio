@@ -115,6 +115,81 @@ export default function EnviosPage() {
     }
   };
 
+  // Calcular dias restantes até a data limite de envio
+  const calcularDiasRestantes = (dataLimite?: string): number | null => {
+    if (!dataLimite) return null;
+
+    const hoje = new Date();
+    const limite = new Date(dataLimite);
+
+    // Normalizar para início do dia
+    hoje.setHours(0, 0, 0, 0);
+    limite.setHours(0, 0, 0, 0);
+
+    const diffTime = limite.getTime() - hoje.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+  };
+
+  // Obter badge de alerta baseado nos dias restantes
+  const getAlertaBadge = (diasRestantes: number | null) => {
+    if (diasRestantes === null) return null;
+
+    if (diasRestantes < 0) {
+      return (
+        <div className="flex items-center space-x-2 bg-red-50 border-2 border-red-200 px-3 py-2 rounded-xl">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <span className="text-sm text-red-700 font-bold">
+            ⚠️ Prazo vencido há {Math.abs(diasRestantes)} dia(s)
+          </span>
+        </div>
+      );
+    }
+
+    if (diasRestantes === 0) {
+      return (
+        <div className="flex items-center space-x-2 bg-red-50 border-2 border-red-200 px-3 py-2 rounded-xl animate-pulse">
+          <AlertCircle className="h-4 w-4 text-red-600" />
+          <span className="text-sm text-red-700 font-bold">
+            ⚠️ ÚLTIMO DIA para envio!
+          </span>
+        </div>
+      );
+    }
+
+    if (diasRestantes <= 2) {
+      return (
+        <div className="flex items-center space-x-2 bg-orange-50 border-2 border-orange-200 px-3 py-2 rounded-xl">
+          <AlertCircle className="h-4 w-4 text-orange-600" />
+          <span className="text-sm text-orange-700 font-bold">
+            ⏰ Enviar em até {diasRestantes} dia(s)
+          </span>
+        </div>
+      );
+    }
+
+    if (diasRestantes <= 5) {
+      return (
+        <div className="flex items-center space-x-2 bg-yellow-50 border border-yellow-200 px-3 py-2 rounded-xl">
+          <Clock className="h-4 w-4 text-yellow-600" />
+          <span className="text-sm text-yellow-700 font-semibold">
+            {diasRestantes} dias restantes
+          </span>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-3 py-2 rounded-xl">
+        <Clock className="h-4 w-4 text-blue-600" />
+        <span className="text-sm text-blue-700 font-medium">
+          {diasRestantes} dias restantes
+        </span>
+      </div>
+    );
+  };
+
   const getStatusInfo = (status: string) => {
     const statusConfig = {
       PENDENTE: {
@@ -306,7 +381,7 @@ export default function EnviosPage() {
                       </div>
 
                       {/* Details Grid */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                         <div className="flex items-start space-x-3 bg-beuni-cream rounded-xl p-3">
                           <Calendar className="h-5 w-5 text-beuni-orange-600 mt-0.5 flex-shrink-0" />
                           <div>
@@ -316,6 +391,23 @@ export default function EnviosPage() {
                             </p>
                           </div>
                         </div>
+
+                        {envio.dataGatilhoEnvio && (
+                          <div className="flex items-start space-x-3 bg-amber-50 border-2 border-amber-200 rounded-xl p-3">
+                            <Clock className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                            <div>
+                              <p className="text-xs text-amber-700 font-semibold uppercase tracking-wide mb-1">
+                                Data Limite de Envio
+                              </p>
+                              <p className="text-sm font-bold text-amber-900">
+                                {formatDate(envio.dataGatilhoEnvio)}
+                              </p>
+                              <p className="text-xs text-amber-600 font-medium mt-0.5">
+                                7 dias úteis antes
+                              </p>
+                            </div>
+                          </div>
+                        )}
 
                         <div className="flex items-start space-x-3 bg-beuni-cream rounded-xl p-3">
                           <MapPin className="h-5 w-5 text-beuni-orange-600 mt-0.5 flex-shrink-0" />
@@ -330,6 +422,13 @@ export default function EnviosPage() {
                           </div>
                         </div>
                       </div>
+
+                      {/* Alerta de dias restantes para envio */}
+                      {envio.status !== 'ENVIADO' && envio.status !== 'ENTREGUE' && envio.status !== 'CANCELADO' && envio.dataGatilhoEnvio && (
+                        <div className="mb-3">
+                          {getAlertaBadge(calcularDiasRestantes(envio.dataGatilhoEnvio))}
+                        </div>
+                      )}
 
                       {envio.dataEnvioRealizado && (
                         <div className="flex items-center space-x-2 bg-green-50 px-3 py-2 rounded-xl">
