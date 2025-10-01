@@ -532,67 +532,80 @@ export default function CalendarioPage() {
 
             {/* Dias do calendário */}
             <div className="grid grid-cols-7">
-              {diasCalendario.map((diaInfo, index) => (
-                <div
-                  key={index}
-                  onClick={() => diaInfo.dia > 0 && diaInfo.aniversariantes.length > 0 && setDiaSelecionado(diaInfo)}
-                  className={`min-h-[80px] lg:min-h-[130px] p-2 lg:p-3 border-r border-b border-gray-200 transition-all ${
-                    diaInfo.dia > 0 && diaInfo.aniversariantes.length > 0 ? 'cursor-pointer hover:bg-beuni-orange-50 hover:border-beuni-orange-300' : ''
-                  } ${
-                    diaInfo.dia === 0 ? 'bg-gray-50 border-gray-100' : 'bg-white'
-                  } ${diaInfo.isToday ? 'bg-gradient-to-br from-beuni-orange-100 to-yellow-100 ring-2 ring-beuni-orange-400 shadow-lg' : ''}`}
-                >
-                  {diaInfo.dia > 0 && (
-                    <>
-                      <div className={`text-sm lg:text-base font-bold mb-1 lg:mb-2 ${
-                        diaInfo.isToday ? 'text-beuni-orange-700 text-lg lg:text-xl' : 'text-gray-700'
-                      }`}>
-                        {diaInfo.dia}
-                      </div>
-
-                      {diaInfo.aniversariantes.length > 0 && (
-                        <div className="space-y-1 lg:space-y-2">
-                          {/* Desktop: mostra até 2 aniversariantes */}
-                          <div className="hidden lg:block space-y-2">
-                            {diaInfo.aniversariantes.slice(0, 2).map(colaborador => (
-                              <div
-                                key={colaborador.id}
-                                className="bg-gradient-to-r from-beuni-orange-200 to-yellow-200 border-l-4 border-beuni-orange-600 p-2 rounded-lg text-xs shadow-md hover:shadow-lg hover:scale-105 transition-all"
-                              >
-                                <div className="flex items-center space-x-1 mb-1">
-                                  <Gift className="h-3 w-3 text-beuni-orange-700 flex-shrink-0" />
-                                  <span className="font-bold text-gray-800 truncate">
-                                    {colaborador.nome_completo}
-                                  </span>
-                                </div>
-                                <div className="text-gray-600 truncate text-xs font-medium">
-                                  {colaborador.cargo}
-                                </div>
-                                <div className="mt-1.5">
-                                  {getStatusBadge(colaborador.status_envio_atual)}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Mobile: apenas badge com contagem */}
-                          <div className="lg:hidden">
-                            <div className="bg-beuni-orange-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold mx-auto shadow-md">
-                              {diaInfo.aniversariantes.length}
-                            </div>
-                          </div>
-
-                          {diaInfo.aniversariantes.length > 2 && (
-                            <div className="hidden lg:block text-xs text-gray-700 text-center font-bold bg-beuni-orange-100 rounded-lg py-1.5 border border-beuni-orange-300">
-                              +{diaInfo.aniversariantes.length - 2} mais
-                            </div>
-                          )}
+              {diasCalendario.map((diaInfo, index) => {
+                // Criar padrão intercalado sutil para células vazias
+                const isEvenRow = Math.floor(index / 7) % 2 === 0;
+                const isEvenCol = index % 2 === 0;
+                const isAlternate = (isEvenRow && isEvenCol) || (!isEvenRow && !isEvenCol);
+                
+                return (
+                  <div
+                    key={index}
+                    onClick={() => diaInfo.dia > 0 && diaInfo.aniversariantes.length > 0 && setDiaSelecionado(diaInfo)}
+                    className={`min-h-[80px] lg:min-h-[130px] p-2 lg:p-3 border-r border-b transition-all ${
+                      diaInfo.dia > 0 && diaInfo.aniversariantes.length > 0 ? 'cursor-pointer hover:bg-beuni-orange-50 hover:border-beuni-orange-300' : ''
+                    } ${
+                      diaInfo.dia === 0 
+                        ? `${isAlternate ? 'bg-gray-25 border-gray-150' : 'bg-gray-50 border-gray-200'} shadow-inner` 
+                        : 'bg-white border-gray-200 shadow-sm'
+                    } ${diaInfo.isToday ? 'bg-gradient-to-br from-beuni-orange-100 to-yellow-100 ring-2 ring-beuni-orange-400 shadow-lg border-beuni-orange-300' : ''}`}
+                    style={diaInfo.dia === 0 ? {
+                      backgroundColor: isAlternate ? '#fafafa' : '#f5f5f5',
+                      borderColor: isAlternate ? '#e5e7eb' : '#d1d5db'
+                    } : {}}
+                  >
+                    {diaInfo.dia > 0 && (
+                      <>
+                        <div className={`text-sm lg:text-base font-bold mb-1 lg:mb-2 ${
+                          diaInfo.isToday ? 'text-beuni-orange-700 text-lg lg:text-xl' : 'text-gray-700'
+                        }`}>
+                          {diaInfo.dia}
                         </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              ))}
+
+                        {diaInfo.aniversariantes.length > 0 && (
+                          <div className="space-y-1 lg:space-y-2">
+                            {/* Desktop: mostra até 2 aniversariantes */}
+                            <div className="hidden lg:block space-y-2">
+                              {diaInfo.aniversariantes.slice(0, 2).map(colaborador => (
+                                <div
+                                  key={colaborador.id}
+                                  className="bg-gradient-to-r from-beuni-orange-200 to-yellow-200 border-l-4 border-beuni-orange-600 p-2 rounded-lg text-xs shadow-md hover:shadow-lg hover:scale-105 transition-all"
+                                >
+                                  <div className="flex items-center space-x-1 mb-1">
+                                    <Gift className="h-3 w-3 text-beuni-orange-700 flex-shrink-0" />
+                                    <span className="font-bold text-gray-800 truncate">
+                                      {colaborador.nome_completo}
+                                    </span>
+                                  </div>
+                                  <div className="text-gray-600 truncate text-xs font-medium">
+                                    {colaborador.cargo}
+                                  </div>
+                                  <div className="mt-1.5">
+                                    {getStatusBadge(colaborador.status_envio_atual)}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Mobile: apenas badge com contagem */}
+                            <div className="lg:hidden">
+                              <div className="bg-beuni-orange-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold mx-auto shadow-md">
+                                {diaInfo.aniversariantes.length}
+                              </div>
+                            </div>
+
+                            {diaInfo.aniversariantes.length > 2 && (
+                              <div className="hidden lg:block text-xs text-gray-700 text-center font-bold bg-beuni-orange-100 rounded-lg py-1.5 border border-beuni-orange-300">
+                                +{diaInfo.aniversariantes.length - 2} mais
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         ) : (

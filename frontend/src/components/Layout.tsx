@@ -56,7 +56,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const loadNotifications = async () => {
     try {
-      const response = await api.get(`${endpoints.notificacoes}?limit=5`);
+      const response = await api.get(endpoints.notificacoes);
       setNotifications(response.data.slice(0, 5)); // Apenas as 5 mais recentes para o popup
     } catch (error) {
       console.error('Erro ao carregar notificações:', error);

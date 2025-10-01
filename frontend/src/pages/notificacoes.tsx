@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 import Layout from '@/components/Layout';
-import api, { endpoints } from '@/lib/api';
+import api, { endpoints, getUser } from '@/lib/api';
 
 interface Notification {
   id: string;
@@ -45,6 +45,12 @@ export default function NotificacoesPage() {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
+    const user = getUser();
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    
     loadNotifications();
   }, []);
 
