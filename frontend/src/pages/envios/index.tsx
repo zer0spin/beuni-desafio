@@ -54,6 +54,7 @@ export default function EnviosPage() {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [stats, setStats] = useState({ total: 0, page: 1, totalPages: 0 });
   const [filter, setFilter] = useState<string>('TODOS');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const user = getUser();
@@ -63,7 +64,7 @@ export default function EnviosPage() {
     }
 
     loadEnvios();
-  }, [filter]);
+  }, [filter, currentPage]);
 
   const loadEnvios = async () => {
     try {
@@ -74,8 +75,8 @@ export default function EnviosPage() {
         params.append('status', filter);
       }
       params.append('ano', '2025');
-      params.append('page', '1');
-      params.append('limit', '50');
+      params.append('page', currentPage.toString());
+      params.append('limit', '15');
 
       const response = await api.get(`/envio-brindes?${params.toString()}`);
       const data = response.data;
@@ -110,14 +111,35 @@ export default function EnviosPage() {
     }
   };
 
-  const calcularDiasRestantes = (dataLimite?: string): number | null => {
-    if (!dataLimite) return null;
+  const calcularDiasRestantes = (envio: EnvioBrinde): number | null => {
+    // Se já foi enviado ou entregue, retorna null pois não tem prazo
+    if (envio.status === 'ENVIADO' || envio.status === 'ENTREGUE') {
+      return null;
+    }
+
     const hoje = new Date();
-    const limite = new Date(dataLimite);
     hoje.setHours(0, 0, 0, 0);
-    limite.setHours(0, 0, 0, 0);
-    const diffTime = limite.getTime() - hoje.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    // Se tem data de gatilho definida, usa ela
+    if (envio.dataGatilhoEnvio) {
+      const limite = new Date(envio.dataGatilhoEnvio);
+      limite.setHours(0, 0, 0, 0);
+      const diffTime = limite.getTime() - hoje.getTime();
+      return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    }
+
+    // Se não tem data de gatilho, calcula baseado na data de aniversário
+    const dataNascimento = new Date(envio.colaborador.dataNascimento);
+    let dataAniversario = new Date(envio.anoAniversario, dataNascimento.getMonth(), dataNascimento.getDate());
+    dataAniversario.setHours(0, 0, 0, 0);
+
+    // Se o aniversário deste ano já passou, calcular para o próximo ano
+    if (dataAniversario < hoje) {
+      dataAniversario.setFullYear(dataAniversario.getFullYear() + 1);
+    }
+
+    const diffTime = dataAniversario.getTime() - hoje.getTime();
+    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
   };
 
   const getStatusConfig = (status: string) => {
@@ -182,7 +204,10 @@ export default function EnviosPage() {
                 return (
                   <button
                     key={filterOption.key}
-                    onClick={() => setFilter(filterOption.key)}
+                    onClick={() => {
+                      setFilter(filterOption.key);
+                      setCurrentPage(1); // Reset para primeira página ao mudar filtro
+                    }}
                     className={`flex items-center px-4 py-2 rounded-xl font-semibold transition-all ${
                       filter === filterOption.key
                         ? 'bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white shadow-md scale-105'
@@ -218,7 +243,7 @@ export default function EnviosPage() {
             {envios.map((envio) => {
               const statusConfig = getStatusConfig(envio.status);
               const StatusIcon = statusConfig.icon;
-              const diasRestantes = calcularDiasRestantes(envio.dataGatilhoEnvio);
+              const diasRestantes = calcularDiasRestantes(envio);
 
               return (
                 <div
@@ -268,8 +293,8 @@ export default function EnviosPage() {
                     </div>
                   </div>
 
-                  {/* Info Grid Compacta */}
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-3">
+                  {/* Info Grid Compacta - SEMPRE 3 COLUNAS */}
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                     {/* Aniversário */}
                     <div className="flex items-center space-x-2 bg-beuni-cream rounded-lg px-3 py-2">
                       <Calendar className="h-4 w-4 text-beuni-orange-600 flex-shrink-0" />
@@ -278,17 +303,6 @@ export default function EnviosPage() {
                         <p className="text-sm font-bold text-beuni-text truncate">{formatDate(envio.colaborador.dataNascimento)}</p>
                       </div>
                     </div>
-
-                    {/* Data Limite */}
-                    {envio.dataGatilhoEnvio && (
-                      <div className="flex items-center space-x-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                        <Clock className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs text-amber-700 font-semibold uppercase">Enviar até</p>
-                          <p className="text-sm font-bold text-amber-900 truncate">{formatDate(envio.dataGatilhoEnvio)}</p>
-                        </div>
-                      </div>
-                    )}
 
                     {/* Endereço */}
                     <div className="flex items-center space-x-2 bg-beuni-cream rounded-lg px-3 py-2">
@@ -300,53 +314,176 @@ export default function EnviosPage() {
                         </p>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Alertas */}
-                  <div className="flex flex-wrap gap-2">
-                    {/* Dias Restantes */}
-                    {envio.status !== 'ENVIADO' && envio.status !== 'ENTREGUE' && envio.status !== 'CANCELADO' && diasRestantes !== null && (
-                      <div className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold ${
+                    {/* Dias Restantes ou Data de Envio/Entrega */}
+                    {envio.status === 'ENTREGUE' ? (
+                      <div className="flex items-center space-x-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs text-emerald-700 font-semibold uppercase">Entregue em</p>
+                          <p className="text-sm font-bold text-emerald-900 truncate">{formatDate(envio.dataEnvioRealizado || '')}</p>
+                        </div>
+                      </div>
+                    ) : envio.status === 'ENVIADO' && envio.dataEnvioRealizado ? (
+                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                        <Truck className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs text-emerald-700 font-semibold uppercase">Entregue em</p>
+                          <p className="text-sm font-bold text-emerald-900 truncate">
+                            {envio.dataEnvioRealizado ? formatDate(envio.dataEnvioRealizado) : '-'}
+                          </p>
+                        </div>
+                      </div>
+                    ) : envio.status === 'ENVIADO' ? (
+                      <div className="flex items-center space-x-2 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                        <Truck className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs text-green-700 font-semibold uppercase">Enviado em</p>
+                          <p className="text-sm font-bold text-green-900 truncate">
+                            {envio.dataEnvioRealizado ? formatDate(envio.dataEnvioRealizado) : '-'}
+                          </p>
+                        </div>
+                      </div>
+                    ) : diasRestantes !== null ? (
+                      <div className={`flex items-center space-x-2 rounded-lg px-3 py-2 ${
                         diasRestantes < 0
-                          ? 'bg-red-50 border border-red-200 text-red-700'
+                          ? 'bg-red-50 border border-red-200'
                           : diasRestantes === 0
-                          ? 'bg-red-50 border border-red-200 text-red-700 animate-pulse'
+                          ? 'bg-red-50 border border-red-200'
                           : diasRestantes <= 2
-                          ? 'bg-orange-50 border border-orange-200 text-orange-700'
+                          ? 'bg-orange-50 border border-orange-200'
                           : diasRestantes <= 5
-                          ? 'bg-yellow-50 border border-yellow-200 text-yellow-700'
-                          : 'bg-blue-50 border border-blue-200 text-blue-700'
+                          ? 'bg-yellow-50 border border-yellow-200'
+                          : 'bg-blue-50 border border-blue-200'
                       }`}>
                         {diasRestantes < 0 ? (
-                          <>
-                            <AlertCircle className="h-3.5 w-3.5" />
-                            <span>Atrasado {Math.abs(diasRestantes)}d</span>
-                          </>
-                        ) : diasRestantes === 0 ? (
-                          <>
-                            <AlertCircle className="h-3.5 w-3.5" />
-                            <span>ÚLTIMO DIA!</span>
-                          </>
+                          <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600" />
                         ) : (
-                          <>
-                            <Clock className="h-3.5 w-3.5" />
-                            <span>{diasRestantes}d restante{diasRestantes > 1 ? 's' : ''}</span>
-                          </>
+                          <Clock className={`h-4 w-4 flex-shrink-0 ${
+                            diasRestantes === 0 ? 'text-red-600' :
+                            diasRestantes <= 2 ? 'text-orange-600' :
+                            diasRestantes <= 5 ? 'text-yellow-600' :
+                            'text-blue-600'
+                          }`} />
                         )}
+                        <div className="min-w-0 flex-1">
+                          <p className={`text-xs font-semibold uppercase ${
+                            diasRestantes < 0 ? 'text-red-700' :
+                            diasRestantes === 0 ? 'text-red-700' :
+                            diasRestantes <= 2 ? 'text-orange-700' :
+                            diasRestantes <= 5 ? 'text-yellow-700' :
+                            'text-blue-700'
+                          }`}>
+                            {diasRestantes < 0 ? 'ATRASADO' : diasRestantes === 0 ? 'ÚLTIMO DIA!' : 'FALTAM'}
+                          </p>
+                          <p className={`text-sm font-bold truncate ${
+                            diasRestantes < 0 ? 'text-red-900' :
+                            diasRestantes === 0 ? 'text-red-900' :
+                            diasRestantes <= 2 ? 'text-orange-900' :
+                            diasRestantes <= 5 ? 'text-yellow-900' :
+                            'text-blue-900'
+                          }`}>
+                            {diasRestantes < 0
+                              ? `${Math.abs(diasRestantes)} dias atrás`
+                              : diasRestantes === 0
+                              ? 'Hoje!'
+                              : `${diasRestantes} dias`
+                            }
+                          </p>
+                        </div>
                       </div>
-                    )}
-
-                    {/* Data de Envio Realizado */}
-                    {envio.dataEnvioRealizado && (
-                      <div className="flex items-center space-x-1.5 bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg text-xs font-bold text-green-700">
-                        <Truck className="h-3.5 w-3.5" />
-                        <span>Enviado em {formatDate(envio.dataEnvioRealizado)}</span>
+                    ) : (
+                      <div className="flex items-center space-x-2 bg-beuni-cream rounded-lg px-3 py-2">
+                        <Clock className="h-4 w-4 text-beuni-orange-600 flex-shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs text-beuni-text/60 font-semibold uppercase">Prazo</p>
+                          <p className="text-sm font-bold text-beuni-text truncate">-</p>
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Paginação */}
+        {!loading && envios.length > 0 && stats.totalPages > 1 && (
+          <div className="mt-8 bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-4">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              {/* Informações da Página */}
+              <div className="text-sm text-beuni-text/60">
+                Mostrando <span className="font-bold text-beuni-text">{envios.length}</span> de{' '}
+                <span className="font-bold text-beuni-text">{stats.total}</span> envios
+                <span className="mx-2">•</span>
+                Página <span className="font-bold text-beuni-text">{stats.page}</span> de{' '}
+                <span className="font-bold text-beuni-text">{stats.totalPages}</span>
+              </div>
+
+              {/* Controles de Navegação */}
+              <div className="flex items-center space-x-2">
+                {/* Botão Anterior */}
+                <button
+                  onClick={() => {
+                    setCurrentPage((prev) => Math.max(prev - 1, 1));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 rounded-lg font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-beuni-cream text-beuni-text hover:bg-beuni-orange-50 disabled:hover:bg-beuni-cream"
+                >
+                  Anterior
+                </button>
+
+                {/* Números das Páginas */}
+                <div className="hidden sm:flex items-center space-x-1">
+                  {Array.from({ length: stats.totalPages }, (_, i) => i + 1).map((page) => {
+                    // Mostra apenas algumas páginas próximas da atual
+                    if (
+                      page === 1 ||
+                      page === stats.totalPages ||
+                      (page >= currentPage - 1 && page <= currentPage + 1)
+                    ) {
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => {
+                            setCurrentPage(page);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className={`w-10 h-10 rounded-lg font-bold text-sm transition-all ${
+                            currentPage === page
+                              ? 'bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white shadow-md'
+                              : 'bg-beuni-cream text-beuni-text hover:bg-beuni-orange-50'
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    } else if (page === currentPage - 2 || page === currentPage + 2) {
+                      return (
+                        <span key={page} className="text-beuni-text/40 px-2">
+                          ...
+                        </span>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+
+                {/* Botão Próxima */}
+                <button
+                  onClick={() => {
+                    setCurrentPage((prev) => Math.min(prev + 1, stats.totalPages));
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  disabled={currentPage === stats.totalPages}
+                  className="px-4 py-2 rounded-lg font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed bg-beuni-cream text-beuni-text hover:bg-beuni-orange-50 disabled:hover:bg-beuni-cream"
+                >
+                  Próxima
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
