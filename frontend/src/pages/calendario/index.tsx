@@ -126,22 +126,25 @@ export default function CalendarioPage() {
       const primeiroDia = new Date(ano, mes, 1);
       const ultimoDia = new Date(ano, mes + 1, 0);
 
-      // Primeiro dia da semana do calendário (domingo da primeira semana)
-      const primeiroDiaCalendario = new Date(primeiroDia);
-      primeiroDiaCalendario.setDate(primeiroDia.getDate() - primeiroDia.getDay());
-
-      // Último dia da semana do calendário (sábado da última semana)
-      const ultimoDiaCalendario = new Date(ultimoDia);
-      ultimoDiaCalendario.setDate(ultimoDia.getDate() + (6 - ultimoDia.getDay()));
-
       const dias: DiaCalendario[] = [];
       const dataHoje = new Date();
 
-      // Gerar todos os dias do calendário
-      for (let d = new Date(primeiroDiaCalendario); d <= ultimoDiaCalendario; d.setDate(d.getDate() + 1)) {
-        const dia = d.getDate();
-        const mesAtual = d.getMonth() === mes;
-        const isToday = d.toDateString() === dataHoje.toDateString();
+      // Adicionar células vazias no início (apenas se necessário)
+      const diasVaziosInicio = primeiroDia.getDay(); // 0 = domingo, 1 = segunda, etc.
+      for (let i = 0; i < diasVaziosInicio; i++) {
+        dias.push({
+          dia: 0, // Marcador para célula vazia
+          aniversariantes: [],
+          isCurrentMonth: false,
+          isToday: false,
+          date: new Date(),
+        });
+      }
+
+      // Gerar apenas os dias do mês atual
+      for (let dia = 1; dia <= ultimoDia.getDate(); dia++) {
+        const dataAtualDia = new Date(ano, mes, dia);
+        const isToday = dataAtualDia.toDateString() === dataHoje.toDateString();
 
         // Encontrar aniversariantes deste dia
         const aniversariantes = colaboradores.filter(c => {
@@ -186,13 +189,25 @@ export default function CalendarioPage() {
         dias.push({
           dia,
           aniversariantes,
-          isCurrentMonth: mesAtual,
+          isCurrentMonth: true,
           isToday,
-          date: new Date(d),
+          date: dataAtualDia,
         });
       }
 
-      console.log('Calendário gerado com', dias.length, 'dias');
+      // Completar as células vazias no final (se necessário para formar semanas completas)
+      const totalCells = 42; // 6 semanas × 7 dias
+      while (dias.length < totalCells) {
+        dias.push({
+          dia: 0, // Marcador para célula vazia
+          aniversariantes: [],
+          isCurrentMonth: false,
+          isToday: false,
+          date: new Date(),
+        });
+      }
+
+      console.log('Calendário gerado com', dias.length, 'células');
       setDiasCalendario(dias);
     } catch (error) {
       console.error('Erro ao gerar calendário:', error);
@@ -289,17 +304,17 @@ export default function CalendarioPage() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      PENDENTE: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Pendente' },
-      PRONTO_PARA_ENVIO: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Pronto' },
-      ENVIADO: { bg: 'bg-green-100', text: 'text-green-800', label: 'Enviado' },
-      ENTREGUE: { bg: 'bg-emerald-100', text: 'text-emerald-800', label: 'Entregue' },
-      CANCELADO: { bg: 'bg-red-100', text: 'text-red-800', label: 'Cancelado' },
+      PENDENTE: { bg: 'bg-yellow-200', text: 'text-yellow-900', label: 'Pendente', border: 'border-yellow-400' },
+      PRONTO_PARA_ENVIO: { bg: 'bg-blue-200', text: 'text-blue-900', label: 'Pronto', border: 'border-blue-400' },
+      ENVIADO: { bg: 'bg-green-200', text: 'text-green-900', label: 'Enviado', border: 'border-green-400' },
+      ENTREGUE: { bg: 'bg-emerald-200', text: 'text-emerald-900', label: 'Entregue', border: 'border-emerald-400' },
+      CANCELADO: { bg: 'bg-red-200', text: 'text-red-900', label: 'Cancelado', border: 'border-red-400' },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.PENDENTE;
 
     return (
-      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}>
+      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold border ${config.bg} ${config.text} ${config.border} shadow-sm`}>
         {config.label}
       </span>
     );
@@ -498,18 +513,18 @@ export default function CalendarioPage() {
         ) : viewMode === 'calendar' ? (
           <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 overflow-hidden">
             {/* Cabeçalho dos dias da semana */}
-            <div className="hidden lg:grid grid-cols-7 bg-gradient-to-r from-beuni-orange-50 to-beuni-cream border-b border-beuni-orange-200">
+            <div className="hidden lg:grid grid-cols-7 bg-gradient-to-r from-gray-700 to-gray-800 border-b-2 border-gray-600">
               {diasSemana.map(dia => (
-                <div key={dia} className="p-4 text-center text-sm font-bold text-beuni-text uppercase tracking-wide">
+                <div key={dia} className="p-4 text-center text-sm font-bold text-white uppercase tracking-wide">
                   {dia}
                 </div>
               ))}
             </div>
 
             {/* Mobile: Cabeçalho simplificado */}
-            <div className="grid grid-cols-7 lg:hidden bg-gradient-to-r from-beuni-orange-50 to-beuni-cream border-b border-beuni-orange-200">
+            <div className="grid grid-cols-7 lg:hidden bg-gradient-to-r from-gray-700 to-gray-800 border-b-2 border-gray-600">
               {diasSemana.map(dia => (
-                <div key={dia} className="p-2 text-center text-xs font-bold text-beuni-text uppercase">
+                <div key={dia} className="p-2 text-center text-xs font-bold text-white uppercase">
                   {dia.substring(0, 1)}
                 </div>
               ))}
@@ -520,57 +535,61 @@ export default function CalendarioPage() {
               {diasCalendario.map((diaInfo, index) => (
                 <div
                   key={index}
-                  onClick={() => diaInfo.aniversariantes.length > 0 && setDiaSelecionado(diaInfo)}
-                  className={`min-h-[80px] lg:min-h-[130px] p-2 lg:p-3 border-r border-b border-beuni-orange-100 transition-all ${
-                    diaInfo.aniversariantes.length > 0 ? 'cursor-pointer hover:bg-beuni-cream/50' : ''
+                  onClick={() => diaInfo.dia > 0 && diaInfo.aniversariantes.length > 0 && setDiaSelecionado(diaInfo)}
+                  className={`min-h-[80px] lg:min-h-[130px] p-2 lg:p-3 border-r border-b border-gray-200 transition-all ${
+                    diaInfo.dia > 0 && diaInfo.aniversariantes.length > 0 ? 'cursor-pointer hover:bg-beuni-orange-50 hover:border-beuni-orange-300' : ''
                   } ${
-                    !diaInfo.isCurrentMonth ? 'bg-gray-50/50 text-gray-400' : 'bg-white'
-                  } ${diaInfo.isToday ? 'bg-gradient-to-br from-beuni-orange-50 to-yellow-50 ring-2 ring-beuni-orange-300 shadow-sm' : ''}`}
+                    diaInfo.dia === 0 ? 'bg-gray-50 border-gray-100' : 'bg-white'
+                  } ${diaInfo.isToday ? 'bg-gradient-to-br from-beuni-orange-100 to-yellow-100 ring-2 ring-beuni-orange-400 shadow-lg' : ''}`}
                 >
-                  <div className={`text-xs lg:text-sm font-bold mb-1 lg:mb-2 ${
-                    diaInfo.isToday ? 'text-beuni-orange-600 text-base lg:text-lg' : 'text-beuni-text/70'
-                  }`}>
-                    {diaInfo.dia}
-                  </div>
+                  {diaInfo.dia > 0 && (
+                    <>
+                      <div className={`text-sm lg:text-base font-bold mb-1 lg:mb-2 ${
+                        diaInfo.isToday ? 'text-beuni-orange-700 text-lg lg:text-xl' : 'text-gray-700'
+                      }`}>
+                        {diaInfo.dia}
+                      </div>
 
-                  {diaInfo.aniversariantes.length > 0 && (
-                    <div className="space-y-1 lg:space-y-2">
-                      {/* Desktop: mostra até 2 aniversariantes */}
-                      <div className="hidden lg:block space-y-2">
-                        {diaInfo.aniversariantes.slice(0, 2).map(colaborador => (
-                          <div
-                            key={colaborador.id}
-                            className="bg-gradient-to-r from-beuni-orange-100 to-yellow-100 border-l-3 border-beuni-orange-500 p-2 rounded-lg text-xs shadow-sm hover:shadow-md transition-all"
-                          >
-                            <div className="flex items-center space-x-1 mb-1">
-                              <Gift className="h-3 w-3 text-beuni-orange-600 flex-shrink-0" />
-                              <span className="font-bold text-beuni-text truncate">
-                                {colaborador.nome_completo}
-                              </span>
-                            </div>
-                            <div className="text-beuni-text/70 truncate text-xs font-medium">
-                              {colaborador.cargo}
-                            </div>
-                            <div className="mt-1.5">
-                              {getStatusBadge(colaborador.status_envio_atual)}
+                      {diaInfo.aniversariantes.length > 0 && (
+                        <div className="space-y-1 lg:space-y-2">
+                          {/* Desktop: mostra até 2 aniversariantes */}
+                          <div className="hidden lg:block space-y-2">
+                            {diaInfo.aniversariantes.slice(0, 2).map(colaborador => (
+                              <div
+                                key={colaborador.id}
+                                className="bg-gradient-to-r from-beuni-orange-200 to-yellow-200 border-l-4 border-beuni-orange-600 p-2 rounded-lg text-xs shadow-md hover:shadow-lg hover:scale-105 transition-all"
+                              >
+                                <div className="flex items-center space-x-1 mb-1">
+                                  <Gift className="h-3 w-3 text-beuni-orange-700 flex-shrink-0" />
+                                  <span className="font-bold text-gray-800 truncate">
+                                    {colaborador.nome_completo}
+                                  </span>
+                                </div>
+                                <div className="text-gray-600 truncate text-xs font-medium">
+                                  {colaborador.cargo}
+                                </div>
+                                <div className="mt-1.5">
+                                  {getStatusBadge(colaborador.status_envio_atual)}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* Mobile: apenas badge com contagem */}
+                          <div className="lg:hidden">
+                            <div className="bg-beuni-orange-600 text-white rounded-full w-7 h-7 flex items-center justify-center text-xs font-bold mx-auto shadow-md">
+                              {diaInfo.aniversariantes.length}
                             </div>
                           </div>
-                        ))}
-                      </div>
 
-                      {/* Mobile: apenas badge com contagem */}
-                      <div className="lg:hidden">
-                        <div className="bg-beuni-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold mx-auto">
-                          {diaInfo.aniversariantes.length}
-                        </div>
-                      </div>
-
-                      {diaInfo.aniversariantes.length > 2 && (
-                        <div className="hidden lg:block text-xs text-beuni-text/60 text-center font-semibold bg-beuni-cream rounded-lg py-1">
-                          +{diaInfo.aniversariantes.length - 2} mais
+                          {diaInfo.aniversariantes.length > 2 && (
+                            <div className="hidden lg:block text-xs text-gray-700 text-center font-bold bg-beuni-orange-100 rounded-lg py-1.5 border border-beuni-orange-300">
+                              +{diaInfo.aniversariantes.length - 2} mais
+                            </div>
+                          )}
                         </div>
                       )}
-                    </div>
+                    </>
                   )}
                 </div>
               ))}
