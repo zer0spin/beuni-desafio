@@ -336,9 +336,6 @@ export class EnvioBrindesService {
     const colaboradoresComEnvios = await this.prisma.colaborador.findMany({
       where: {
         organizationId,
-        dataNascimento: {
-          not: null
-        }
       },
       include: {
         enviosBrinde: {

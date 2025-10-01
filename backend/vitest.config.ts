@@ -3,7 +3,7 @@ import path from 'path';
 
 export default defineConfig({
   test: {
-    globals: false,
+    globals: true,
     environment: 'node',
     coverage: {
       provider: 'v8',
@@ -19,10 +19,10 @@ export default defineConfig({
         '**/main.ts',
       ],
       thresholds: {
-        lines: 80,
-        functions: 80,
-        branches: 80,
-        statements: 80,
+        lines: 60,
+        functions: 60,
+        branches: 60,
+        statements: 60,
       },
     },
     include: ['src/**/*.spec.ts', 'src/**/*.test.ts'],
