@@ -118,9 +118,24 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
           const response = await api.get(`/colaboradores/${colaboradorId}`);
           const colaborador = response.data;
 
+          // Função auxiliar para converter data BR para formato input date
+          const formatDateForInput = (dateStr?: string) => {
+            if (!dateStr) return '';
+            // Se já estiver no formato ISO (YYYY-MM-DD)
+            if (dateStr.includes('-') && !dateStr.includes('/')) {
+              return dateStr.split('T')[0];
+            }
+            // Se estiver no formato BR (DD/MM/YYYY)
+            if (dateStr.includes('/')) {
+              const [day, month, year] = dateStr.split('/');
+              return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            }
+            return '';
+          };
+
           setFormData({
-            nome_completo: colaborador.nomeCompleto || '',
-            data_nascimento: colaborador.dataNascimento ? colaborador.dataNascimento.split('T')[0] : '',
+            nome_completo: colaborador.nome_completo || colaborador.nomeCompleto || '',
+            data_nascimento: formatDateForInput(colaborador.data_nascimento || colaborador.dataNascimento),
             cargo: colaborador.cargo || '',
             departamento: colaborador.departamento || '',
             endereco: {

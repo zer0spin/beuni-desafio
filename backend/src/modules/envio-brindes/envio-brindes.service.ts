@@ -287,6 +287,90 @@ export class EnvioBrindesService {
   }
 
   /**
+   * Buscar relatório completo de envios
+   */
+  async buscarRelatorios(organizationId: string, ano: number) {
+    // Buscar total de colaboradores
+    const totalColaboradores = await this.prisma.colaborador.count({
+      where: { organizationId },
+    });
+
+    // Buscar aniversariantes do ano
+    const aniversariantesEsteAno = await this.prisma.colaborador.count({
+      where: {
+        organizationId,
+        dataNascimento: {
+          not: null,
+        },
+      },
+    });
+
+    // Buscar estatísticas de envios por status
+    const stats = await this.prisma.envioBrinde.groupBy({
+      by: ['status'],
+      where: {
+        anoAniversario: ano,
+        colaborador: {
+          organizationId,
+        },
+      },
+      _count: {
+        status: true,
+      },
+    });
+
+    const enviosPorStatus = stats.reduce((acc, stat) => {
+      acc[stat.status] = stat._count.status;
+      return acc;
+    }, {
+      PENDENTE: 0,
+      PRONTO_PARA_ENVIO: 0,
+      ENVIADO: 0,
+      ENTREGUE: 0,
+      CANCELADO: 0,
+    } as Record<string, number>);
+
+    // Buscar envios por mês
+    const enviosPorMes = await this.prisma.$queryRaw<Array<{
+      mes: number;
+      total: bigint;
+      enviados: bigint;
+      pendentes: bigint;
+    }>>`
+      SELECT
+        EXTRACT(MONTH FROM c.data_nascimento)::INTEGER as mes,
+        COUNT(*)::BIGINT as total,
+        COUNT(CASE WHEN eb.status IN ('ENVIADO', 'ENTREGUE') THEN 1 END)::BIGINT as enviados,
+        COUNT(CASE WHEN eb.status IN ('PENDENTE', 'PRONTO_PARA_ENVIO') THEN 1 END)::BIGINT as pendentes
+      FROM colaboradores c
+      LEFT JOIN envio_brindes eb ON c.id = eb.colaborador_id AND eb.ano_aniversario = ${ano}
+      WHERE c.organization_id = ${organizationId} AND c.data_nascimento IS NOT NULL
+      GROUP BY EXTRACT(MONTH FROM c.data_nascimento)
+      ORDER BY mes ASC
+    `;
+
+    const mesesNomes = [
+      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+    ];
+
+    const enviosPorMesFormatado = enviosPorMes.map(m => ({
+      mes: m.mes,
+      nomeDoMes: mesesNomes[m.mes - 1],
+      total: Number(m.total),
+      enviados: Number(m.enviados),
+      pendentes: Number(m.pendentes),
+    }));
+
+    return {
+      totalColaboradores,
+      aniversariantesEsteAno,
+      enviosPorStatus,
+      enviosPorMes: enviosPorMesFormatado,
+    };
+  }
+
+  /**
    * Simular processamento para criar registros para próximos aniversários
    * (Útil para demonstração e testes)
    */

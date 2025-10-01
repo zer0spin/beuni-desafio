@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { Users, Plus, Search, Edit, Trash2, Calendar, MapPin, Briefcase } from 'lucide-react';
+import { Users, Plus, Search, Edit, Calendar, MapPin, Briefcase } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import Layout from '@/components/Layout';
@@ -22,15 +21,16 @@ export default function ColaboradoresPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [stats, setStats] = useState({ total: 0, page: 1, totalPages: 0 });
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    loadColaboradores();
-  }, []);
+    loadColaboradores(currentPage);
+  }, [currentPage]);
 
-  const loadColaboradores = async () => {
+  const loadColaboradores = async (page: number = 1) => {
     try {
       setLoading(true);
-      const response = await api.get<ColaboradoresResponse>(endpoints.colaboradores);
+      const response = await api.get<ColaboradoresResponse>(`${endpoints.colaboradores}?page=${page}&limit=10`);
       setColaboradores(response.data.colaboradores);
       setStats({
         total: response.data.total,
@@ -167,10 +167,7 @@ export default function ColaboradoresPage() {
                       Colaborador
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-beuni-text/70 uppercase tracking-wider">
-                      Cargo/Departamento
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-beuni-text/70 uppercase tracking-wider">
-                      Aniversário
+                      Departamento
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-beuni-text/70 uppercase tracking-wider">
                       Localização
@@ -193,24 +190,21 @@ export default function ColaboradoresPage() {
                           </div>
                           <div className="ml-4">
                             <p className="font-semibold text-beuni-text">{colaborador.nome_completo || 'Nome não disponível'}</p>
-                            <p className="text-sm text-beuni-text/60">{colaborador.email || '-'}</p>
+                            <p className="text-sm text-beuni-text/60">{colaborador.cargo || '-'}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <p className="font-medium text-beuni-text">{colaborador.cargo || '-'}</p>
-                        <p className="text-sm text-beuni-text/60">{colaborador.departamento || '-'}</p>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center">
-                          <Calendar className="h-4 w-4 text-beuni-orange-600 mr-2" />
-                          <span className="text-sm text-beuni-text">
-                            {(() => {
-                              const d = parseBrDate(colaborador.data_nascimento);
-                              return d ? d.toLocaleDateString('pt-BR') : '-';
-                            })()}
-                          </span>
-                        </div>
+                        <p className="font-medium text-beuni-text">{colaborador.departamento || '-'}</p>
+                        <p className="text-sm text-beuni-text/60 flex items-center mt-1">
+                          <Calendar className="h-3 w-3 text-beuni-orange-600 mr-1" />
+                          {colaborador.data_nascimento
+                            ? (() => {
+                                const d = parseBrDate(colaborador.data_nascimento);
+                                return d ? d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long' }) : '-';
+                              })()
+                            : '-'}
+                        </p>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center">
@@ -239,12 +233,43 @@ export default function ColaboradoresPage() {
           )}
         </div>
 
-        {/* Pagination Info */}
-        {!loading && filteredColaboradores.length > 0 && (
+        {/* Pagination */}
+        {!loading && stats.totalPages > 1 && (
           <div className="mt-6 flex items-center justify-between">
             <p className="text-sm text-beuni-text/60">
-              Mostrando {filteredColaboradores.length} de {stats.total} colaboradores
+              Mostrando {filteredColaboradores.length} de {stats.total} colaboradores • Página {currentPage} de {stats.totalPages}
             </p>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 border-2 border-beuni-orange-200 rounded-lg hover:bg-beuni-cream disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
+              >
+                Anterior
+              </button>
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: stats.totalPages }, (_, i) => i + 1).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded-lg font-semibold transition-all ${
+                      currentPage === page
+                        ? 'bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white shadow-md'
+                        : 'border-2 border-beuni-orange-200 hover:bg-beuni-cream'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, stats.totalPages))}
+                disabled={currentPage === stats.totalPages}
+                className="px-4 py-2 border-2 border-beuni-orange-200 rounded-lg hover:bg-beuni-cream disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
+              >
+                Próxima
+              </button>
+            </div>
           </div>
         )}
       </div>

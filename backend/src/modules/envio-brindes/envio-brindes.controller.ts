@@ -223,6 +223,32 @@ export class EnvioBrindesController {
     );
   }
 
+  @Get('relatorios')
+  @ApiOperation({
+    summary: 'Obter relatório completo de envios',
+    description: 'Retorna relatório completo com estatísticas de colaboradores, aniversariantes e envios por mês.'
+  })
+  @ApiQuery({
+    name: 'ano',
+    required: false,
+    type: Number,
+    description: 'Ano para consulta (padrão: ano atual)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Relatório completo de envios',
+  })
+  async buscarRelatorios(
+    @Query('ano') ano: string,
+    @Request() req,
+  ) {
+    const anoNum = ano ? parseInt(ano, 10) : new Date().getFullYear();
+    return this.envioBrindesService.buscarRelatorios(
+      req.user.organizationId,
+      anoNum,
+    );
+  }
+
   @Post('simular-processamento')
   @ApiOperation({
     summary: 'Simular processamento de aniversários',

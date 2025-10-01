@@ -69,7 +69,8 @@ export default function CalendarioPage() {
       console.log('Colaboradores carregados:', todosColaboradores.length);
 
       // Extrair departamentos únicos
-      const deptUnicos = [...new Set(todosColaboradores.map((c: Colaborador) => c.departamento).filter(Boolean))];
+      const departamentosMap = todosColaboradores.map((c: Colaborador) => c.departamento).filter(Boolean) as string[];
+      const deptUnicos = Array.from(new Set(departamentosMap));
       setDepartamentos(deptUnicos);
 
       // Filtrar colaboradores por departamento se necessário
@@ -202,7 +203,7 @@ export default function CalendarioPage() {
     });
 
     if (aniversariantesDoMes.length === 0) {
-      toast.info('Nenhum aniversariante encontrado neste mês');
+      toast('Nenhum aniversariante encontrado neste mês');
       return;
     }
 
