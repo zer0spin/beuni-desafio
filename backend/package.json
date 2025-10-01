@@ -40,6 +40,8 @@
     "@prisma/client": "^5.1.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/helmet": "^0.0.48",
+    "@types/multer": "^2.0.0",
+    "@types/uuid": "^10.0.0",
     "bcrypt": "^5.1.0",
     "bcryptjs": "^3.0.2",
     "cache-manager": "^7.2.2",
@@ -48,13 +50,16 @@
     "class-validator": "^0.14.0",
     "date-fns": "^4.1.0",
     "helmet": "^7.2.0",
+    "multer": "^2.0.2",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
     "redis": "^4.6.7",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
-    "swagger-ui-express": "^5.0.0"
+    "sharp": "^0.34.4",
+    "swagger-ui-express": "^5.0.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

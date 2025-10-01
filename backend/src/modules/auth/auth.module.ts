@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
+import { UploadService } from '../../shared/services/upload.service';
 
 // Import related modules
 import { UsuariosModule } from '../usuarios/usuarios.module';
@@ -26,7 +27,7 @@ import { UsuariosModule } from '../usuarios/usuarios.module';
     UsuariosModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, UploadService],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

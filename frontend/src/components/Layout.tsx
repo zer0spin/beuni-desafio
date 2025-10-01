@@ -29,6 +29,7 @@ export default function Layout({ children }: LayoutProps) {
   const [user, setUser] = useState<User | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -182,8 +183,16 @@ export default function Layout({ children }: LayoutProps) {
           <div className="flex-shrink-0 border-t border-beuni-orange-100 p-4">
             {sidebarOpen ? (
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-                  {user.nome.charAt(0)}
+                <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 overflow-hidden">
+                  {user.imagemPerfil ? (
+                    <img 
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`}
+                      alt={user.nome}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    user.nome.charAt(0)
+                  )}
                 </div>
                 <div className="ml-3 flex-1 min-w-0">
                   <p className="text-sm font-medium text-beuni-text truncate">
@@ -202,13 +211,26 @@ export default function Layout({ children }: LayoutProps) {
                 </button>
               </div>
             ) : (
-              <button
-                onClick={handleLogout}
-                className="w-full p-2 text-beuni-text/60 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                title="Sair"
-              >
-                <LogOut className="h-5 w-5 mx-auto" />
-              </button>
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
+                  {user.imagemPerfil ? (
+                    <img 
+                      src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`}
+                      alt={user.nome}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    user.nome.charAt(0)
+                  )}
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="p-2 text-beuni-text/60 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Sair"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
             )}
           </div>
 
@@ -273,22 +295,59 @@ export default function Layout({ children }: LayoutProps) {
 
               {/* User Section */}
               <div className="border-t border-beuni-orange-100 p-4">
-                <div className="flex items-center mb-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold">
-                    {user.nome.charAt(0)}
-                  </div>
-                  <div className="ml-3 flex-1">
-                    <p className="text-sm font-medium text-beuni-text">{user.nome}</p>
-                    <p className="text-xs text-beuni-text/60">{user.email}</p>
-                  </div>
+                <div className="relative">
+                  <button
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="w-full flex items-center p-2 hover:bg-beuni-orange-50 rounded-lg transition-colors"
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
+                      {user.imagemPerfil ? (
+                        <img 
+                          src={user.imagemPerfil} 
+                          alt="Perfil" 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        user.nome.charAt(0)
+                      )}
+                    </div>
+                    <div className="ml-3 flex-1 text-left">
+                      <p className="text-sm font-medium text-beuni-text">{user.nome}</p>
+                      <p className="text-xs text-beuni-text/60">{user.email}</p>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-beuni-text/60 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {profileDropdownOpen && (
+                    <div className="absolute bottom-full left-0 right-0 mb-2 bg-white border border-beuni-orange-200 rounded-lg shadow-lg z-50">
+                      <div className="p-2">
+                        <button
+                          onClick={() => {
+                            router.push('/configuracoes');
+                            setProfileDropdownOpen(false);
+                            setMobileMenuOpen(false);
+                          }}
+                          className="w-full flex items-center px-3 py-2 text-sm font-medium text-beuni-text hover:bg-beuni-orange-50 rounded-lg transition-colors"
+                        >
+                          <Settings className="h-4 w-4 mr-3" />
+                          Editar perfil
+                        </button>
+                        <hr className="my-2 border-beuni-orange-100" />
+                        <button
+                          onClick={() => {
+                            handleLogout();
+                            setProfileDropdownOpen(false);
+                          }}
+                          className="w-full flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <LogOut className="h-4 w-4 mr-3" />
+                          Sair
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span className="ml-3">Sair</span>
-                </button>
               </div>
             </div>
           </aside>
@@ -459,12 +518,82 @@ export default function Layout({ children }: LayoutProps) {
                   )}
                 </div>
 
-                <button
-                  onClick={() => router.push('/configuracoes')}
-                  className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors"
-                >
-                  <Settings className="h-5 w-5" />
-                </button>
+                {/* Profile Dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                    className="flex items-center gap-2 p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors"
+                  >
+                    <div className="w-8 h-8 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                      {user.imagemPerfil ? (
+                        <img 
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`}
+                          alt={user.nome}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        user.nome.charAt(0)
+                      )}
+                    </div>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Profile Dropdown Menu */}
+                  {profileDropdownOpen && (
+                    <>
+                      <div 
+                        className="fixed inset-0 z-30" 
+                        onClick={() => setProfileDropdownOpen(false)}
+                      />
+                      <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-beuni-orange-100 z-40 overflow-hidden">
+                        {/* User Info */}
+                        <div className="px-4 py-3 bg-gradient-to-r from-beuni-orange-50 to-beuni-cream border-b border-beuni-orange-100">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
+                              {user.imagemPerfil ? (
+                                <img 
+                                  src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`}
+                                  alt={user.nome}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                user.nome.charAt(0)
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-beuni-text truncate">{user.nome}</p>
+                              <p className="text-sm text-beuni-text/60 truncate">{user.email}</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Menu Items */}
+                        <div className="py-2">
+                          <button
+                            onClick={() => {
+                              router.push('/configuracoes');
+                              setProfileDropdownOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-beuni-text hover:bg-beuni-orange-50 transition-colors"
+                          >
+                            <Settings className="h-4 w-4" />
+                            Editar perfil
+                          </button>
+                          <button
+                            onClick={() => {
+                              handleLogout();
+                              setProfileDropdownOpen(false);
+                            }}
+                            className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                          >
+                            <LogOut className="h-4 w-4" />
+                            Sair
+                          </button>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           </div>

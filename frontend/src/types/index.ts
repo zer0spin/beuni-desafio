@@ -11,6 +11,7 @@ export interface User {
   id: string;
   nome: string;
   email: string;
+  imagemPerfil?: string;
   organizationId: string;
   organizacao: {
     id: string;

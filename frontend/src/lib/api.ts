@@ -129,6 +129,7 @@ export const endpoints = {
   register: '/auth/register',
   profile: '/auth/profile',
   updateProfile: '/auth/profile',
+  uploadProfileImage: '/auth/upload-profile-image',
   updateOrganizacao: (id: string) => `/organizacoes/${id}`,
 
   // Colaboradores

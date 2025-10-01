@@ -21,6 +21,7 @@ export interface AuthResponse {
     id: string;
     nome: string;
     email: string;
+    imagemPerfil?: string;
     organizationId: string;
     organizacao: {
       id: string;
@@ -72,6 +73,7 @@ export class AuthService {
         id: user.id,
         nome: user.nome,
         email: user.email,
+        imagemPerfil: user.imagemPerfil,
         organizationId: user.organizationId,
         organizacao: user.organizacao,
       },
@@ -159,12 +161,25 @@ export class AuthService {
   }
 
   async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
+    const updateData: any = {};
+    
+    if (updateProfileDto.name !== undefined) {
+      updateData.nome = updateProfileDto.name;
+    }
+    
+    if (updateProfileDto.imagemPerfil !== undefined) {
+      updateData.imagemPerfil = updateProfileDto.imagemPerfil;
+    }
+
     const updatedUser = await this.prisma.usuario.update({
       where: { id: userId },
-      data: {
-        nome: updateProfileDto.name,
-      },
-      include: {
+      data: updateData,
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        imagemPerfil: true,
+        organizationId: true,
         organizacao: {
           select: { id: true, nome: true },
         },
@@ -175,6 +190,7 @@ export class AuthService {
       id: updatedUser.id,
       nome: updatedUser.nome,
       email: updatedUser.email,
+      imagemPerfil: updatedUser.imagemPerfil,
       organizationId: updatedUser.organizationId,
       organizacao: updatedUser.organizacao,
     };
