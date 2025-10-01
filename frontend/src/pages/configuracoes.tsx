@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from 'react-query';
 import Layout from '@/components/Layout';
-import api, { endpoints, apiCall } from '@/lib/api';
+import api, { endpoints } from '@/lib/api';
 import { toast } from 'react-hot-toast';
+import Cookies from 'js-cookie';
 
 interface UserProfile {
   id: string;
@@ -55,34 +56,38 @@ export default function Configuracoes() {
       toast.error('Dados do usuário não carregados');
       return;
     }
-    
+
     setIsSaving(true);
     try {
       // Atualizar dados do usuário
-      const updatedUser = await apiCall(async () => 
-        api.patch(endpoints.updateProfile, {
-          name: formData.name,
-        }),
-        { showSuccessToast: false }
-      );
+      const userResponse = await api.patch(endpoints.updateProfile, {
+        name: formData.name,
+      });
 
       // Atualizar nome da organização
-      const updatedOrg = await apiCall(async () =>
-        api.patch(endpoints.updateOrganizacao(profile.organizationId), {
-          name: formData.organizationName,
-        }),
-        { showSuccessToast: false }
-      );
+      await api.patch(endpoints.updateOrganizacao(profile.organizationId), {
+        name: formData.organizationName,
+      });
 
-      // Invalidar cache e refetch para atualizar os dados
-      queryClient.invalidateQueries('userProfile');
+      // Atualizar cookie do usuário com os novos dados
+      const updatedUser = userResponse.data;
+      const cookieOptions = {
+        expires: 7,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict' as const,
+        path: '/',
+      };
+      Cookies.set('beuni_user', JSON.stringify(updatedUser), cookieOptions);
+
+      // Invalidar cache e refetch para atualizar os dados na tela
+      await queryClient.invalidateQueries('userProfile');
       await refetch();
 
       toast.success('Dados atualizados com sucesso!');
       setIsEditing(false);
     } catch (error) {
       console.error('Erro ao atualizar:', error);
-      toast.error('Não foi possível atualizar os dados. Tente novamente.');
+      // Erro já tratado pelo interceptor do axios
     } finally {
       setIsSaving(false);
     }
