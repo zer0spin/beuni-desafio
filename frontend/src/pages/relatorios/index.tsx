@@ -61,8 +61,77 @@ export default function RelatoriosPage() {
     }
   };
 
-  const exportToCSV = () => {
-    toast.success('Relatório exportado com sucesso!');
+  const exportToCSV = async () => {
+    try {
+      toast.loading('Preparando relatório...');
+
+      // Buscar dados dos envios para exportação
+      const response = await api.get(`/envio-brindes?ano=${anoSelecionado}&limit=1000`);
+      const envios = response.data.envios || [];
+
+      if (envios.length === 0) {
+        toast.dismiss();
+        toast.error('Nenhum dado para exportar');
+        return;
+      }
+
+      // Preparar dados para CSV
+      const csvRows = [];
+
+      // Cabeçalho
+      csvRows.push([
+        'ID',
+        'Colaborador',
+        'Cargo',
+        'Departamento',
+        'Data Nascimento',
+        'Cidade',
+        'UF',
+        'Status',
+        'Ano Aniversário',
+        'Data Gatilho',
+        'Data Envio',
+        'Observações'
+      ].join(','));
+
+      // Dados
+      envios.forEach((envio: any) => {
+        csvRows.push([
+          envio.id,
+          `"${envio.colaborador.nomeCompleto}"`,
+          `"${envio.colaborador.cargo || ''}"`,
+          `"${envio.colaborador.departamento || ''}"`,
+          envio.colaborador.dataNascimento,
+          `"${envio.colaborador.endereco.cidade}"`,
+          envio.colaborador.endereco.uf,
+          envio.status,
+          envio.anoAniversario,
+          envio.dataGatilhoEnvio || '',
+          envio.dataEnvioRealizado || '',
+          `"${envio.observacoes || ''}"`
+        ].join(','));
+      });
+
+      // Criar blob e download
+      const csvContent = csvRows.join('\n');
+      const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+
+      link.setAttribute('href', url);
+      link.setAttribute('download', `relatorio_envios_${anoSelecionado}_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast.dismiss();
+      toast.success('Relatório exportado com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar relatório:', error);
+      toast.dismiss();
+      toast.error('Erro ao exportar relatório');
+    }
   };
 
   const getStatusColor = (status: string) => {

@@ -45,11 +45,17 @@ export default function ColaboradoresPage() {
     }
   };
 
-  const filteredColaboradores = colaboradores.filter((col) =>
-    col.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    col.departamento?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    col.cargo?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredColaboradores = colaboradores
+    .filter((col) =>
+      col.nome_completo?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      col.departamento?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      col.cargo?.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .sort((a, b) => {
+      const nomeA = a.nome_completo?.toLowerCase() || '';
+      const nomeB = b.nome_completo?.toLowerCase() || '';
+      return nomeA.localeCompare(nomeB);
+    });
 
   return (
     <Layout>

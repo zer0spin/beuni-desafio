@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Package, MapPin, Calendar, Truck, CheckCircle, Clock, AlertCircle, Filter, User } from 'lucide-react';
+import { Package, MapPin, Calendar, Truck, CheckCircle, Clock, AlertCircle, Search } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import Layout from '@/components/Layout';
@@ -55,6 +55,7 @@ export default function EnviosPage() {
   const [stats, setStats] = useState({ total: 0, page: 1, totalPages: 0 });
   const [filter, setFilter] = useState<string>('TODOS');
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const user = getUser();
@@ -221,6 +222,20 @@ export default function EnviosPage() {
               })}
             </div>
           </div>
+
+          {/* Search Bar */}
+          <div className="mt-4">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-beuni-text/40" />
+              <input
+                type="text"
+                placeholder="Buscar por nome, destino, departamento ou cargo..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-white border border-beuni-orange-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 transition-all"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Content */}
@@ -240,7 +255,22 @@ export default function EnviosPage() {
           </div>
         ) : (
           <div className="grid gap-4">
-            {envios.map((envio) => {
+            {envios
+              .filter((envio) => {
+                const searchLower = searchTerm.toLowerCase();
+                return (
+                  envio.colaborador.nomeCompleto?.toLowerCase().includes(searchLower) ||
+                  envio.colaborador.departamento?.toLowerCase().includes(searchLower) ||
+                  envio.colaborador.cargo?.toLowerCase().includes(searchLower) ||
+                  `${envio.colaborador.endereco.cidade}/${envio.colaborador.endereco.uf}`.toLowerCase().includes(searchLower)
+                );
+              })
+              .sort((a, b) => {
+                const nomeA = a.colaborador.nomeCompleto?.toLowerCase() || '';
+                const nomeB = b.colaborador.nomeCompleto?.toLowerCase() || '';
+                return nomeA.localeCompare(nomeB);
+              })
+              .map((envio) => {
               const statusConfig = getStatusConfig(envio.status);
               const StatusIcon = statusConfig.icon;
               const diasRestantes = calcularDiasRestantes(envio);
