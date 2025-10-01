@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import Layout from '@/components/Layout';
-import api, { endpoints, apiCall } from '@/lib/api';
+import api, { endpoints, apiCall, getUser, setAuthToken } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 
 interface UserProfile {
@@ -17,6 +17,7 @@ interface UserProfile {
 
 export default function Configuracoes() {
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -26,8 +27,12 @@ export default function Configuracoes() {
   const { data: profile, refetch } = useQuery<UserProfile>(
     'userProfile',
     async () => {
-      const response = await api.get('/auth/profile');
+      const response = await api.get(endpoints.profile);
       return response.data;
+    },
+    {
+      retry: 1,
+      refetchOnWindowFocus: false,
     }
   );
 
@@ -43,22 +48,56 @@ export default function Configuracoes() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!profile) {
+      toast.error('Dados do usuário não carregados');
+      return;
+    }
+    
+    setIsSaving(true);
     try {
       // Atualizar dados do usuário
-      await api.patch('/auth/profile', {
-        name: formData.name,
-      });
+      const updatedUser = await apiCall(async () => 
+        api.patch(endpoints.updateProfile, {
+          name: formData.name,
+        }),
+        { showSuccessToast: false }
+      );
 
       // Atualizar nome da organização
-      await api.patch(`/organizacoes/${profile?.organizacao.id}`, {
-        name: formData.organizationName,
-      });
+      const updatedOrg = await apiCall(async () =>
+        api.patch(endpoints.updateOrganizacao(profile.organizationId), {
+          name: formData.organizationName,
+        }),
+        { showSuccessToast: false }
+      );
+
+      // Atualizar dados no cookie e estado global
+      const currentUser = getUser();
+      if (currentUser) {
+        const updatedUserData = {
+          ...currentUser,
+          nome: formData.name,
+          organizacao: {
+            ...currentUser.organizacao,
+            nome: formData.organizationName
+          }
+        };
+        
+        // Atualizar o cookie com os novos dados
+        setAuthToken(currentUser.token, updatedUserData);
+
+        // Forçar recarregamento da página para atualizar todos os componentes
+        window.location.reload();
+      }
 
       toast.success('Dados atualizados com sucesso!');
       setIsEditing(false);
       refetch(); // Recarregar os dados
     } catch (error) {
-      toast.error('Erro ao atualizar os dados');
+      console.error('Erro ao atualizar:', error);
+      toast.error('Não foi possível atualizar os dados. Tente novamente.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -147,9 +186,14 @@ export default function Configuracoes() {
                   </button>
                   <button
                     type="submit"
-                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+                    disabled={isSaving}
+                    className={`px-4 py-2 rounded text-white ${
+                      isSaving
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-green-500 hover:bg-green-600'
+                    }`}
                   >
-                    Salvar
+                    {isSaving ? 'Salvando...' : 'Salvar'}
                   </button>
                 </div>
               )}
