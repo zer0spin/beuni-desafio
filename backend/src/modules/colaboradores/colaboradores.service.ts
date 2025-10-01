@@ -172,18 +172,23 @@ export class ColaboradoresService {
 
   async getAniversariantesProximos(organizationId: string) {
     const hoje = new Date();
-    const proximoMes = hoje.getMonth() + 1; // 0-11, então +1 para próximo mês
-    const mesConsulta = proximoMes > 11 ? 1 : proximoMes + 1; // Se dezembro, volta para janeiro
+    const mesAtual = hoje.getMonth() + 1; // 0-11, então +1 para 1-12
+    const proximoMes = mesAtual > 11 ? 1 : mesAtual + 1; // Se dezembro, próximo mês é janeiro
 
-    // Usar raw query para filtrar por mês independente do ano
+    // Buscar aniversariantes do mês atual e próximo mês (próximos 60 dias)
     const aniversariantes = await this.prisma.$queryRaw`
       SELECT c.*,
              e.id as endereco_id, e.cep, e.logradouro, e.numero, e.complemento, e.bairro, e.cidade, e.uf
       FROM colaboradores c
       LEFT JOIN enderecos e ON c.address_id = e.id
       WHERE c.organization_id = ${organizationId}
-      AND EXTRACT(MONTH FROM c.data_nascimento) = ${mesConsulta}
-      ORDER BY EXTRACT(DAY FROM c.data_nascimento) ASC
+      AND (EXTRACT(MONTH FROM c.data_nascimento) = ${mesAtual} OR EXTRACT(MONTH FROM c.data_nascimento) = ${proximoMes})
+      ORDER BY
+        CASE
+          WHEN EXTRACT(MONTH FROM c.data_nascimento) = ${mesAtual} THEN 0
+          ELSE 1
+        END,
+        EXTRACT(DAY FROM c.data_nascimento) ASC
       LIMIT 50
     `;
 

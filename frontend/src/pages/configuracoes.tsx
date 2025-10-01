@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import Layout from '@/components/Layout';
-import api, { endpoints, apiCall, getUser, setAuthToken } from '@/lib/api';
+import api, { endpoints, apiCall } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 
 interface UserProfile {
@@ -16,6 +16,7 @@ interface UserProfile {
 }
 
 export default function Configuracoes() {
+  const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -32,7 +33,9 @@ export default function Configuracoes() {
     },
     {
       retry: 1,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
+      staleTime: 0,
+      cacheTime: 0,
     }
   );
 
@@ -71,28 +74,12 @@ export default function Configuracoes() {
         { showSuccessToast: false }
       );
 
-      // Atualizar dados no cookie e estado global
-      const currentUser = getUser();
-      if (currentUser) {
-        const updatedUserData = {
-          ...currentUser,
-          nome: formData.name,
-          organizacao: {
-            ...currentUser.organizacao,
-            nome: formData.organizationName
-          }
-        };
-        
-        // Atualizar o cookie com os novos dados
-        setAuthToken(currentUser.token, updatedUserData);
-
-        // Forçar recarregamento da página para atualizar todos os componentes
-        window.location.reload();
-      }
+      // Invalidar cache e refetch para atualizar os dados
+      queryClient.invalidateQueries('userProfile');
+      await refetch();
 
       toast.success('Dados atualizados com sucesso!');
       setIsEditing(false);
-      refetch(); // Recarregar os dados
     } catch (error) {
       console.error('Erro ao atualizar:', error);
       toast.error('Não foi possível atualizar os dados. Tente novamente.');
