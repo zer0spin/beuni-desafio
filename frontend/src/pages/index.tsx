@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
-import { Gift, Users, Calendar, ChevronRight, CheckCircle, Star, ArrowRight, Play, Shield, Zap, Heart, TrendingUp, Award, Package, Sparkles } from 'lucide-react';
+import { Gift, Users, Calendar, CheckCircle, Star, ArrowRight, Shield, Zap, Heart, TrendingUp, Award, Package, Sparkles } from 'lucide-react';
 
 export default function HomePage() {
   const router = useRouter();
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   const testimonials = [
     {
@@ -30,13 +29,6 @@ export default function HomePage() {
       rating: 5
     }
   ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [testimonials.length]);
 
   // Seção "O que podemos fazer para você?"
   const solutions = {
@@ -126,15 +118,6 @@ export default function HomePage() {
     }
   ];
 
-  // Logos de clientes
-  const clientLogos = [
-    { name: 'Maersk', image: '/images/logos/maersk.png' },
-    { name: 'Cargill', image: '/images/logos/cargill.png' },
-    { name: 'Somos', image: '/images/logos/somos.png' },
-    { name: 'Isaac', image: '/images/logos/isaac.png' },
-    { name: 'Conquer', image: '/images/logos/conquer.png' }
-  ];
-
   // Experts da Beuni
   const experts = [
     { name: 'Expert 1', avatar: '👨‍💼' },
@@ -200,7 +183,7 @@ export default function HomePage() {
       </header>
 
       {/* Hero Section */}
-      <section className="py-20 lg:py-36 relative overflow-hidden">
+      <section className="py-16 lg:py-24 relative overflow-hidden">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Conteúdo à esquerda */}
@@ -261,17 +244,17 @@ export default function HomePage() {
                 </button>
               </div>
 
-              {/* Logos de empresas parceiras */}
+              {/* Logos de empresas parceiras com animação */}
               <div className="mt-12">
                 <p className="text-sm text-beuni-text/60 mb-4 font-medium">
                   Plataforma de Confiança das Principais Empresas em Diversos Setores:
                 </p>
-                <div className="flex flex-wrap items-center gap-8 opacity-60">
-                  <span className="font-semibold text-gray-600">MAERSK</span>
-                  <span className="font-semibold text-gray-600">Cargill</span>
-                  <span className="font-semibold text-gray-600">SOMOS</span>
-                  <span className="font-semibold text-gray-600">isaac</span>
-                  <span className="font-semibold text-gray-600">CONQUER</span>
+                <div className="flex flex-wrap items-center gap-8">
+                  <span className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer animate-fade-in" style={{ animationDelay: '0.1s' }}>MAERSK</span>
+                  <span className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer animate-fade-in" style={{ animationDelay: '0.2s' }}>Cargill</span>
+                  <span className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer animate-fade-in" style={{ animationDelay: '0.3s' }}>SOMOS</span>
+                  <span className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer animate-fade-in" style={{ animationDelay: '0.4s' }}>isaac</span>
+                  <span className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer animate-fade-in" style={{ animationDelay: '0.5s' }}>CONQUER</span>
                 </div>
               </div>
             </div>
@@ -322,24 +305,35 @@ export default function HomePage() {
       </section>
 
       {/* Seção Cases - "Veja o que fazemos" */}
-      <section className="py-24 bg-white">
+      <section className="py-20 bg-white">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-16">
+          <div className="mb-12">
             <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">CASES</span>
-            <h2 className="text-5xl font-bold text-beuni-text mb-6 mt-3">
+            <h2 className="text-4xl lg:text-5xl font-bold text-beuni-text mb-4 mt-3">
               Veja o que fazemos
             </h2>
-            <p className="text-2xl text-beuni-text/80 max-w-3xl leading-relaxed">
+            <p className="text-lg lg:text-xl text-beuni-text/80 max-w-3xl leading-relaxed">
               Atendemos a todas as suas necessidades de brindes.
             </p>
           </div>
 
-          {/* Grid de imagens de cases */}
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
-            {[1,2,3,4,5,6].map((_, index) => (
-              <div key={index} className="aspect-square rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer">
-                <div className="w-full h-full bg-gradient-to-br from-beuni-orange-100 to-beuni-brown-100 flex items-center justify-center">
-                  <Gift className="h-8 w-8 text-beuni-orange-500" />
+          {/* Grid de imagens de cases com produtos reais */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
+            {[
+              { icon: Gift, bg: 'from-orange-100 to-orange-200', text: 'Kits Personalizados' },
+              { icon: Users, bg: 'from-blue-100 to-blue-200', text: 'Eventos Corporativos' },
+              { icon: Package, bg: 'from-green-100 to-green-200', text: 'Brindes Sustentáveis' },
+              { icon: Star, bg: 'from-yellow-100 to-yellow-200', text: 'Presentes VIP' },
+              { icon: Heart, bg: 'from-pink-100 to-pink-200', text: 'Reconhecimento' },
+              { icon: Award, bg: 'from-purple-100 to-purple-200', text: 'Celebrações' }
+            ].map((item, index) => (
+              <div
+                key={index}
+                className="group aspect-square rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2"
+              >
+                <div className={`w-full h-full bg-gradient-to-br ${item.bg} flex flex-col items-center justify-center p-4 transition-transform duration-300 group-hover:scale-110`}>
+                  <item.icon className="h-10 w-10 lg:h-12 lg:w-12 text-beuni-orange-600 mb-2" />
+                  <span className="text-xs lg:text-sm font-semibold text-beuni-text text-center">{item.text}</span>
                 </div>
               </div>
             ))}
@@ -348,14 +342,14 @@ export default function HomePage() {
       </section>
 
       {/* Seção "O que podemos fazer para você?" */}
-      <section className="py-24 bg-beuni-cream">
+      <section className="py-20 bg-beuni-cream">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-16">
-            <span className="text-beuni-orange-600 font-semibold text-base uppercase tracking-wide">TIPOS DE BRINDES</span>
-            <h2 className="text-5xl font-bold text-beuni-text mb-6 mt-3">
+          <div className="mb-12">
+            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">TIPOS DE BRINDES</span>
+            <h2 className="text-4xl lg:text-5xl font-bold text-beuni-text mb-4 mt-3">
               O que podemos fazer para você?
             </h2>
-            <p className="text-2xl text-beuni-text/80 max-w-4xl leading-relaxed">
+            <p className="text-lg lg:text-xl text-beuni-text/80 max-w-4xl leading-relaxed">
               Uma gestão eficiente de brindes é essencial para qualquer organização. Na beuni, desenvolvemos uma plataforma que elimina a complexidade da compra, armazenamento e envio de brindes personalizados, oferecendo total visibilidade e controle.
             </p>
           </div>
@@ -416,10 +410,10 @@ export default function HomePage() {
 
       {/* Seção "Passo a Passo" */}
       <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-16">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-12">
             <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">PASSO A PASSO</span>
-            <h2 className="text-4xl font-bold text-beuni-text mb-4 mt-2">
+            <h2 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-4 mt-2">
               Como fazer meu pedido de brindes personalizados com a beuni
             </h2>
           </div>
@@ -463,39 +457,60 @@ export default function HomePage() {
 
       {/* Seção Integrações */}
       <section className="py-20 bg-beuni-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-3xl p-12 shadow-xl border border-beuni-orange-100">
-            <div className="text-center mb-12">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-xl border border-beuni-orange-100">
+            <div className="text-center mb-10">
               <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">INTEGRAÇÕES</span>
-              <h2 className="text-4xl font-bold text-beuni-text mb-4 mt-2">
+              <h2 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-4 mt-2">
                 Melhore sua experiência com integrações.
               </h2>
-              <p className="text-xl text-beuni-text/80 max-w-3xl mx-auto">
+              <p className="text-base lg:text-lg text-beuni-text/80 max-w-3xl mx-auto">
                 Integramos a beuni às mais diversas plataformas do mercado para permitir que os processos de envio aconteçam de forma automática e personalizada, tudo para tornar a experiência ainda melhor.
               </p>
             </div>
 
-            {/* Placeholder para logos de integrações */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              {[1,2,3,4].map((_, index) => (
-                <div key={index} className="bg-gray-100 rounded-xl p-6 flex items-center justify-center aspect-square">
-                  <Zap className="h-12 w-12 text-gray-400" />
+            {/* Grid de integrações com ícones e nomes */}
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+              {[
+                { name: 'Salesforce', icon: '☁️', color: 'from-blue-50 to-cyan-50' },
+                { name: 'HubSpot', icon: '🎯', color: 'from-orange-50 to-red-50' },
+                { name: 'Slack', icon: '💬', color: 'from-purple-50 to-pink-50' },
+                { name: 'Zapier', icon: '⚡', color: 'from-orange-50 to-yellow-50' },
+                { name: 'Google Suite', icon: '🔧', color: 'from-green-50 to-blue-50' },
+                { name: 'Microsoft', icon: '🪟', color: 'from-blue-50 to-indigo-50' }
+              ].map((integration, index) => (
+                <div
+                  key={index}
+                  className="group bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 flex flex-col items-center justify-center aspect-square hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-200 hover:border-beuni-orange-300"
+                >
+                  <div className={`text-4xl mb-3 transform group-hover:scale-110 transition-transform duration-300`}>
+                    {integration.icon}
+                  </div>
+                  <span className="text-xs lg:text-sm font-semibold text-beuni-text text-center">
+                    {integration.name}
+                  </span>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-10 text-center">
+              <button className="px-6 py-3 bg-beuni-orange-500 text-white font-semibold rounded-xl hover:bg-beuni-orange-600 transition-all duration-200 shadow-md">
+                Ver todas as integrações
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       {/* Seção Depoimentos */}
-      <section className="py-24 bg-white">
+      <section className="py-20 bg-white">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="text-beuni-orange-600 font-semibold text-base uppercase tracking-wide">DEPOIMENTOS</span>
-            <h2 className="text-5xl font-bold text-beuni-text mb-6 mt-3">
+          <div className="text-center mb-12">
+            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">DEPOIMENTOS</span>
+            <h2 className="text-4xl lg:text-5xl font-bold text-beuni-text mb-4 mt-3">
               O que falam sobre a beuni
             </h2>
-            <p className="text-2xl text-beuni-text/80 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-lg lg:text-xl text-beuni-text/80 max-w-4xl mx-auto leading-relaxed">
               Cada projeto na beuni é uma parceria em que colocamos nossa criatividade e expertise para transformar ideias em soluções memoráveis. Veja o que nossos clientes têm a dizer sobre suas jornadas conosco!
             </p>
           </div>
@@ -529,10 +544,10 @@ export default function HomePage() {
 
       {/* Seção Blog */}
       <section className="py-20 bg-beuni-cream">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
             <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">BLOG</span>
-            <h2 className="text-4xl font-bold text-beuni-text mb-4 mt-2">
+            <h2 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-4 mt-2">
               Fique por dentro das novidades da beuni
             </h2>
           </div>
@@ -574,18 +589,28 @@ export default function HomePage() {
       </section>
 
       {/* Seção Investidores */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-white overflow-hidden">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide mb-4 block">NOSSOS INVESTIDORES</span>
-            <h3 className="text-3xl font-bold text-beuni-text mb-8">
+            <h3 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-10">
               Quem acredita e nos impulsiona
             </h3>
-            <div className="flex flex-wrap justify-center items-center gap-12 opacity-60">
-              <span className="font-semibold text-gray-600 text-lg">🎯 Sai do Papel</span>
-              <span className="font-semibold text-gray-600 text-lg">💼 Investidores.vc</span>
-              <span className="font-semibold text-gray-600 text-lg">👼 ERA Angels</span>
-              <span className="font-semibold text-gray-600 text-lg">⚖️ EquityRio</span>
+            <div className="relative">
+              {/* Animação de scroll infinito */}
+              <div className="flex animate-scroll">
+                <div className="flex space-x-12 items-center">
+                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">🎯 Sai do Papel</span>
+                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">💼 Investidores.vc</span>
+                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">👼 ERA Angels</span>
+                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">⚖️ EquityRio</span>
+                  {/* Duplicados para efeito de scroll contínuo */}
+                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">🎯 Sai do Papel</span>
+                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">💼 Investidores.vc</span>
+                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">👼 ERA Angels</span>
+                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">⚖️ EquityRio</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
