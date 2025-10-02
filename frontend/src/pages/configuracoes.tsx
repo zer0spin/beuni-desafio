@@ -34,9 +34,10 @@ export default function Configuracoes() {
   });
 
   // Função para gerar URL da imagem com timestamp para evitar cache
-  const getProfileImageUrl = (imagemPerfil: string) => {
+  const getProfileImageUrl = (imagemPerfil?: string) => {
     const timestamp = Date.now();
-    return `${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${imagemPerfil}?t=${timestamp}`;
+    const filename = imagemPerfil || 'default-profile.png';
+    return `${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${filename}?t=${timestamp}`;
   };
 
   const { data: profile, refetch } = useQuery<UserProfile>(
@@ -210,19 +211,21 @@ export default function Configuracoes() {
             <div className="relative">
               <div className="w-24 h-24 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
                 {imagePreview ? (
-                  <img 
-                    src={imagePreview} 
-                    alt="Preview" 
-                    className="w-full h-full object-cover"
-                  />
-                ) : profile?.imagemPerfil ? (
-                  <img 
-                    src={getProfileImageUrl(profile.imagemPerfil)}
-                    alt="Perfil" 
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  profile?.nome?.charAt(0) || <User className="h-8 w-8" />
+                  <img
+                    src={getProfileImageUrl(profile?.imagemPerfil)}
+                    alt="Perfil"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.innerHTML = profile?.nome?.charAt(0) || '<svg class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+                    }}
+                  />
                 )}
               </div>
               {isUploadingImage && (

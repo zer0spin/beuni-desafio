@@ -191,16 +191,25 @@ export class AuthController {
   async getProfileImage(@Param('filename') filename: string, @Res() res: Response) {
     try {
       const imagePath = join(process.cwd(), 'uploads', 'profile-images', filename);
-      
+
       // Verificar se o arquivo existe
       if (!existsSync(imagePath)) {
-        throw new NotFoundException('Imagem não encontrada');
+        // Retornar imagem padrão
+        const defaultImagePath = join(process.cwd(), 'public', 'default-profile.png');
+
+        if (!existsSync(defaultImagePath)) {
+          throw new NotFoundException('Imagem padrão não encontrada');
+        }
+
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+        return res.sendFile(defaultImagePath);
       }
 
       // Determinar o tipo de conteúdo baseado na extensão
       const ext = filename.split('.').pop()?.toLowerCase();
       let contentType = 'image/jpeg';
-      
+
       switch (ext) {
         case 'png':
           contentType = 'image/png';
@@ -215,7 +224,7 @@ export class AuthController {
 
       res.setHeader('Content-Type', contentType);
       res.setHeader('Cache-Control', 'public, max-age=86400'); // Cache por 1 dia
-      
+
       return res.sendFile(imagePath);
     } catch (error) {
       throw new NotFoundException('Imagem não encontrada');

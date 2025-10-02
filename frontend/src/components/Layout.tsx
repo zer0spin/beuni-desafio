@@ -36,10 +36,12 @@ export default function Layout({ children }: LayoutProps) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   // Função para gerar URL da imagem com timestamp para evitar cache
-  const getProfileImageUrl = (imagemPerfil: string) => {
+  const getProfileImageUrl = (imagemPerfil?: string) => {
     const timestamp = user?.imageTimestamp || Date.now();
-    console.log('Layout.getProfileImageUrl:', imagemPerfil, 'timestamp:', timestamp);
-    return `${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${imagemPerfil}?t=${timestamp}`;
+    // Se não houver imagem de perfil, use a imagem padrão
+    const filename = imagemPerfil || 'default-profile.png';
+    console.log('Layout.getProfileImageUrl:', filename, 'timestamp:', timestamp);
+    return `${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${filename}?t=${timestamp}`;
   };
 
   useEffect(() => {
@@ -209,15 +211,16 @@ export default function Layout({ children }: LayoutProps) {
             {sidebarOpen ? (
               <div className="flex items-center">
                 <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 overflow-hidden">
-                  {user.imagemPerfil ? (
-                    <img 
-                      src={getProfileImageUrl(user.imagemPerfil)}
-                      alt={user.nome}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    user?.nome?.charAt(0) || 'U'
-                  )}
+                  <img
+                    src={getProfileImageUrl(user.imagemPerfil)}
+                    alt={user.nome}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Se falhar ao carregar, mostrar inicial
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.textContent = user?.nome?.charAt(0) || 'U';
+                    }}
+                  />
                 </div>
                 <div className="ml-3 flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -248,15 +251,15 @@ export default function Layout({ children }: LayoutProps) {
             ) : (
               <div className="flex flex-col items-center gap-2">
                 <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
-                  {user.imagemPerfil ? (
-                    <img 
-                      src={getProfileImageUrl(user.imagemPerfil)}
-                      alt={user.nome}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    user?.nome?.charAt(0) || 'U'
-                  )}
+                  <img
+                    src={getProfileImageUrl(user.imagemPerfil)}
+                    alt={user.nome}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                      e.currentTarget.parentElement!.textContent = user?.nome?.charAt(0) || 'U';
+                    }}
+                  />
                 </div>
                 <button
                   onClick={handleLogout}
@@ -336,15 +339,15 @@ export default function Layout({ children }: LayoutProps) {
                     className="w-full flex items-center p-2 hover:bg-beuni-orange-50 rounded-lg transition-colors"
                   >
                     <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
-                      {user.imagemPerfil ? (
-                        <img 
-                          src={getProfileImageUrl(user.imagemPerfil)} 
-                          alt="Perfil" 
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        user?.nome?.charAt(0) || 'U'
-                      )}
+                      <img
+                        src={getProfileImageUrl(user.imagemPerfil)}
+                        alt="Perfil"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.parentElement!.textContent = user?.nome?.charAt(0) || 'U';
+                        }}
+                      />
                     </div>
                     <div className="ml-3 flex-1 text-left">
                       <p className="text-sm font-medium text-beuni-text">{user?.nome || 'Usuário'}</p>
@@ -558,15 +561,15 @@ export default function Layout({ children }: LayoutProps) {
                     className="flex items-center gap-4 p-3 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-gradient-to-br from-beuni-orange-50 to-beuni-orange-100 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
                   >
                     <div className="w-10 h-10 bg-gradient-to-br from-beuni-orange-500 via-beuni-orange-600 to-beuni-orange-700 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden shadow-lg">
-                      {user.imagemPerfil ? (
-                        <img 
-                          src={getProfileImageUrl(user.imagemPerfil)}
-                          alt={user.nome}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        user?.nome?.charAt(0) || 'U'
-                      )}
+                      <img
+                        src={getProfileImageUrl(user.imagemPerfil)}
+                        alt={user.nome}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.parentElement!.textContent = user?.nome?.charAt(0) || 'U';
+                        }}
+                      />
                     </div>
                     <div className="hidden md:block text-left">
                       <p className="text-sm font-bold text-beuni-text">
@@ -588,15 +591,15 @@ export default function Layout({ children }: LayoutProps) {
                         <div className="px-4 py-3 bg-gradient-to-r from-beuni-orange-50 to-beuni-cream border-b border-beuni-orange-100">
                           <div className="flex items-center gap-3">
                             <div className="w-12 h-12 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
-                              {user.imagemPerfil ? (
-                                <img 
-                                  src={getProfileImageUrl(user.imagemPerfil)}
-                                  alt={user.nome}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                user?.nome?.charAt(0) || 'U'
-                              )}
+                              <img
+                                src={getProfileImageUrl(user.imagemPerfil)}
+                                alt={user.nome}
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.currentTarget.style.display = 'none';
+                                  e.currentTarget.parentElement!.textContent = user?.nome?.charAt(0) || 'U';
+                                }}
+                              />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="font-semibold text-beuni-text truncate">{user?.nome || 'Usuário'}</p>
