@@ -31,7 +31,6 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
             return Math.min(retries * 50, 500);
           },
           connectTimeout: 60000,
-          commandTimeout: 5000,
         },
       });
 

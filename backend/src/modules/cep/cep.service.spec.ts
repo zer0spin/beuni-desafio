@@ -300,7 +300,7 @@ describe('CepService', () => {
       await service.limparCache();
 
       // Assert
-      expect(consoleWarnSpy).toHaveBeenCalledWith('Limpar todo o cache não está implementado na v6 do cache-manager');
+      expect(consoleWarnSpy).toHaveBeenCalledWith('Clear all cache not implemented for RedisService');
       expect(cacheManager.del).not.toHaveBeenCalled();
 
       // Cleanup
