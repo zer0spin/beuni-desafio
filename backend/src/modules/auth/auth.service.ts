@@ -174,12 +174,7 @@ export class AuthService {
     const updatedUser = await this.prisma.usuario.update({
       where: { id: userId },
       data: updateData,
-      select: {
-        id: true,
-        nome: true,
-        email: true,
-        imagemPerfil: true,
-        organizationId: true,
+      include: {
         organizacao: {
           select: { id: true, nome: true },
         },

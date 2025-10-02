@@ -90,9 +90,14 @@ export default function Configuracoes() {
 
       toast.success('Dados atualizados com sucesso!');
       setIsEditing(false);
+      
+      // Recarregar a página para garantir atualização completa
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error('Erro ao atualizar:', error);
-      // Erro já tratado pelo interceptor do axios
+      toast.error('Erro ao atualizar dados');
     } finally {
       setIsSaving(false);
     }
@@ -148,9 +153,15 @@ export default function Configuracoes() {
 
       toast.success('Foto de perfil atualizada com sucesso!');
       setImagePreview(null);
+      
+      // Recarregar a página para garantir atualização
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error('Erro ao fazer upload da imagem:', error);
       setImagePreview(null);
+      toast.error('Erro ao fazer upload da imagem');
     } finally {
       setIsUploadingImage(false);
     }
@@ -158,6 +169,42 @@ export default function Configuracoes() {
 
   const triggerImageUpload = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleRemoveImage = async () => {
+    if (!profile?.imagemPerfil) return;
+
+    setIsUploadingImage(true);
+    try {
+      // Atualizar perfil removendo a imagem
+      const response = await api.patch(endpoints.updateProfile, {
+        imagemPerfil: null,
+      });
+
+      // Atualizar cookie do usuário
+      const updatedUser = response.data;
+      const cookieOptions = {
+        expires: 7,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict' as const,
+        path: '/',
+      };
+      Cookies.set('beuni_user', JSON.stringify(updatedUser), cookieOptions);
+
+      // Invalidar cache e recarregar
+      await queryClient.invalidateQueries('userProfile');
+      await refetch();
+      
+      // Recarregar a página para garantir atualização
+      window.location.reload();
+
+      toast.success('Foto de perfil removida com sucesso!');
+    } catch (error) {
+      console.error('Erro ao remover imagem:', error);
+      toast.error('Erro ao remover foto de perfil');
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const removeImagePreview = () => {
@@ -186,7 +233,7 @@ export default function Configuracoes() {
                   />
                 ) : profile?.imagemPerfil ? (
                   <img 
-                    src={profile.imagemPerfil} 
+                    src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${profile.imagemPerfil}`}
                     alt="Perfil" 
                     className="w-full h-full object-cover"
                   />
@@ -213,8 +260,19 @@ export default function Configuracoes() {
                   className="flex items-center px-4 py-2 bg-beuni-orange-500 hover:bg-beuni-orange-600 text-white rounded-lg transition-colors disabled:bg-gray-400"
                 >
                   <Camera className="h-4 w-4 mr-2" />
-                  {isUploadingImage ? 'Enviando...' : 'Alterar Foto'}
+                  {isUploadingImage ? 'Enviando...' : profile?.imagemPerfil ? 'Alterar Foto' : 'Adicionar Foto'}
                 </button>
+                
+                {profile?.imagemPerfil && !imagePreview && (
+                  <button
+                    onClick={handleRemoveImage}
+                    disabled={isUploadingImage}
+                    className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors disabled:bg-gray-400"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Remover
+                  </button>
+                )}
                 
                 {imagePreview && (
                   <button

@@ -52,19 +52,20 @@ export class UploadService {
       // Salvar a imagem processada
       await fs.writeFile(filePath, processedImage);
 
-      // Retornar URL relativa para o frontend
-      return `/uploads/profile-images/${fileName}`;
+      // Retornar apenas o nome do arquivo para salvar no banco
+      return fileName;
     } catch (error) {
       throw new BadRequestException('Erro ao processar a imagem');
     }
   }
 
   async deleteProfileImage(imageUrl: string): Promise<void> {
-    if (!imageUrl || !imageUrl.includes('/uploads/profile-images/')) {
+    if (!imageUrl) {
       return;
     }
 
-    const fileName = imageUrl.split('/').pop();
+    // Se for uma URL completa, extrair apenas o nome do arquivo
+    const fileName = imageUrl.includes('/') ? imageUrl.split('/').pop() : imageUrl;
     if (!fileName) return;
 
     const filePath = join(this.uploadDir, fileName);
