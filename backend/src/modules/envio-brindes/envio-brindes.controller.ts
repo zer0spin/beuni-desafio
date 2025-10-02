@@ -234,18 +234,27 @@ export class EnvioBrindesController {
     type: Number,
     description: 'Ano para consulta (padrão: ano atual)',
   })
+  @ApiQuery({
+    name: 'mes',
+    required: false,
+    type: Number,
+    description: 'Mês para consulta (1-12, opcional)',
+  })
   @ApiResponse({
     status: 200,
     description: 'Relatório completo de envios',
   })
   async buscarRelatorios(
     @Query('ano') ano: string,
+    @Query('mes') mes: string,
     @Request() req,
   ) {
     const anoNum = ano ? parseInt(ano, 10) : new Date().getFullYear();
+    const mesNum = mes ? parseInt(mes, 10) : undefined;
     return this.envioBrindesService.buscarRelatorios(
       req.user.organizationId,
       anoNum,
+      mesNum,
     );
   }
 

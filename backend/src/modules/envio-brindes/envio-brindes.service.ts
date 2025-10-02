@@ -289,33 +289,79 @@ export class EnvioBrindesService {
   /**
    * Buscar relatório completo de envios
    */
-  async buscarRelatorios(organizationId: string, ano: number) {
+  async buscarRelatorios(organizationId: string, ano: number, mes?: number) {
     // Buscar total de colaboradores
     const totalColaboradores = await this.prisma.colaborador.count({
       where: { organizationId },
     });
 
-    // Buscar aniversariantes do ano
-    const aniversariantesEsteAno = await this.prisma.colaborador.count({
-      where: {
-        organizationId,
-        enviosBrinde: {
-          some: {
-            anoAniversario: ano
-          }
+    // Buscar aniversariantes do ano (e mes se fornecido)
+    const whereAniversariantes: any = {
+      organizationId,
+      enviosBrinde: {
+        some: {
+          anoAniversario: ano
         }
-      },
-    });
+      }
+    };
+
+    // Se um mês específico foi fornecido, filtrar por mês de nascimento
+    if (mes) {
+      // Prisma não tem função de extração de mês diretamente, então usamos raw SQL
+      const aniversariantesEsteAno = await this.prisma.$queryRaw<Array<{ count: bigint }>>`
+        SELECT COUNT(*)::int as count
+        FROM "Colaborador" c
+        WHERE c."organizationId" = ${organizationId}
+        AND EXTRACT(MONTH FROM c."dataNascimento") = ${mes}
+        AND EXISTS (
+          SELECT 1 FROM "EnvioBrinde" eb
+          WHERE eb."colaboradorId" = c.id
+          AND eb."anoAniversario" = ${ano}
+        )
+      `;
+      const aniversariantesCount = Number(aniversariantesEsteAno[0]?.count || 0);
+
+      whereAniversariantes.dataNascimento = {
+        gte: new Date(2000, mes - 1, 1),
+        lt: new Date(2000, mes, 1)
+      };
+    }
+
+    const aniversariantesEsteAno = mes
+      ? await this.prisma.$queryRaw<Array<{ count: bigint }>>`
+          SELECT COUNT(*)::int as count
+          FROM "Colaborador" c
+          WHERE c."organizationId" = ${organizationId}
+          AND EXTRACT(MONTH FROM c."dataNascimento") = ${mes}
+          AND EXISTS (
+            SELECT 1 FROM "EnvioBrinde" eb
+            WHERE eb."colaboradorId" = c.id
+            AND eb."anoAniversario" = ${ano}
+          )
+        `.then(result => Number(result[0]?.count || 0))
+      : await this.prisma.colaborador.count({
+          where: whereAniversariantes,
+        });
 
     // Buscar estatísticas de envios por status
+    const whereStatus: any = {
+      anoAniversario: ano,
+      colaborador: {
+        organizationId,
+      },
+    };
+
+    // Se mes fornecido, adicionar filtro de mês
+    if (mes) {
+      whereStatus.colaborador.dataNascimento = {
+        gte: new Date(2000, mes - 1, 1),
+        lt: new Date(2000, mes, 1)
+      };
+    }
+
     const stats = await this.prisma.envioBrinde.groupBy({
       by: ['status'],
-      where: {
-        anoAniversario: ano,
-        colaborador: {
-          organizationId,
-        },
-      },
+      where: whereStatus,
       _count: {
         status: true,
       },
