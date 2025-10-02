@@ -10,7 +10,6 @@ import {
   Settings,
   LogOut,
   Bell,
-  Search,
   Menu,
   X,
   ChevronDown
@@ -191,7 +190,7 @@ export default function Layout({ children }: LayoutProps) {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    user.nome.charAt(0)
+                    user?.nome?.charAt(0) || 'U'
                   )}
                 </div>
                 <div className="ml-3 flex-1 min-w-0">
@@ -230,7 +229,7 @@ export default function Layout({ children }: LayoutProps) {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    user.nome.charAt(0)
+                    user?.nome?.charAt(0) || 'U'
                   )}
                 </div>
                 <button
@@ -318,14 +317,14 @@ export default function Layout({ children }: LayoutProps) {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        user.nome.charAt(0)
+                        user?.nome?.charAt(0) || 'U'
                       )}
                     </div>
                     <div className="ml-3 flex-1 text-left">
-                      <p className="text-sm font-medium text-beuni-text">{user.nome}</p>
+                      <p className="text-sm font-medium text-beuni-text">{user?.nome || 'Usuário'}</p>
                       <p className="text-xs text-beuni-text/60">{user.email}</p>
                     </div>
-                    <ChevronDown className={`h-4 w-4 text-beuni-text/60 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`h-5 w-5 text-beuni-text/60 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {/* Dropdown Menu */}
@@ -340,7 +339,7 @@ export default function Layout({ children }: LayoutProps) {
                           }}
                           className="w-full flex items-center px-3 py-2 text-sm font-medium text-beuni-text hover:bg-beuni-orange-50 rounded-lg transition-colors"
                         >
-                          <Settings className="h-4 w-4 mr-3" />
+                          <Settings className="h-5 w-5 mr-3" />
                           Editar perfil
                         </button>
                         <hr className="my-2 border-beuni-orange-100" />
@@ -399,17 +398,13 @@ export default function Layout({ children }: LayoutProps) {
 
               {/* Right Actions */}
               <div className="flex items-center space-x-2">
-                <button className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors">
-                  <Search className="h-5 w-5" />
-                </button>
-
                 {/* Notifications Button */}
                 <div className="relative">
                   <button
                     onClick={() => setNotificationsOpen(!notificationsOpen)}
                     className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors relative"
                   >
-                    <Bell className="h-5 w-5" />
+                    <Bell className="h-6 w-6" />
                     {unreadCount > 0 && (
                       <span className="absolute top-1 right-1 h-5 w-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center font-bold">
                         {unreadCount}
@@ -544,15 +539,15 @@ export default function Layout({ children }: LayoutProps) {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        user.nome.charAt(0)
+                        user?.nome?.charAt(0) || 'U'
                       )}
                     </div>
                     <div className="hidden md:block text-left">
                       <p className="text-sm font-semibold text-beuni-text">
-                        {user.nome}
+                        {user?.nome || 'Usuário'}
                       </p>
                     </div>
-                    <ChevronDown className={`h-4 w-4 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`h-5 w-5 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {/* Profile Dropdown Menu */}
@@ -574,12 +569,12 @@ export default function Layout({ children }: LayoutProps) {
                                   className="w-full h-full object-cover"
                                 />
                               ) : (
-                                user.nome.charAt(0)
+                                user?.nome?.charAt(0) || 'U'
                               )}
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-semibold text-beuni-text truncate">{user.nome}</p>
-                              <p className="text-sm text-beuni-text/60 truncate">{user.email}</p>
+                              <p className="font-semibold text-beuni-text truncate">{user?.nome || 'Usuário'}</p>
+                              <p className="text-sm text-beuni-text/60 truncate">{user?.email || 'email@exemplo.com'}</p>
                             </div>
                           </div>
                         </div>
@@ -593,7 +588,7 @@ export default function Layout({ children }: LayoutProps) {
                             }}
                             className="w-full flex items-center gap-3 px-4 py-2 text-sm text-beuni-text hover:bg-beuni-orange-50 transition-colors"
                           >
-                            <Settings className="h-4 w-4" />
+                            <Settings className="h-5 w-5" />
                             Editar perfil
                           </button>
                           <button
