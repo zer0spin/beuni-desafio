@@ -338,11 +338,12 @@ export default function RelatoriosPage() {
     );
   };
 
-  // Gerar anos disponíveis (2023 até ano atual + 2)
+  // Gerar últimos 5 anos incluindo o ano atual (nunca anos futuros)
+  const anoAtual = new Date().getFullYear();
   const anosDisponiveis = Array.from(
-    { length: new Date().getFullYear() - 2022 + 2 },
-    (_, i) => 2023 + i
-  );
+    { length: 5 },
+    (_, i) => anoAtual - i
+  ).reverse();
 
   return (
     <Layout>

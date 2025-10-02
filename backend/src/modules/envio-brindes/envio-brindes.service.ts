@@ -295,9 +295,20 @@ export class EnvioBrindesService {
       where: { organizationId },
     });
 
-    // Buscar aniversariantes do ano (e mes se fornecido)
+    // Construir filtro base para colaboradores
+    const whereColaborador: any = { organizationId };
+
+    // Se mês fornecido, filtrar por mês de nascimento
+    if (mes) {
+      whereColaborador.dataNascimento = {
+        gte: new Date(2000, mes - 1, 1),
+        lt: new Date(2000, mes, 1)
+      };
+    }
+
+    // Buscar aniversariantes considerando ano e mês
     const whereAniversariantes: any = {
-      organizationId,
+      ...whereColaborador,
       enviosBrinde: {
         some: {
           anoAniversario: ano
@@ -305,59 +316,15 @@ export class EnvioBrindesService {
       }
     };
 
-    // Se um mês específico foi fornecido, filtrar por mês de nascimento
-    if (mes) {
-      // Prisma não tem função de extração de mês diretamente, então usamos raw SQL
-      const aniversariantesEsteAno = await this.prisma.$queryRaw<Array<{ count: bigint }>>`
-        SELECT COUNT(*)::int as count
-        FROM "Colaborador" c
-        WHERE c."organizationId" = ${organizationId}
-        AND EXTRACT(MONTH FROM c."dataNascimento") = ${mes}
-        AND EXISTS (
-          SELECT 1 FROM "EnvioBrinde" eb
-          WHERE eb."colaboradorId" = c.id
-          AND eb."anoAniversario" = ${ano}
-        )
-      `;
-      const aniversariantesCount = Number(aniversariantesEsteAno[0]?.count || 0);
-
-      whereAniversariantes.dataNascimento = {
-        gte: new Date(2000, mes - 1, 1),
-        lt: new Date(2000, mes, 1)
-      };
-    }
-
-    const aniversariantesEsteAno = mes
-      ? await this.prisma.$queryRaw<Array<{ count: bigint }>>`
-          SELECT COUNT(*)::int as count
-          FROM "Colaborador" c
-          WHERE c."organizationId" = ${organizationId}
-          AND EXTRACT(MONTH FROM c."dataNascimento") = ${mes}
-          AND EXISTS (
-            SELECT 1 FROM "EnvioBrinde" eb
-            WHERE eb."colaboradorId" = c.id
-            AND eb."anoAniversario" = ${ano}
-          )
-        `.then(result => Number(result[0]?.count || 0))
-      : await this.prisma.colaborador.count({
-          where: whereAniversariantes,
-        });
+    const aniversariantesEsteAno = await this.prisma.colaborador.count({
+      where: whereAniversariantes,
+    });
 
     // Buscar estatísticas de envios por status
     const whereStatus: any = {
       anoAniversario: ano,
-      colaborador: {
-        organizationId,
-      },
+      colaborador: whereColaborador,
     };
-
-    // Se mes fornecido, adicionar filtro de mês
-    if (mes) {
-      whereStatus.colaborador.dataNascimento = {
-        gte: new Date(2000, mes - 1, 1),
-        lt: new Date(2000, mes, 1)
-      };
-    }
 
     const stats = await this.prisma.envioBrinde.groupBy({
       by: ['status'],
@@ -380,9 +347,7 @@ export class EnvioBrindesService {
 
     // Buscar envios por mês usando Prisma
     const colaboradoresComEnvios = await this.prisma.colaborador.findMany({
-      where: {
-        organizationId,
-      },
+      where: whereColaborador,
       include: {
         enviosBrinde: {
           where: {
@@ -392,23 +357,24 @@ export class EnvioBrindesService {
       }
     });
 
-    const enviosPorMes = Array.from({ length: 12 }, (_, index) => {
-      const mes = index + 1;
+    // Se filtrou por mês específico, retornar apenas aquele mês
+    const mesesParaRetornar = mes ? [mes] : Array.from({ length: 12 }, (_, i) => i + 1);
+
+    const enviosPorMes = mesesParaRetornar.map(mesAtual => {
       const colaboradoresDoMes = colaboradoresComEnvios.filter(colab => {
         const dataNasc = new Date(colab.dataNascimento);
-        return dataNasc.getMonth() + 1 === mes;
+        return dataNasc.getMonth() + 1 === mesAtual;
       });
 
       const enviosDoMes = colaboradoresDoMes.flatMap(c => c.enviosBrinde);
 
       return {
-        mes,
+        mes: mesAtual,
         total: colaboradoresDoMes.length,
         enviados: enviosDoMes.filter(e => ['ENVIADO', 'ENTREGUE'].includes(e.status)).length,
         pendentes: enviosDoMes.filter(e => ['PENDENTE', 'PRONTO_PARA_ENVIO'].includes(e.status)).length,
       };
     });
-;
 
     const mesesNomes = [
       'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
@@ -439,6 +405,132 @@ export class EnvioBrindesService {
     console.log('🧪 Simulando processamento de aniversários...');
     await this.verificarAniversariosProximos();
     return { success: true, message: 'Processamento simulado executado' };
+  }
+
+  /**
+   * Popular banco com dados de teste
+   */
+  async seedTestData(organizationId: string) {
+    const nomes = ['Rafael', 'Fernanda', 'Lucas', 'Juliana', 'Thiago', 'Camila', 'Felipe', 'Amanda', 'Rodrigo', 'Beatriz', 'Bruno', 'Larissa', 'Guilherme', 'Patrícia', 'Marcelo', 'Renata', 'André', 'Carolina', 'Diego', 'Vanessa'];
+    const sobrenomes = ['Silva', 'Santos', 'Oliveira', 'Souza', 'Rodrigues', 'Ferreira', 'Alves', 'Pereira', 'Lima', 'Gomes', 'Costa', 'Ribeiro'];
+    const cargos = ['Desenvolvedor Full Stack', 'Analista de Dados', 'Gerente de Projetos', 'Designer UX/UI', 'Engenheiro de Software', 'Product Owner', 'Scrum Master', 'DevOps Engineer', 'QA Analyst', 'Business Analyst'];
+    const departamentos = ['Tecnologia', 'Produto', 'Engenharia', 'Design', 'Qualidade', 'DevOps', 'Dados', 'Inovação'];
+    const cidades = [
+      { cidade: 'São Paulo', uf: 'SP', cep: '01000000' },
+      { cidade: 'Rio de Janeiro', uf: 'RJ', cep: '20000000' },
+      { cidade: 'Belo Horizonte', uf: 'MG', cep: '30000000' },
+      { cidade: 'Curitiba', uf: 'PR', cep: '80000000' },
+    ];
+
+    const randomItem = <T,>(array: T[]): T => array[Math.floor(Math.random() * array.length)];
+    const randomDate = (start: Date, end: Date) => new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+    const generateBirthDate = (mes: number) => {
+      const ano = 1985 + Math.floor(Math.random() * 15);
+      const dia = 1 + Math.floor(Math.random() * 28);
+      return new Date(ano, mes - 1, dia);
+    };
+
+    const colaboradoresCriados = [];
+
+    // Criar 30 colaboradores distribuídos em todos os meses
+    for (let i = 0; i < 30; i++) {
+      const mes = (i % 12) + 1;
+      const nome = randomItem(nomes);
+      const sobrenome = randomItem(sobrenomes);
+      const endereco = randomItem(cidades);
+
+      const colaborador = await this.prisma.colaborador.create({
+        data: {
+          nomeCompleto: `${nome} ${sobrenome} ${i}`,
+          dataNascimento: generateBirthDate(mes),
+          cargo: randomItem(cargos),
+          departamento: randomItem(departamentos),
+          organizacao: {
+            connect: { id: organizationId }
+          },
+          endereco: {
+            create: {
+              logradouro: `Rua ${randomItem(['das Flores', 'Principal', 'Central'])}`,
+              numero: String(100 + Math.floor(Math.random() * 900)),
+              bairro: randomItem(['Centro', 'Jardim', 'Vila Nova']),
+              cidade: endereco.cidade,
+              uf: endereco.uf,
+              cep: endereco.cep,
+            }
+          },
+        },
+      });
+
+      colaboradoresCriados.push(colaborador);
+    }
+
+    // Criar envios para múltiplos anos
+    const anos = [2021, 2022, 2023, 2024, 2025];
+    let totalEnvios = 0;
+
+    for (const ano of anos) {
+      for (const colaborador of colaboradoresCriados) {
+        let status: string;
+        const random = Math.random();
+
+        if (ano < 2024) {
+          if (random < 0.7) status = 'ENTREGUE';
+          else if (random < 0.85) status = 'ENVIADO';
+          else if (random < 0.95) status = 'CANCELADO';
+          else status = 'PRONTO_PARA_ENVIO';
+        } else if (ano === 2024) {
+          if (random < 0.5) status = 'ENTREGUE';
+          else if (random < 0.7) status = 'ENVIADO';
+          else if (random < 0.85) status = 'PRONTO_PARA_ENVIO';
+          else if (random < 0.95) status = 'PENDENTE';
+          else status = 'CANCELADO';
+        } else {
+          if (random < 0.3) status = 'ENTREGUE';
+          else if (random < 0.5) status = 'ENVIADO';
+          else if (random < 0.7) status = 'PRONTO_PARA_ENVIO';
+          else if (random < 0.9) status = 'PENDENTE';
+          else status = 'CANCELADO';
+        }
+
+        const dataNasc = new Date(colaborador.dataNascimento);
+        const dataGatilho = new Date(ano, dataNasc.getMonth(), dataNasc.getDate() - 30);
+        let dataEnvio = null;
+        if (['ENVIADO', 'ENTREGUE'].includes(status)) {
+          dataEnvio = randomDate(dataGatilho, new Date(ano, dataNasc.getMonth(), dataNasc.getDate()));
+        }
+
+        await this.prisma.envioBrinde.upsert({
+          where: {
+            colaboradorId_anoAniversario: {
+              colaboradorId: colaborador.id,
+              anoAniversario: ano,
+            },
+          },
+          update: {
+            status: status as any,
+            dataGatilhoEnvio: dataGatilho,
+            dataEnvioRealizado: dataEnvio,
+          },
+          create: {
+            colaboradorId: colaborador.id,
+            anoAniversario: ano,
+            status: status as any,
+            dataGatilhoEnvio: dataGatilho,
+            dataEnvioRealizado: dataEnvio,
+          },
+        });
+
+        totalEnvios++;
+      }
+    }
+
+    return {
+      success: true,
+      colaboradoresCriados: colaboradoresCriados.length,
+      totalEnvios,
+      anos,
+      message: 'Dados de teste criados com sucesso!'
+    };
   }
 
   /**

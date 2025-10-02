@@ -271,6 +271,19 @@ export class EnvioBrindesController {
     return this.envioBrindesService.simularProcessamento();
   }
 
+  @Post('seed-test-data')
+  @ApiOperation({
+    summary: 'Popular banco com dados de teste',
+    description: 'Cria colaboradores e envios de teste para todos os meses e anos (2021-2025)'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Dados de teste criados com sucesso',
+  })
+  async seedTestData(@Request() req) {
+    return this.envioBrindesService.seedTestData(req.user.organizationId);
+  }
+
   @Post('criar-registros-ano/:ano')
   @ApiOperation({
     summary: 'Criar registros para novo ano',
