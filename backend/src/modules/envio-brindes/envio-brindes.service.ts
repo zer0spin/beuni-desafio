@@ -290,136 +290,167 @@ export class EnvioBrindesService {
    * Buscar relatório completo de envios
    */
   async buscarRelatorios(organizationId: string, ano: number, mes?: number) {
-    // Construir filtro base para colaboradores
-    const whereColaborador: any = { organizationId };
+    // Quando NÃO há filtro de mês, usamos as consultas agregadas (mais performáticas)
+    if (!mes) {
+      // Total de colaboradores (todos da organização)
+      const totalColaboradores = await this.prisma.colaborador.count({
+        where: { organizationId },
+      });
 
-    // Se mês fornecido, filtrar por mês de nascimento
-    if (mes) {
-      whereColaborador.dataNascimento = {
-        gte: new Date(2000, mes - 1, 1),
-        lt: new Date(2000, mes, 1)
-      };
-    }
+      // Aniversariantes no ano (com envio registrado para o ano)
+      const aniversariantesEsteAno = await this.prisma.colaborador.count({
+        where: {
+          organizationId,
+          enviosBrinde: { some: { anoAniversario: ano } },
+        },
+      });
 
-    // Buscar total de colaboradores (considerando filtro de mês se aplicado)
-    const totalColaboradores = await this.prisma.colaborador.count({
-      where: whereColaborador,
-    });
+      // Estatísticas por status (ano + organização)
+      const stats = await this.prisma.envioBrinde.groupBy({
+        by: ['status'],
+        where: {
+          anoAniversario: ano,
+          colaborador: { organizationId },
+        },
+        _count: { status: true },
+      });
 
-    // Buscar aniversariantes considerando ano e mês
-    const whereAniversariantes: any = {
-      ...whereColaborador,
-      enviosBrinde: {
-        some: {
-          anoAniversario: ano
-        }
-      }
-    };
+      const enviosPorStatus = stats.reduce(
+        (acc, stat) => {
+          acc[stat.status] = stat._count.status;
+          return acc;
+        },
+        {
+          PENDENTE: 0,
+          PRONTO_PARA_ENVIO: 0,
+          ENVIADO: 0,
+          ENTREGUE: 0,
+          CANCELADO: 0,
+        } as Record<string, number>
+      );
 
-    const aniversariantesEsteAno = await this.prisma.colaborador.count({
-      where: whereAniversariantes,
-    });
+      // Série por mês
+      const colaboradoresComEnvios = await this.prisma.colaborador.findMany({
+        where: { organizationId },
+        include: { enviosBrinde: { where: { anoAniversario: ano } } },
+      });
 
-    // Buscar estatísticas de envios por status
-    const whereStatus: any = {
-      anoAniversario: ano,
-      colaborador: whereColaborador,
-    };
-
-    const stats = await this.prisma.envioBrinde.groupBy({
-      by: ['status'],
-      where: whereStatus,
-      _count: {
-        status: true,
-      },
-    });
-
-    const enviosPorStatus = stats.reduce((acc, stat) => {
-      acc[stat.status] = stat._count.status;
-      return acc;
-    }, {
-      PENDENTE: 0,
-      PRONTO_PARA_ENVIO: 0,
-      ENVIADO: 0,
-      ENTREGUE: 0,
-      CANCELADO: 0,
-    } as Record<string, number>);
-
-    // Buscar envios por mês usando Prisma
-    const colaboradoresComEnvios = await this.prisma.colaborador.findMany({
-      where: whereColaborador,
-      include: {
-        enviosBrinde: {
-          where: {
-            anoAniversario: ano
-          }
-        }
-      }
-    });
-
-    // Se filtrou por mês específico, fornecer dados mais granulares (por dia do mês)
-    let enviosPorMes;
-    
-    if (mes) {
-      // Para mês específico: agrupar por dia do mês
-      const diasDoMes = Array.from({ length: 31 }, (_, i) => i + 1);
-      
-      enviosPorMes = diasDoMes.map(dia => {
-        const colaboradoresNoDia = colaboradoresComEnvios.filter(colab => {
-          const dataNasc = new Date(colab.dataNascimento);
-          return dataNasc.getDate() === dia;
-        });
-
-        const enviosNoDia = colaboradoresNoDia.flatMap(c => c.enviosBrinde);
-
-        return {
-          mes: dia,
-          nomeDoMes: `Dia ${dia}`,
-          total: colaboradoresNoDia.length,
-          enviados: enviosNoDia.filter(e => ['ENVIADO', 'ENTREGUE'].includes(e.status)).length,
-          pendentes: enviosNoDia.filter(e => ['PENDENTE', 'PRONTO_PARA_ENVIO'].includes(e.status)).length,
-        };
-      }).filter(dia => dia.total > 0); // Remover dias sem aniversariantes
-      
-    } else {
-      // Para todos os meses: agrupar por mês
       const mesesParaRetornar = Array.from({ length: 12 }, (_, i) => i + 1);
-
-      enviosPorMes = mesesParaRetornar.map(mesAtual => {
-        const colaboradoresDoMes = colaboradoresComEnvios.filter(colab => {
+      const enviosPorMes = mesesParaRetornar.map((mesAtual) => {
+        const colaboradoresDoMes = colaboradoresComEnvios.filter((colab) => {
           const dataNasc = new Date(colab.dataNascimento);
           return dataNasc.getMonth() + 1 === mesAtual;
         });
 
-        const enviosDoMes = colaboradoresDoMes.flatMap(c => c.enviosBrinde);
+        const enviosDoMes = colaboradoresDoMes.flatMap((c) => c.enviosBrinde);
 
         return {
           mes: mesAtual,
           total: colaboradoresDoMes.length,
-          enviados: enviosDoMes.filter(e => ['ENVIADO', 'ENTREGUE'].includes(e.status)).length,
-          pendentes: enviosDoMes.filter(e => ['PENDENTE', 'PRONTO_PARA_ENVIO'].includes(e.status)).length,
+          enviados: enviosDoMes.filter((e) => ['ENVIADO', 'ENTREGUE'].includes(e.status)).length,
+          pendentes: enviosDoMes.filter((e) => ['PENDENTE', 'PRONTO_PARA_ENVIO'].includes(e.status)).length,
         };
       });
+
+      const mesesNomes = [
+        'Janeiro',
+        'Fevereiro',
+        'Março',
+        'Abril',
+        'Maio',
+        'Junho',
+        'Julho',
+        'Agosto',
+        'Setembro',
+        'Outubro',
+        'Novembro',
+        'Dezembro',
+      ];
+
+      const enviosPorMesFormatado = enviosPorMes.map((m) => ({
+        mes: m.mes,
+        nomeDoMes: mesesNomes[m.mes - 1],
+        total: Number(m.total),
+        enviados: Number(m.enviados),
+        pendentes: Number(m.pendentes),
+      }));
+
+      return {
+        totalColaboradores,
+        aniversariantesEsteAno,
+        enviosPorStatus,
+        enviosPorMes: enviosPorMesFormatado,
+      };
     }
 
-    const mesesNomes = [
-      'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-      'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-    ];
+    // Quando HÁ filtro de mês, fazemos filtragem em memória por mês (compatível com múltiplos anos)
+    // 1) Buscar colaboradores e filtrar por mês de aniversário
+    const colaboradores = await this.prisma.colaborador.findMany({
+      where: { organizationId },
+      select: { id: true, dataNascimento: true },
+    });
+    const colaboradoresDoMes = colaboradores.filter((c) => {
+      const dn = new Date(c.dataNascimento);
+      return dn.getMonth() + 1 === mes;
+    });
+    const totalColaboradores = colaboradoresDoMes.length;
 
-    const enviosPorMesFormatado = enviosPorMes.map(m => ({
-      mes: m.mes,
-      nomeDoMes: mes ? m.nomeDoMes : mesesNomes[m.mes - 1],
-      total: Number(m.total),
-      enviados: Number(m.enviados),
-      pendentes: Number(m.pendentes),
-    }));
+    // 2) Buscar envios do ano e filtrar pelo mês do aniversariante
+    const enviosAno = await this.prisma.envioBrinde.findMany({
+      where: {
+        anoAniversario: ano,
+        colaborador: { organizationId },
+      },
+      include: { colaborador: { select: { id: true, dataNascimento: true } } },
+    });
+    const enviosDoMes = enviosAno.filter((e) => {
+      const dn = new Date(e.colaborador.dataNascimento);
+      return dn.getMonth() + 1 === mes;
+    });
+
+    // 3) Aniversariantes do ano (no mês filtrado): colaboradores únicos com envio no ano
+    const aniversariantesEsteAno = new Set(enviosDoMes.map((e) => e.colaboradorId)).size;
+
+    // 4) Estatísticas por status
+    const enviosPorStatus = enviosDoMes.reduce(
+      (acc, e) => {
+        acc[e.status] = (acc[e.status] || 0) + 1;
+        return acc;
+      },
+      {
+        PENDENTE: 0,
+        PRONTO_PARA_ENVIO: 0,
+        ENVIADO: 0,
+        ENTREGUE: 0,
+        CANCELADO: 0,
+      } as Record<string, number>
+    );
+
+    // 5) Série por dia do mês
+    const diasDoMes = Array.from({ length: 31 }, (_, i) => i + 1);
+    const enviosPorMes = diasDoMes
+      .map((dia) => {
+        const colaboradoresDia = colaboradoresDoMes.filter((c) => new Date(c.dataNascimento).getDate() === dia);
+        if (colaboradoresDia.length === 0) return null;
+
+        const idsDia = new Set(colaboradoresDia.map((c) => c.id));
+        const enviosDia = enviosDoMes.filter((e) => idsDia.has(e.colaboradorId));
+
+        return {
+          mes: dia,
+          nomeDoMes: `Dia ${dia}`,
+          total: colaboradoresDia.length,
+          enviados: enviosDia.filter((e) => ['ENVIADO', 'ENTREGUE'].includes(e.status)).length,
+          pendentes: enviosDia.filter((e) => ['PENDENTE', 'PRONTO_PARA_ENVIO'].includes(e.status)).length,
+        };
+      })
+      .filter(Boolean) as Array<{ mes: number; nomeDoMes: string; total: number; enviados: number; pendentes: number }>;
 
     return {
       totalColaboradores,
       aniversariantesEsteAno,
       enviosPorStatus,
-      enviosPorMes: enviosPorMesFormatado,
+      enviosPorMes,
     };
   }
 
