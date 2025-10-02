@@ -62,23 +62,23 @@ export default function ColaboradoresPage() {
       <div className="p-6 lg:p-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-3xl font-bold text-beuni-text flex items-center">
-                <Users className="h-8 w-8 mr-3 text-beuni-orange-600" />
-                Colaboradores
-              </h1>
-              <p className="text-beuni-text/60 mt-1">
-                Gerencie todos os colaboradores da organização
-              </p>
+          <div className="bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl shadow-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold flex items-center">
+                  <Users className="h-8 w-8 mr-3" />
+                  Colaboradores
+                </h1>
+                <p className="text-white/80 mt-1">Gerencie todos os colaboradores da organização</p>
+              </div>
+              <button
+                onClick={() => router.push('/colaboradores/novo')}
+                className="flex items-center px-6 py-3 bg-white text-beuni-orange-600 font-semibold rounded-xl hover:bg-beuni-orange-50 transition-all duration-200 shadow-md hover:shadow-lg"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Novo Colaborador
+              </button>
             </div>
-            <button
-              onClick={() => router.push('/colaboradores/novo')}
-              className="flex items-center px-6 py-3 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white font-semibold rounded-xl hover:from-beuni-orange-600 hover:to-beuni-orange-700 transition-all duration-200 shadow-md hover:shadow-lg"
-            >
-              <Plus className="h-5 w-5 mr-2" />
-              Novo Colaborador
-            </button>
           </div>
 
           {/* Stats Cards */}

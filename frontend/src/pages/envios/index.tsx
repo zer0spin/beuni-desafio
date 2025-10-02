@@ -112,35 +112,24 @@ export default function EnviosPage() {
     }
   };
 
-  const calcularDiasRestantes = (envio: EnvioBrinde): number | null => {
-    // Se já foi enviado ou entregue, retorna null pois não tem prazo
-    if (envio.status === 'ENVIADO' || envio.status === 'ENTREGUE') {
-      return null;
-    }
-
+  // Retorna informações de prazo sempre SEM alterar dados no backend
+  const getPrazoInfo = (envio: EnvioBrinde) => {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
-    // Se tem data de gatilho definida, usa ela
-    if (envio.dataGatilhoEnvio) {
-      const limite = new Date(envio.dataGatilhoEnvio);
-      limite.setHours(0, 0, 0, 0);
-      const diffTime = limite.getTime() - hoje.getTime();
-      return Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    }
-
-    // Se não tem data de gatilho, calcula baseado na data de aniversário
     const dataNascimento = new Date(envio.colaborador.dataNascimento);
-    let dataAniversario = new Date(envio.anoAniversario, dataNascimento.getMonth(), dataNascimento.getDate());
+    const dataAniversario = new Date(envio.anoAniversario, dataNascimento.getMonth(), dataNascimento.getDate());
     dataAniversario.setHours(0, 0, 0, 0);
 
-    // Se o aniversário deste ano já passou, calcular para o próximo ano
-    if (dataAniversario < hoje) {
-      dataAniversario.setFullYear(dataAniversario.getFullYear() + 1);
-    }
+    const diasParaAniversario = Math.floor((dataAniversario.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
+    const passouAniversario = diasParaAniversario < 0;
 
-    const diffTime = dataAniversario.getTime() - hoje.getTime();
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    // Usado apenas para sinalização visual do prazo ideal de envio (7 dias úteis antes)
+    const dataGatilho = envio.dataGatilhoEnvio ? new Date(envio.dataGatilhoEnvio) : null;
+    if (dataGatilho) dataGatilho.setHours(0, 0, 0, 0);
+    const passouGatilho = dataGatilho ? hoje.getTime() > dataGatilho.getTime() : false;
+
+    return { diasParaAniversario, passouAniversario, passouGatilho, dataGatilho } as const;
   };
 
   const getStatusConfig = (status: string) => {
@@ -172,21 +161,21 @@ export default function EnviosPage() {
     <Layout>
       <div className="p-6 lg:p-8 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-beuni-text flex items-center">
-                <Package className="h-8 w-8 mr-3 text-beuni-orange-600" />
-                Controle de Envios
-              </h1>
-              <p className="text-beuni-text/60 mt-1">
-                Gerencie os envios de brindes de aniversário
-              </p>
-            </div>
-            <div className="flex items-center space-x-2 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white px-6 py-3 rounded-xl shadow-md">
-              <Package className="h-5 w-5" />
-              <span className="font-bold text-2xl">{stats.total}</span>
-              <span className="text-sm opacity-90">envios</span>
+          <div className="mb-8">
+          <div className="bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl shadow-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold flex items-center">
+                  <Package className="h-8 w-8 mr-3" />
+                  Controle de Envios
+                </h1>
+                <p className="text-white/80 mt-1">Gerencie os envios de brindes de aniversário</p>
+              </div>
+              <div className="flex items-center space-x-2 bg-white/15 backdrop-blur-sm px-5 py-2.5 rounded-xl shadow-md border border-white/20">
+                <Package className="h-5 w-5" />
+                <span className="font-bold text-2xl">{stats.total}</span>
+                <span className="text-sm opacity-90">envios</span>
+              </div>
             </div>
           </div>
 
@@ -273,7 +262,7 @@ export default function EnviosPage() {
               .map((envio) => {
               const statusConfig = getStatusConfig(envio.status);
               const StatusIcon = statusConfig.icon;
-              const diasRestantes = calcularDiasRestantes(envio);
+              const { diasParaAniversario, passouAniversario, passouGatilho, dataGatilho } = getPrazoInfo(envio);
 
               return (
                 <div
@@ -345,7 +334,7 @@ export default function EnviosPage() {
                       </div>
                     </div>
 
-                    {/* Dias Restantes ou Data de Envio/Entrega */}
+                    {/* Prazo / Datas - lógica visual revisada */}
                     {envio.status === 'ENTREGUE' ? (
                       <div className="flex items-center space-x-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
                         <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
@@ -374,54 +363,68 @@ export default function EnviosPage() {
                           </p>
                         </div>
                       </div>
-                    ) : diasRestantes !== null ? (
-                      <div className={`flex items-center space-x-2 rounded-lg px-3 py-2 ${
-                        diasRestantes < 0
+                    ) : (
+                      (() => {
+                        // Para PENDENTE/PRONTO_PARA_ENVIO, exibimos contagem regressiva até o ANIVERSÁRIO
+                        const bgClass = passouAniversario
                           ? 'bg-red-50 border border-red-200'
-                          : diasRestantes === 0
+                          : diasParaAniversario === 0
                           ? 'bg-red-50 border border-red-200'
-                          : diasRestantes <= 2
+                          : diasParaAniversario <= 2
                           ? 'bg-orange-50 border border-orange-200'
-                          : diasRestantes <= 5
+                          : diasParaAniversario <= 5
                           ? 'bg-yellow-50 border border-yellow-200'
-                          : 'bg-blue-50 border border-blue-200'
-                      }`}>
-                        {diasRestantes < 0 ? (
-                          <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600" />
-                        ) : (
-                          <Clock className={`h-4 w-4 flex-shrink-0 ${
-                            diasRestantes === 0 ? 'text-red-600' :
-                            diasRestantes <= 2 ? 'text-orange-600' :
-                            diasRestantes <= 5 ? 'text-yellow-600' :
-                            'text-blue-600'
-                          }`} />
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className={`text-xs font-semibold uppercase ${
-                            diasRestantes < 0 ? 'text-red-700' :
-                            diasRestantes === 0 ? 'text-red-700' :
-                            diasRestantes <= 2 ? 'text-orange-700' :
-                            diasRestantes <= 5 ? 'text-yellow-700' :
-                            'text-blue-700'
-                          }`}>
-                            {diasRestantes < 0 ? 'ATRASADO' : diasRestantes === 0 ? 'ÚLTIMO DIA!' : 'FALTAM'}
-                          </p>
-                          <p className={`text-sm font-bold truncate ${
-                            diasRestantes < 0 ? 'text-red-900' :
-                            diasRestantes === 0 ? 'text-red-900' :
-                            diasRestantes <= 2 ? 'text-orange-900' :
-                            diasRestantes <= 5 ? 'text-yellow-900' :
-                            'text-blue-900'
-                          }`}>
-                            {diasRestantes < 0
-                              ? `${Math.abs(diasRestantes)} dias atrás`
-                              : diasRestantes === 0
-                              ? 'Hoje!'
-                              : `${diasRestantes} dias`
-                            }
-                          </p>
-                        </div>
-                      </div>
+                          : 'bg-blue-50 border border-blue-200';
+
+                        const textTone = passouAniversario
+                          ? { small: 'text-red-700', big: 'text-red-900' }
+                          : diasParaAniversario === 0
+                          ? { small: 'text-red-700', big: 'text-red-900' }
+                          : diasParaAniversario <= 2
+                          ? { small: 'text-orange-700', big: 'text-orange-900' }
+                          : diasParaAniversario <= 5
+                          ? { small: 'text-yellow-700', big: 'text-yellow-900' }
+                          : { small: 'text-blue-700', big: 'text-blue-900' };
+
+                        return (
+                          <div className={`flex items-center space-x-2 rounded-lg px-3 py-2 ${bgClass}`}>
+                            {passouAniversario ? (
+                              <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600" />
+                            ) : (
+                              <Clock className={`h-4 w-4 flex-shrink-0 ${
+                                diasParaAniversario === 0
+                                  ? 'text-red-600'
+                                  : diasParaAniversario <= 2
+                                  ? 'text-orange-600'
+                                  : diasParaAniversario <= 5
+                                  ? 'text-yellow-600'
+                                  : 'text-blue-600'
+                              }`} />
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <p className={`text-xs font-semibold uppercase ${textTone.small}`}>
+                                {passouAniversario
+                                  ? 'ATRASADO'
+                                  : diasParaAniversario === 0
+                                  ? 'ÚLTIMO DIA!'
+                                  : 'FALTAM'}
+                              </p>
+                              <p className={`text-sm font-bold truncate ${textTone.big}`}>
+                                {passouAniversario
+                                  ? `${Math.abs(diasParaAniversario)} dias atrás`
+                                  : diasParaAniversario === 0
+                                  ? 'Hoje!'
+                                  : `${diasParaAniversario} dias`}
+                              </p>
+                              {dataGatilho && (
+                                <p className="text-[11px] text-beuni-text/70 mt-0.5">
+                                  Prazo ideal de envio: até {formatDate(dataGatilho)} {passouGatilho && '(após o prazo ideal)'}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })()
                     ) : (
                       <div className="flex items-center space-x-2 bg-beuni-cream rounded-lg px-3 py-2">
                         <Clock className="h-4 w-4 text-beuni-orange-600 flex-shrink-0" />
@@ -430,7 +433,7 @@ export default function EnviosPage() {
                           <p className="text-sm font-bold text-beuni-text truncate">-</p>
                         </div>
                       </div>
-                    )}
+                    )
                   </div>
                 </div>
               );
