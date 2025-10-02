@@ -1,5 +1,6 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import {
   Gift,
   LayoutDashboard,
@@ -144,17 +145,19 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex-1 flex flex-col min-h-0">
           {/* Logo */}
           <div className="flex items-center h-16 px-4 border-b border-beuni-orange-100">
-            {sidebarOpen ? (
-              <img
-                src="/images/logos/logo-beuni.png"
-                alt="Beuni Logo"
-                className="h-8 w-auto"
-              />
-            ) : (
-              <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0 mx-auto">
-                <Gift className="h-6 w-6 text-white" />
-              </div>
-            )}
+            <Link href="/dashboard" className="flex items-center">
+              {sidebarOpen ? (
+                <img
+                  src="/images/logos/logo-beuni.png"
+                  alt="Beuni Logo"
+                  className="h-8 w-auto hover:scale-105 transition-transform cursor-pointer"
+                />
+              ) : (
+                <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0 mx-auto hover:scale-105 transition-transform cursor-pointer">
+                  <Gift className="h-6 w-6 text-white" />
+                </div>
+              )}
+            </Link>
           </div>
 
           {/* Navigation */}
@@ -201,7 +204,7 @@ export default function Layout({ children }: LayoutProps) {
                     </p>
                   </div>
                   <p className="text-sm font-bold text-beuni-text truncate">
-                    {user.organizacao.nome}
+                    {user?.organizacao?.nome || 'Organização'}
                   </p>
                   <p className="text-xs text-beuni-text/50 truncate">
                     {new Date().toLocaleDateString('pt-BR', { 
@@ -370,26 +373,26 @@ export default function Layout({ children }: LayoutProps) {
         }`}
       >
         {/* Top Header */}
-        <header className="bg-white/90 backdrop-blur-md border-b border-beuni-orange-100 sticky top-0 z-40 shadow-sm">
+        <header className="bg-gradient-to-r from-white via-beuni-orange-50/30 to-white backdrop-blur-md border-b-2 border-beuni-orange-200 sticky top-0 z-40 shadow-lg">
           <div className="px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
+            <div className="flex justify-between items-center h-18">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setMobileMenuOpen(true)}
-                className="lg:hidden p-2 text-beuni-text/60 hover:bg-beuni-orange-50 rounded-lg"
+                className="lg:hidden p-3 text-beuni-text/60 hover:bg-beuni-orange-100 hover:text-beuni-orange-600 rounded-xl transition-all duration-200 shadow-sm"
               >
                 <Menu className="h-6 w-6" />
               </button>
 
-              {/* Organization Name - Design Moderno */}
+              {/* Organization Name - Design Super Moderno */}
               <div className="hidden lg:block">
-                <div className="flex items-center space-x-3 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-lg border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-200">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-6 h-6 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-md flex items-center justify-center">
-                      <div className="w-3 h-3 bg-white rounded-sm"></div>
+                <div className="flex items-center space-x-4 bg-gradient-to-r from-white to-beuni-orange-50 backdrop-blur-md px-6 py-3 rounded-2xl border border-beuni-orange-200/60 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-8 h-8 bg-gradient-to-br from-beuni-orange-500 via-beuni-orange-600 to-beuni-orange-700 rounded-xl flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-200 hover:rotate-3">
+                      <div className="w-4 h-4 bg-white rounded-md shadow-sm"></div>
                     </div>
                     <div className="flex flex-col">
-                      <p className="text-sm font-bold text-beuni-text leading-none">{user.organizacao.nome}</p>
+                      <p className="text-lg font-bold text-beuni-text leading-none bg-gradient-to-r from-beuni-text to-beuni-orange-700 bg-clip-text text-transparent">{user?.organizacao?.nome || 'Organização'}</p>
                       <p className="text-xs text-beuni-text/50 leading-none">Dashboard</p>
                     </div>
                   </div>
@@ -397,16 +400,16 @@ export default function Layout({ children }: LayoutProps) {
               </div>
 
               {/* Right Actions */}
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-3">
                 {/* Notifications Button */}
                 <div className="relative">
                   <button
                     onClick={() => setNotificationsOpen(!notificationsOpen)}
-                    className="p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors relative"
+                    className="p-3 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-gradient-to-br from-beuni-orange-50 to-beuni-orange-100 rounded-2xl transition-all duration-300 relative shadow-sm hover:shadow-md hover:scale-110"
                   >
                     <Bell className="h-6 w-6" />
                     {unreadCount > 0 && (
-                      <span className="absolute top-1 right-1 h-5 w-5 bg-red-500 rounded-full text-white text-xs flex items-center justify-center font-bold">
+                      <span className="absolute -top-1 -right-1 h-6 w-6 bg-gradient-to-r from-red-500 to-red-600 rounded-full text-white text-xs flex items-center justify-center font-bold shadow-lg animate-pulse">
                         {unreadCount}
                       </span>
                     )}
@@ -529,9 +532,9 @@ export default function Layout({ children }: LayoutProps) {
                 <div className="relative">
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-3 p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors"
+                    className="flex items-center gap-4 p-3 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-gradient-to-br from-beuni-orange-50 to-beuni-orange-100 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-md hover:scale-105"
                   >
-                    <div className="w-8 h-8 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                    <div className="w-10 h-10 bg-gradient-to-br from-beuni-orange-500 via-beuni-orange-600 to-beuni-orange-700 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden shadow-lg">
                       {user.imagemPerfil ? (
                         <img 
                           src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`}
@@ -543,7 +546,7 @@ export default function Layout({ children }: LayoutProps) {
                       )}
                     </div>
                     <div className="hidden md:block text-left">
-                      <p className="text-sm font-semibold text-beuni-text">
+                      <p className="text-sm font-bold text-beuni-text">
                         {user?.nome || 'Usuário'}
                       </p>
                     </div>
