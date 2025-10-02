@@ -45,6 +45,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const updateUser = (userData: Partial<User>) => {
     if (!user) return;
 
+    console.log('UserContext.updateUser chamado:', userData);
+
     // Se a imagem foi atualizada, adicionar timestamp para forçar refresh
     if (userData.imagemPerfil) {
       userData = { 
@@ -52,9 +54,11 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
         imagemPerfil: userData.imagemPerfil,
         imageTimestamp: Date.now()
       };
+      console.log('ImageTimestamp adicionado:', userData.imageTimestamp);
     }
 
     const updatedUser = { ...user, ...userData };
+    console.log('Usuário atualizado:', updatedUser);
     setUser(updatedUser);
     
     // Atualizar cookie

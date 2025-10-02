@@ -88,15 +88,27 @@ export const apiCall = async <T = any>(
 
 // Auth helpers with secure cookie configuration
 export const setAuthToken = (token: string, user: any) => {
+  console.log('setAuthToken: Definindo cookies', { token: token.substring(0, 10) + '...', user });
+  
   const cookieOptions = {
     expires: 7, // 7 days
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-    sameSite: 'strict' as const, // CSRF protection
+    secure: false, // Permitir HTTP em desenvolvimento
+    sameSite: 'lax' as const, // Mais permissivo para compatibility
     path: '/', // Cookie available for entire site
   };
 
-  Cookies.set('beuni_token', token, cookieOptions);
-  Cookies.set('beuni_user', JSON.stringify(user), cookieOptions);
+  try {
+    Cookies.set('beuni_token', token, cookieOptions);
+    Cookies.set('beuni_user', JSON.stringify(user), cookieOptions);
+    console.log('setAuthToken: Cookies definidos com sucesso');
+    
+    // Verificar se foi setado corretamente
+    const tokenCheck = Cookies.get('beuni_token');
+    const userCheck = Cookies.get('beuni_user');
+    console.log('setAuthToken: Verificação', { tokenSet: !!tokenCheck, userSet: !!userCheck });
+  } catch (error) {
+    console.error('setAuthToken: Erro ao definir cookies', error);
+  }
 };
 
 export const removeAuthToken = () => {

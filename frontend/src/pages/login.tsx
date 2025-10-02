@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff } from 'lucide-react';
@@ -7,11 +7,31 @@ import Image from 'next/image';
 
 import api, { setAuthToken, endpoints } from '@/lib/api';
 import type { LoginCredentials, AuthResponse } from '@/types';
+import { useUser } from '@/contexts/UserContext';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { user, refreshUser } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+
+  // Redirecionar se já estiver logado
+  useEffect(() => {
+    if (user && !isLoading) {
+      console.log('Login: Usuário já logado, redirecionando');
+      router.replace('/dashboard');
+    }
+  }, [user, isLoading, router]);
+
+  // Após login bem-sucedido, aguardar UserContext atualizar
+  useEffect(() => {
+    if (loginSuccess && user) {
+      console.log('Login: UserContext atualizado após login, redirecionando');
+      router.replace('/dashboard');
+      setLoginSuccess(false);
+    }
+  }, [loginSuccess, user, router]);
 
   const {
     register,
@@ -22,13 +42,25 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginCredentials) => {
     setIsLoading(true);
     try {
+      console.log('Login: Enviando dados', data);
       const response = await api.post<AuthResponse>(endpoints.login, data);
       const { access_token, user } = response.data;
 
+      console.log('Login: Resposta recebida', { access_token: access_token.substring(0, 10) + '...', user });
       setAuthToken(access_token, user);
+      console.log('Login: Token definido, atualizando UserContext...');
+      
+      // Atualizar UserContext
+      refreshUser();
+      
       toast.success(`Bem-vindo, ${user.nome}!`);
-      router.push('/dashboard');
+      
+      // Marcar login como bem-sucedido para triggerar o useEffect
+      setLoginSuccess(true);
+      
+      console.log('Login: Processo concluído');
     } catch (error) {
+      console.error('Login: Erro no login', error);
       // Error is handled by axios interceptor
     } finally {
       setIsLoading(false);

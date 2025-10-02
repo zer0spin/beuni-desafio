@@ -38,16 +38,24 @@ export default function Layout({ children }: LayoutProps) {
   // Função para gerar URL da imagem com timestamp para evitar cache
   const getProfileImageUrl = (imagemPerfil: string) => {
     const timestamp = user?.imageTimestamp || Date.now();
+    console.log('Layout.getProfileImageUrl:', imagemPerfil, 'timestamp:', timestamp);
     return `${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${imagemPerfil}?t=${timestamp}`;
   };
 
   useEffect(() => {
+    console.log('Layout: user changed:', user);
+  }, [user]);
+
+  useEffect(() => {
+    console.log('Layout: Verificando autenticação', { isLoading, user: !!user });
     if (!isLoading && !user) {
+      console.log('Layout: Usuário não autenticado, redirecionando para login');
       router.push('/login');
       return;
     }
 
     if (user) {
+      console.log('Layout: Usuário autenticado:', user.nome);
       // Carregar notificações da API
       loadNotifications();
       loadUnreadCount();
