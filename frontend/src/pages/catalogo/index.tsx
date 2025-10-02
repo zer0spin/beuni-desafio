@@ -141,68 +141,75 @@ export default function CatalogoPage() {
   return (
     <Layout>
       <div className="p-6 lg:p-8">
-        {/* Header */}
+        {/* Header - gradient style to match other pages */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-beuni-text flex items-center">
-                <ShoppingBag className="h-8 w-8 mr-3 text-beuni-orange-600" />
-                Catálogo de Produtos
-              </h1>
-              <p className="text-beuni-text/60 mt-1">
-                Explore nossa seleção de brindes corporativos personalizados
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'grid'
-                    ? 'bg-beuni-orange-500 text-white'
-                    : 'bg-white text-beuni-text/60 hover:bg-beuni-orange-50'
-                }`}
-              >
-                <Grid className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 rounded-lg transition-colors ${
-                  viewMode === 'list'
-                    ? 'bg-beuni-orange-500 text-white'
-                    : 'bg-white text-beuni-text/60 hover:bg-beuni-orange-50'
-                }`}
-              >
-                <List className="h-5 w-5" />
-              </button>
+          <div className="bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl shadow-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold flex items-center">
+                  <ShoppingBag className="h-8 w-8 mr-3" />
+                  Catálogo de Produtos
+                </h1>
+                <p className="text-white/80 mt-1">Explore nossa seleção de brindes corporativos personalizados</p>
+              </div>
+              <div className="flex items-center space-x-2 bg-white/15 backdrop-blur-sm px-5 py-2.5 rounded-xl shadow-md border border-white/20">
+                <Package className="h-5 w-5" />
+                <span className="font-bold text-2xl">{filteredProducts.length}</span>
+                <span className="text-sm opacity-90">itens</span>
+              </div>
             </div>
           </div>
 
           {/* Search & Filter Bar */}
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-beuni-text/40" />
-              <input
-                type="text"
-                placeholder="Buscar produtos..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-white border border-beuni-orange-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 transition-all"
-              />
-            </div>
-            <div className="flex items-center space-x-2 overflow-x-auto pb-2 md:pb-0">
-              {categories.map((category) => (
+          <div className="mt-4 bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-beuni-text/40" />
+                <input
+                  type="text"
+                  placeholder="Buscar produtos..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 bg-white border border-beuni-orange-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 transition-all"
+                />
+              </div>
+              <div className="flex items-center space-x-2 overflow-x-auto pb-2 md:pb-0">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`px-4 py-2 rounded-xl whitespace-nowrap font-semibold transition-all ${
+                      selectedCategory === category
+                        ? 'bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white shadow-md scale-105'
+                        : 'bg-beuni-cream text-beuni-text hover:bg-beuni-orange-50'
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center space-x-2">
                 <button
-                  key={category}
-                  onClick={() => setSelectedCategory(category)}
-                  className={`px-4 py-2 rounded-xl whitespace-nowrap font-medium transition-all ${
-                    selectedCategory === category
-                      ? 'bg-beuni-orange-500 text-white shadow-md'
-                      : 'bg-white text-beuni-text hover:bg-beuni-orange-50 border border-beuni-orange-100'
+                  onClick={() => setViewMode('grid')}
+                  className={`p-3 rounded-xl transition-all ${
+                    viewMode === 'grid'
+                      ? 'bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white shadow-md'
+                      : 'bg-beuni-cream text-beuni-text hover:bg-beuni-orange-50'
                   }`}
                 >
-                  {category}
+                  <Grid className="h-5 w-5" />
                 </button>
-              ))}
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`p-3 rounded-xl transition-all ${
+                    viewMode === 'list'
+                      ? 'bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white shadow-md'
+                      : 'bg-beuni-cream text-beuni-text hover:bg-beuni-orange-50'
+                  }`}
+                >
+                  <List className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

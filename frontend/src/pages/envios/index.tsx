@@ -61,6 +61,18 @@ function addDaysLocal(date: Date, days: number): Date {
   return copy;
 }
 
+// Calculates the date that is N business days before a target date
+function calculateBusinessDaysBefore(targetDate: Date, businessDays: number): Date {
+  let currentDate = new Date(targetDate);
+  let daysToSubtract = 0;
+  while (businessDays > 0) {
+    daysToSubtract++;
+    currentDate = addDaysLocal(targetDate, -daysToSubtract);
+    if (isBusinessDay(currentDate)) businessDays--;
+  }
+  return currentDate;
+}
+
 // Counts business days between two dates (inclusive of end, exclusive of start)
 // i.e., from (start + 1 day) up to end
 function countBusinessDaysBetween(startDate: Date, endDate: Date): number {
@@ -183,9 +195,10 @@ export default function EnviosPage() {
   };
 
   // Returns deadline info for UI ONLY (no backend mutation)
-  // - businessDaysUntilBirthday: business days left from today until birthday (exclusive of today)
-  // - passouAniversario: whether birthday already passed
-  // - dataGatilho: ideal deadline (7 business days before birthday) if provided by backend
+  // - businessDaysUntilIdeal: business days left from today until ideal send date
+  // - passouIdeal: ideal date already passed
+  // - passouAniversario: birthday already passed
+  // - dataGatilho: ideal deadline (7 business days before birthday) from backend if present
   const getPrazoInfo = (envio: EnvioBrinde) => {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
@@ -195,16 +208,17 @@ export default function EnviosPage() {
     dataAniversario.setHours(0, 0, 0, 0);
 
     const passouAniversario = dataAniversario.getTime() < hoje.getTime();
-    const businessDaysUntilBirthday = passouAniversario
-      ? 0
-      : countBusinessDaysBetween(hoje, dataAniversario);
 
     // Only for visual guidance about the ideal deadline (7 business days before)
     const dataGatilho = envio.dataGatilhoEnvio ? new Date(envio.dataGatilhoEnvio) : null;
     if (dataGatilho) dataGatilho.setHours(0, 0, 0, 0);
+    const idealDate = dataGatilho || calculateBusinessDaysBefore(dataAniversario, 7);
+    const passouIdeal = idealDate.getTime() < hoje.getTime();
+    const businessDaysUntilIdeal = passouIdeal ? 0 : countBusinessDaysBetween(hoje, idealDate);
+
     const passouGatilho = dataGatilho ? hoje.getTime() > dataGatilho.getTime() : false;
 
-    return { businessDaysUntilBirthday, passouAniversario, passouGatilho, dataGatilho } as const;
+    return { businessDaysUntilIdeal, passouIdeal, passouAniversario, passouGatilho, idealDate } as const;
   };
 
   const getStatusConfig = (status: string) => {
@@ -337,7 +351,7 @@ export default function EnviosPage() {
               .map((envio) => {
               const statusConfig = getStatusConfig(envio.status);
               const StatusIcon = statusConfig.icon;
-              const { businessDaysUntilBirthday, passouAniversario, passouGatilho, dataGatilho } = getPrazoInfo(envio);
+              const { businessDaysUntilIdeal, passouIdeal, passouAniversario, passouGatilho, idealDate } = getPrazoInfo(envio);
 
               return (
                 <div
@@ -409,7 +423,7 @@ export default function EnviosPage() {
                       </div>
                     </div>
 
-                    {/* Deadline / Dates - visual logic (business-day aware) */}
+                    {/* Deadline / Dates - visual logic (business-day aware, ideal date focused) */}
                     {envio.status === 'ENTREGUE' ? (
                       <div className="flex items-center space-x-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
                         <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
@@ -440,24 +454,28 @@ export default function EnviosPage() {
                       </div>
                     ) : (
                       (() => {
-                        // For PENDENTE/PRONTO_PARA_ENVIO, show countdown to BIRTHDAY in business days
+                        // For PENDENTE/PRONTO_PARA_ENVIO, show countdown to IDEAL send date (7 business days before birthday)
                         const bgClass = passouAniversario
                           ? 'bg-red-50 border border-red-200'
-                          : businessDaysUntilBirthday === 0
-                          ? 'bg-red-50 border border-red-200'
-                          : businessDaysUntilBirthday <= 2
+                          : passouIdeal
                           ? 'bg-orange-50 border border-orange-200'
-                          : businessDaysUntilBirthday <= 5
+                          : businessDaysUntilIdeal === 0
+                          ? 'bg-red-50 border border-red-200'
+                          : businessDaysUntilIdeal <= 2
+                          ? 'bg-orange-50 border border-orange-200'
+                          : businessDaysUntilIdeal <= 5
                           ? 'bg-yellow-50 border border-yellow-200'
                           : 'bg-blue-50 border border-blue-200';
 
                         const textTone = passouAniversario
                           ? { small: 'text-red-700', big: 'text-red-900' }
-                          : businessDaysUntilBirthday === 0
-                          ? { small: 'text-red-700', big: 'text-red-900' }
-                          : businessDaysUntilBirthday <= 2
+                          : passouIdeal
                           ? { small: 'text-orange-700', big: 'text-orange-900' }
-                          : businessDaysUntilBirthday <= 5
+                          : businessDaysUntilIdeal === 0
+                          ? { small: 'text-red-700', big: 'text-red-900' }
+                          : businessDaysUntilIdeal <= 2
+                          ? { small: 'text-orange-700', big: 'text-orange-900' }
+                          : businessDaysUntilIdeal <= 5
                           ? { small: 'text-yellow-700', big: 'text-yellow-900' }
                           : { small: 'text-blue-700', big: 'text-blue-900' };
 
@@ -467,11 +485,13 @@ export default function EnviosPage() {
                               <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600" />
                             ) : (
                               <Clock className={`h-4 w-4 flex-shrink-0 ${
-                                businessDaysUntilBirthday === 0
-                                  ? 'text-red-600'
-                                  : businessDaysUntilBirthday <= 2
+                                passouIdeal
                                   ? 'text-orange-600'
-                                  : businessDaysUntilBirthday <= 5
+                                  : businessDaysUntilIdeal === 0
+                                  ? 'text-red-600'
+                                  : businessDaysUntilIdeal <= 2
+                                  ? 'text-orange-600'
+                                  : businessDaysUntilIdeal <= 5
                                   ? 'text-yellow-600'
                                   : 'text-blue-600'
                               }`} />
@@ -480,20 +500,27 @@ export default function EnviosPage() {
                               <p className={`text-xs font-semibold uppercase ${textTone.small}`}>
                                 {passouAniversario
                                   ? 'ATRASADO'
-                                  : businessDaysUntilBirthday === 0
-                                  ? 'ÚLTIMO DIA!'
-                                  : 'FALTAM'}
+                                  : passouIdeal
+                                  ? 'APÓS PRAZO IDEAL'
+                                  : businessDaysUntilIdeal === 0
+                                  ? 'ÚLTIMO DIA PARA ENVIAR'
+                                  : 'PRAZO IDEAL'}
                               </p>
                               <p className={`text-sm font-bold truncate ${textTone.big}`}>
                                 {passouAniversario
                                   ? '—'
-                                  : businessDaysUntilBirthday === 0
-                                  ? 'Hoje!'
-                                  : `${businessDaysUntilBirthday} dias úteis`}
+                                  : passouIdeal
+                                  ? 'Envie o quanto antes'
+                                  : businessDaysUntilIdeal === 0
+                                  ? 'Hoje é o último dia'
+                                  : `${businessDaysUntilIdeal} dias para enviar brinde`}
                               </p>
-                              {dataGatilho && (
-                                <p className="text-[11px] text-beuni-text/70 mt-0.5">
-                                  Prazo ideal de envio: até {formatDate(dataGatilho)} {passouGatilho && '(após o prazo ideal)'}
+                              {idealDate && (
+                                <p className="text-[12px] mt-0.5">
+                                  <span className="inline-block px-2 py-0.5 rounded-md bg-beuni-orange-100 text-beuni-orange-700 font-semibold mr-2">Prazo ideal</span>
+                                  <span className="text-beuni-text font-medium">até {formatDate(idealDate)}{' '}
+                                    {passouIdeal && <span className="text-red-600 font-semibold">(após o prazo ideal)</span>}
+                                  </span>
                                 </p>
                               )}
                             </div>
