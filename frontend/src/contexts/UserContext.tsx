@@ -68,7 +68,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       ?.split('=')[1];
     
     if (token) {
-      setAuthToken(token, updatedUser);
+      // Token agora é httpOnly no backend; aqui só persistimos dados do usuário no cookie
+      setAuthToken(updatedUser);
     }
   };
 

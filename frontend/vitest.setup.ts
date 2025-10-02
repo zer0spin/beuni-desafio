@@ -1,4 +1,5 @@
 import { expect, afterEach, vi } from 'vitest';
+import React from 'react';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
@@ -18,11 +19,12 @@ vi.mock('next/router', () => ({
   }),
 }));
 
-// Mock Next.js Image component
+// Mock Next.js Image component without JSX to keep this file as .ts
 vi.mock('next/image', () => ({
+  __esModule: true,
   default: ({ src, alt, ...props }: any) => {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} {...props} />;
+    return React.createElement('img', { ...props, src, alt });
   },
 }));
 
