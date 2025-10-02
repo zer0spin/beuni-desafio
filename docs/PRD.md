@@ -1,93 +1,93 @@
 # 📋 PRD - Product Requirements Document
-## Beuni: Plataforma de Gestão de Aniversariantes Corporativos
+## Beuni: Corporate Birthday Management Platform
 
-**Versão:** 1.0
-**Data:** 28/09/2025
-**Autor:** Equipe Beuni
-**Status:** MVP Desenvolvido
-
----
-
-## 🎯 Visão Executiva
-
-### **Problema**
-Empresas perdem oportunidades valiosas de engajamento com colaboradores ao esquecer aniversários, resultando em:
-- Diminuição do moral da equipe
-- Perda de momentos de reconhecimento
-- Processos manuais propensos a erro
-- Falta de padronização nos brindes
-- Ausência de métricas de engagement
-
-### **Solução**
-Beuni é uma plataforma SaaS completa que automatiza a gestão de aniversariantes corporativos, oferecendo:
-- Cadastro centralizado de colaboradores
-- Calendário inteligente de aniversários
-- Envio automático de brindes personalizados
-- Dashboard com métricas de engajamento
-- API robusta para integrações
-
-### **Proposta de Valor**
-> "Transforme cada aniversário em um momento especial de reconhecimento, fortalecendo a cultura organizacional através da tecnologia."
+**Version:** 1.0
+**Date:** 09/28/2025
+**Author:** Beuni Team
+**Status:** MVP Developed
 
 ---
 
-## 🏢 Contexto de Mercado
+## 🎯 Executive Vision
+
+### **Problem**
+Companies lose valuable employee engagement opportunities by forgetting birthdays, resulting in:
+- Decreased team morale
+- Lost recognition moments
+- Error-prone manual processes
+- Lack of gift standardization
+- Absence of engagement metrics
+
+### **Solution**
+Beuni is a complete SaaS platform that automates corporate birthday management, offering:
+- Centralized employee registry
+- Intelligent birthday calendar
+- Automated personalized gift delivery
+- Dashboard with engagement metrics
+- Robust API for integrations
+
+### **Value Proposition**
+> "Transform every birthday into a special recognition moment, strengthening organizational culture through technology."
+
+---
+
+## 🏢 Market Context
 
 ### **Target Audience**
-- **Primário:** Empresas de 50-500 colaboradores
-- **Secundário:** Startups em crescimento (20-50 pessoas)
-- **Terciário:** Corporações (500+ colaboradores)
+- **Primary:** Companies with 50-500 employees
+- **Secondary:** Growing startups (20-50 people)
+- **Tertiary:** Corporations (500+ employees)
 
 ### **Personas**
-1. **Ana Silva - Gerente de RH** (Persona Principal)
-   - Idade: 32 anos
-   - Responsabilidades: Gestão de pessoas, cultura organizacional
-   - Dores: Processos manuais, esquecimento de datas importantes
-   - Objetivos: Automatizar processos, melhorar engagement
+1. **Ana Silva - HR Manager** (Primary Persona)
+   - Age: 32 years
+   - Responsibilities: People management, organizational culture
+   - Pain Points: Manual processes, forgetting important dates
+   - Goals: Automate processes, improve engagement
 
-2. **Carlos Santos - Diretor de Pessoas**
-   - Idade: 45 anos
-   - Responsabilidades: Estratégia de pessoas, budget de benefícios
-   - Dores: Falta de métricas, custos descontrolados
-   - Objetivos: ROI mensurável, padronização de processos
-
----
-
-## 🎯 Objetivos do Produto
-
-### **Objetivos Primários**
-1. **Automatização Completa:** Eliminar 100% dos processos manuais
-2. **Zero Esquecimentos:** Garantir que nenhum aniversário seja perdido
-3. **Padronização:** Criar experiência consistente para todos os colaboradores
-4. **Métricas:** Fornecer insights sobre engagement e custos
-
-### **Objetivos Secundários**
-1. **Integração:** Conectar com sistemas de RH existentes
-2. **Personalização:** Permitir customização de brindes por nível/cargo
-3. **Escalabilidade:** Suportar empresas de qualquer tamanho
-4. **Compliance:** Atender requisitos de LGPD/GDPR
-
-### **KPIs de Sucesso**
-- **Adoption Rate:** >90% dos colaboradores cadastrados
-- **Engagement:** >95% de entregas bem-sucedidas
-- **Time Savings:** 10+ horas/mês economizadas por empresa
-- **NPS:** >70 pontos
-- **Churn Rate:** <5% anual
+2. **Carlos Santos - People Director**
+   - Age: 45 years
+   - Responsibilities: People strategy, benefits budget
+   - Pain Points: Lack of metrics, uncontrolled costs
+   - Goals: Measurable ROI, process standardization
 
 ---
 
-## 🔧 Funcionalidades Técnicas
+## 🎯 Product Objectives
 
-### **Core Features (MVP Implementado)**
+### **Primary Objectives**
+1. **Complete Automation:** Eliminate 100% of manual processes
+2. **Zero Forgotten Birthdays:** Ensure no birthday is missed
+3. **Standardization:** Create consistent experience for all employees
+4. **Metrics:** Provide insights on engagement and costs
 
-#### **1. Sistema de Autenticação**
-- **JWT-based authentication** com refresh tokens
-- **Multi-tenant architecture** (isolamento por organização)
-- **Rate limiting** (5 tentativas/minuto)
-- **Password security** com bcrypt hash
-- **Session management** com cookies seguros
+### **Secondary Objectives**
+1. **Integration:** Connect with existing HR systems
+2. **Personalization:** Allow gift customization by level/position
+3. **Scalability:** Support companies of any size
+4. **Compliance:** Meet LGPD/GDPR requirements
 
-#### **2. Gestão de Colaboradores**
+### **Success KPIs**
+- **Adoption Rate:** >90% of employees registered
+- **Engagement:** >95% successful deliveries
+- **Time Savings:** 10+ hours/month saved per company
+- **NPS:** >70 points
+- **Churn Rate:** <5% annually
+
+---
+
+## 🔧 Technical Features
+
+### **Core Features (MVP Implemented)**
+
+#### **1. Authentication System**
+- **JWT-based authentication** with refresh tokens
+- **Multi-tenant architecture** (organization isolation)
+- **Rate limiting** (5 attempts/minute)
+- **Password security** with bcrypt hash
+- **Session management** with secure cookies
+
+#### **2. Employee Management**
 ```typescript
 interface Colaborador {
   id: string;
@@ -100,18 +100,18 @@ interface Colaborador {
   createdAt: Date;
 }
 ```
-- **CRUD completo** de colaboradores
-- **Validação de dados** com class-validator
-- **Soft delete** para auditoria
-- **Busca avançada** por departamento/cargo
+- **Complete CRUD** for employees
+- **Data validation** with class-validator
+- **Soft delete** for audit trails
+- **Advanced search** by department/position
 
-#### **3. Calendário de Aniversários**
-- **Vista mensal** com aniversariantes do período
-- **Alertas antecipados** (7 dias antes)
-- **Filtros por departamento** e cargo
-- **Export para calendários** externos (ICS)
+#### **3. Birthday Calendar**
+- **Monthly view** with period celebrants
+- **Early alerts** (7 days before)
+- **Department and position filters**
+- **Export to external calendars** (ICS)
 
-#### **4. Sistema de Envio de Brindes**
+#### **4. Gift Delivery System**
 ```typescript
 interface EnvioBrinde {
   id: string;
@@ -123,16 +123,16 @@ interface EnvioBrinde {
   observacoes?: string;
 }
 ```
-- **Automação baseada em triggers** temporais
-- **Estados bem definidos** com transições auditadas
-- **Integração com correios** (preparado para APIs)
-- **Tracking de entregas** em tempo real
+- **Temporal trigger-based automation**
+- **Well-defined states** with audited transitions
+- **Postal service integration** (prepared for APIs)
+- **Real-time delivery tracking**
 
-#### **5. Integração CEP**
-- **Cache Redis** para performance
-- **Rate limiting** específico (30 req/min)
-- **Fallback strategies** para APIs indisponíveis
-- **Validação de endereços** brasileiros
+#### **5. CEP Integration**
+- **Redis cache** for performance
+- **Specific rate limiting** (30 req/min)
+- **Fallback strategies** for unavailable APIs
+- **Brazilian address validation**
 
 ### **Architecture Highlights**
 
@@ -179,47 +179,47 @@ interface EnvioBrinde {
 
 ---
 
-## 🔐 Requisitos de Segurança
+## 🔐 Security Requirements
 
-### **Autenticação & Autorização**
-- **JWT tokens** com expiração configurável (7 dias)
+### **Authentication & Authorization**
+- **JWT tokens** with configurable expiration (7 days)
 - **Role-based access control** (Admin, Manager, Viewer)
-- **API key authentication** para integrações
-- **Session invalidation** em logout
+- **API key authentication** for integrations
+- **Session invalidation** on logout
 
 ### **Data Protection**
 - **Encryption at rest** (database level)
 - **HTTPS enforcement** (SSL/TLS)
-- **Input sanitization** para prevenção de XSS
+- **Input sanitization** for XSS prevention
 - **SQL injection protection** via Prisma ORM
 
 ### **Compliance**
-- **LGPD compliance** (direito ao esquecimento)
-- **Audit logs** para todas as operações
-- **Data minimization** (apenas dados necessários)
-- **Consent management** explícito
+- **LGPD compliance** (right to be forgotten)
+- **Audit logs** for all operations
+- **Data minimization** (only necessary data)
+- **Explicit consent management**
 
 ### **Infrastructure Security**
 - **Container isolation** (Docker networks)
-- **Environment variables** para secrets
-- **Rate limiting** por endpoint
-- **CORS policy** restritiva
+- **Environment variables** for secrets
+- **Rate limiting** per endpoint
+- **Restrictive CORS policy**
 
 ---
 
-## 📊 Modelo de Dados
+## 📊 Data Model
 
 ### **Core Entities**
 
 ```sql
--- Organizações (Multi-tenant)
+-- Organizations (Multi-tenant)
 CREATE TABLE organizacoes (
   id VARCHAR PRIMARY KEY,
   nome VARCHAR NOT NULL,
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Usuários (Admins/Managers)
+-- Users (Admins/Managers)
 CREATE TABLE usuarios (
   id VARCHAR PRIMARY KEY,
   nome VARCHAR NOT NULL,
@@ -229,7 +229,7 @@ CREATE TABLE usuarios (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Endereços (Normalizado)
+-- Addresses (Normalized)
 CREATE TABLE enderecos (
   id VARCHAR PRIMARY KEY,
   cep VARCHAR(8) NOT NULL,
@@ -241,7 +241,7 @@ CREATE TABLE enderecos (
   uf VARCHAR(2) NOT NULL
 );
 
--- Colaboradores (Core Business Entity)
+-- Employees (Core Business Entity)
 CREATE TABLE colaboradores (
   id VARCHAR PRIMARY KEY,
   nome_completo VARCHAR NOT NULL,
@@ -253,7 +253,7 @@ CREATE TABLE colaboradores (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
--- Envios de Brindes (Automation Engine)
+-- Gift Deliveries (Automation Engine)
 CREATE TABLE envio_brindes (
   id VARCHAR PRIMARY KEY,
   colaborador_id VARCHAR REFERENCES colaboradores(id),
@@ -267,54 +267,54 @@ CREATE TABLE envio_brindes (
 ```
 
 ### **Business Rules**
-1. **Um colaborador por organização** (soft delete para histórico)
-2. **Um envio por ano por colaborador** (único constraint)
-3. **Endereços normalizados** (reuso entre colaboradores)
-4. **Auditoria completa** (created_at, updated_at em todas as tabelas)
+1. **One employee per organization** (soft delete for history)
+2. **One delivery per year per employee** (unique constraint)
+3. **Normalized addresses** (reuse between employees)
+4. **Complete audit** (created_at, updated_at in all tables)
 
 ---
 
-## 🚀 Roadmap de Features
+## 🚀 Feature Roadmap
 
-### **Phase 1: MVP (✅ Implementado)**
-- [x] Autenticação multi-tenant
-- [x] CRUD de colaboradores
-- [x] Calendário de aniversários
-- [x] Sistema básico de envios
-- [x] Integração CEP
-- [x] Dashboard inicial
+### **Phase 1: MVP (✅ Implemented)**
+- [x] Multi-tenant authentication
+- [x] Employee CRUD
+- [x] Birthday calendar
+- [x] Basic delivery system
+- [x] CEP integration
+- [x] Initial dashboard
 
-### **Phase 2: Automation (Next 3 meses)**
-- [ ] **Email notifications** automáticas
-- [ ] **WhatsApp integration** para notificações
+### **Phase 2: Automation (Next 3 months)**
+- [ ] **Automatic email notifications**
+- [ ] **WhatsApp integration** for notifications
 - [ ] **Advanced scheduling** (custom triggers)
-- [ ] **Bulk import** de colaboradores (CSV/Excel)
+- [ ] **Bulk import** of employees (CSV/Excel)
 - [ ] **Mobile app** (React Native)
 
-### **Phase 3: Intelligence (Next 6 meses)**
-- [ ] **AI-powered gift suggestions** baseado no perfil
-- [ ] **Sentiment analysis** de feedback
-- [ ] **Predictive analytics** para churn prevention
+### **Phase 3: Intelligence (Next 6 months)**
+- [ ] **AI-powered gift suggestions** based on profile
+- [ ] **Sentiment analysis** of feedback
+- [ ] **Predictive analytics** for churn prevention
 - [ ] **Integration marketplace** (Slack, Teams, etc.)
 - [ ] **Advanced reporting** (BI dashboard)
 
-### **Phase 4: Enterprise (Next 12 meses)**
+### **Phase 4: Enterprise (Next 12 months)**
 - [ ] **SSO integration** (SAML, OIDC)
-- [ ] **Advanced RBAC** com custom permissions
-- [ ] **White-label solution** para revendedores
-- [ ] **API ecosystem** com webhooks
-- [ ] **Global expansion** (multi-idioma, multi-moeda)
+- [ ] **Advanced RBAC** with custom permissions
+- [ ] **White-label solution** for resellers
+- [ ] **API ecosystem** with webhooks
+- [ ] **Global expansion** (multi-language, multi-currency)
 
 ---
 
-## 📈 Métricas e Analytics
+## 📈 Metrics and Analytics
 
 ### **Business Metrics**
-- **Colaboradores ativos** por organização
-- **Taxa de entrega** de brindes (%)
-- **Tempo médio** de processamento
-- **Custo por colaborador** mensal
-- **Engagement rate** (feedback positivo)
+- **Active employees** per organization
+- **Gift delivery rate** (%)
+- **Average processing time**
+- **Cost per employee** monthly
+- **Engagement rate** (positive feedback)
 
 ### **Technical Metrics**
 - **API response time** (<100ms p95)
@@ -330,23 +330,23 @@ CREATE TABLE envio_brindes (
 - **Task completion rate** (>95%)
 - **User satisfaction** (NPS >70)
 - **Support ticket volume** (<5% users/month)
-- **Feature adoption** por funcionalidade
+- **Feature adoption** per functionality
 
 ---
 
-## 🔄 Integrações
+## 🔄 Integrations
 
-### **Implementadas**
-- **ViaCEP API** - Consulta de endereços
-- **JWT Authentication** - Segurança robusta
+### **Implemented**
+- **ViaCEP API** - Address lookup
+- **JWT Authentication** - Robust security
 - **Redis Cache** - Performance optimization
 
-### **Planejadas (Phase 2)**
-- **SendGrid** - Email transacional
+### **Planned (Phase 2)**
+- **SendGrid** - Transactional email
 - **Twilio** - SMS/WhatsApp notifications
-- **Correios API** - Tracking de entregas
-- **BambooHR** - Sincronização de colaboradores
-- **Slack/Teams** - Notificações internas
+- **Postal Service API** - Delivery tracking
+- **BambooHR** - Employee synchronization
+- **Slack/Teams** - Internal notifications
 
 ### **API-First Architecture**
 ```typescript
@@ -362,25 +362,25 @@ CREATE TABLE envio_brindes (
 
 ---
 
-## 💰 Modelo de Negócio
+## 💰 Business Model
 
 ### **Pricing Strategy**
-- **Freemium:** Até 10 colaboradores (R$ 0/mês)
-- **Professional:** Até 100 colaboradores (R$ 89/mês)
-- **Enterprise:** Colaboradores ilimitados (R$ 299/mês)
-- **Custom:** Soluções white-label (cotação)
+- **Freemium:** Up to 10 employees (R$ 0/month)
+- **Professional:** Up to 100 employees (R$ 89/month)
+- **Enterprise:** Unlimited employees (R$ 299/month)
+- **Custom:** White-label solutions (quote)
 
 ### **Revenue Streams**
-1. **SaaS Subscription** (80% da receita esperada)
-2. **Professional Services** (implementação, treinamento)
-3. **API Usage** (integrações avançadas)
-4. **Marketplace Commission** (parceiros de brindes)
+1. **SaaS Subscription** (80% of expected revenue)
+2. **Professional Services** (implementation, training)
+3. **API Usage** (advanced integrations)
+4. **Marketplace Commission** (gift partners)
 
 ### **Cost Structure**
 - **Infrastructure:** AWS/GCP (~15% revenue)
-- **Development:** Equipe técnica (~40% revenue)
-- **Sales & Marketing:** Aquisição (~25% revenue)
-- **Operations:** Suporte e admin (~10% revenue)
+- **Development:** Technical team (~40% revenue)
+- **Sales & Marketing:** Acquisition (~25% revenue)
+- **Operations:** Support and admin (~10% revenue)
 - **Margin:** ~10% EBITDA target
 
 ---
@@ -388,25 +388,25 @@ CREATE TABLE envio_brindes (
 ## 🎯 Success Criteria
 
 ### **Technical Success**
-- [x] **100% API endpoints** funcionais
+- [x] **100% API endpoints** functional
 - [x] **Zero downtime** deployment process
-- [x] **Comprehensive testing framework** (Vitest configurado)
-- [x] **Security best practices** implementadas
-- [x] **Scalable architecture** preparada para growth
-- [x] **Test coverage >90%** configurado para CI/CD
+- [x] **Comprehensive testing framework** (Vitest configured)
+- [x] **Security best practices** implemented
+- [x] **Scalable architecture** prepared for growth
+- [x] **Test coverage >90%** configured for CI/CD
 
 ### **Business Success**
-- [ ] **50+ empresas** usando a plataforma (6 meses)
-- [ ] **5000+ colaboradores** cadastrados (12 meses)
+- [ ] **50+ companies** using the platform (6 months)
+- [ ] **5000+ employees** registered (12 months)
 - [ ] **95% customer satisfaction** (ongoing)
 - [ ] **<5% monthly churn** (ongoing)
-- [ ] **Break-even** em 18 meses
+- [ ] **Break-even** in 18 months
 
 ### **User Success**
 - [x] **Intuitive interface** (landing page + dashboard)
-- [x] **Fast onboarding** (<5 minutos para primeira configuração)
-- [x] **Reliable automation** (zero aniversários perdidos)
-- [ ] **Measurable ROI** para clientes
+- [x] **Fast onboarding** (<5 minutes for first setup)
+- [x] **Reliable automation** (zero birthdays missed)
+- [ ] **Measurable ROI** for clients
 - [ ] **Strong word-of-mouth** growth
 
 ---
@@ -421,24 +421,24 @@ CREATE TABLE envio_brindes (
 - **Concurrent Users:** 1000+ simultaneous
 
 ### **Quality Assurance Requirements**
-- **Test Framework:** Vitest para frontend e backend
-- **Unit Test Coverage:** >90% de cobertura de código
-- **Integration Test Coverage:** >80% dos fluxos críticos
-- **E2E Test Coverage:** 100% dos user journeys principais
+- **Test Framework:** Vitest for frontend and backend
+- **Unit Test Coverage:** >90% code coverage
+- **Integration Test Coverage:** >80% of critical flows
+- **E2E Test Coverage:** 100% of main user journeys
 - **Code Quality:** TypeScript strict mode, ESLint zero warnings
-- **Performance Testing:** Response time <100ms para todas as APIs
-- **Security Testing:** Análise estática (SAST) e dinâmica (DAST)
-- **Manual Testing:** Procedimentos documentados para validação
+- **Performance Testing:** Response time <100ms for all APIs
+- **Security Testing:** Static (SAST) and dynamic (DAST) analysis
+- **Manual Testing:** Documented procedures for validation
 
 ### **Scalability Design**
 - **Horizontal scaling** via container orchestration
-- **Database sharding** por organização
-- **CDN integration** para assets estáticos
-- **Microservices evolution** path planejado
-- **Auto-scaling** baseado em métricas
+- **Database sharding** by organization
+- **CDN integration** for static assets
+- **Microservices evolution** path planned
+- **Auto-scaling** based on metrics
 
 ### **Monitoring & Observability**
-- **Health checks** em todos os services
+- **Health checks** on all services
 - **Structured logging** (JSON format)
 - **APM integration** (New Relic/DataDog)
 - **Error tracking** (Sentry)
@@ -446,17 +446,17 @@ CREATE TABLE envio_brindes (
 
 ---
 
-## 📝 Conclusão
+## 📝 Conclusion
 
-A Beuni representa uma solução completa e tecnicamente robusta para um problema real no mercado corporativo. O MVP implementado demonstra:
+Beuni represents a complete and technically robust solution for a real problem in the corporate market. The implemented MVP demonstrates:
 
-1. **Viabilidade Técnica:** Stack moderna e escalável
-2. **Market Fit:** Problema validado com personas reais
-3. **Business Model:** Estratégia de monetização clara
-4. **Growth Path:** Roadmap estruturado para evolução
+1. **Technical Viability:** Modern and scalable stack
+2. **Market Fit:** Validated problem with real personas
+3. **Business Model:** Clear monetization strategy
+4. **Growth Path:** Structured roadmap for evolution
 
-O produto está pronto para **validação de mercado** e **primeiros clientes beta**, com arquitetura preparada para escalar conforme a demanda cresce.
+The product is ready for **market validation** and **first beta clients**, with architecture prepared to scale as demand grows.
 
 ---
 
-*Este PRD serve como norte para o desenvolvimento futuro e pode ser usado para alinhar stakeholders, investidores e equipe técnica sobre a visão e direção do produto.*
+*This PRD serves as guidance for future development and can be used to align stakeholders, investors, and technical team on the product vision and direction.*
