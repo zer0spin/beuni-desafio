@@ -1,34 +1,20 @@
 import { vi } from 'vitest';
 
 /**
- * Mock do JwtService para testes
+ * Mock do JwtService para testes de autenticação
  */
-export const createMockJwtService = () => {
-  return {
-    sign: vi.fn((payload) => {
-      return `mock.jwt.token.${payload.sub}`;
-    }),
-    verify: vi.fn((token) => {
-      const parts = token.split('.');
-      if (parts.length !== 4) throw new Error('Invalid token');
-      return {
-        sub: parts[3],
-        email: 'user@test.com',
-        organizationId: 'org-123',
-        iat: Date.now(),
-        exp: Date.now() + 3600000,
-      };
-    }),
-    decode: vi.fn((token) => {
-      const parts = token.split('.');
-      if (parts.length !== 4) return null;
-      return {
-        sub: parts[3],
-        email: 'user@test.com',
-        organizationId: 'org-123',
-      };
-    }),
-  };
+export const mockJwtService = {
+  sign: vi.fn((payload: any) => 'mock-jwt-token-' + payload.sub),
+  verify: vi.fn((token: string) => ({
+    sub: 'mock-user-id',
+    email: 'mock@example.com',
+    organizationId: 'mock-org-id',
+  })),
+  decode: vi.fn((token: string) => ({
+    sub: 'mock-user-id',
+    email: 'mock@example.com',
+    organizationId: 'mock-org-id',
+  })),
 };
 
-export type MockJwtService = ReturnType<typeof createMockJwtService>;
+export type MockJwtService = typeof mockJwtService;
