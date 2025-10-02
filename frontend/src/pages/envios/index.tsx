@@ -518,9 +518,7 @@ export default function EnviosPage() {
                               {idealDate && (
                                 <p className="text-[12px] mt-0.5">
                                   <span className="inline-block px-2 py-0.5 rounded-md bg-beuni-orange-100 text-beuni-orange-700 font-semibold mr-2">Prazo ideal</span>
-                                  <span className="text-beuni-text font-medium">até {formatDate(idealDate)}{' '}
-                                    {passouIdeal && <span className="text-red-600 font-semibold">(após o prazo ideal)</span>}
-                                  </span>
+                                  <span className="text-beuni-text font-medium">até {formatDate(idealDate)}</span>
                                 </p>
                               )}
                             </div>

@@ -97,6 +97,13 @@ docker exec beuni-backend npx prisma migrate deploy
 docker exec beuni-backend npm run prisma:seed
 ```
 
+Alternatively, for a larger, multi-year and multi-status dataset (recommended for dashboards and reports):
+
+```powershell
+docker exec beuni-backend npx prisma migrate deploy
+docker exec beuni-backend node -e "require('ts-node/register'); require('./prisma/seed-populated.ts');"
+```
+
 ### **5. Verify Status**
 
 ```powershell
