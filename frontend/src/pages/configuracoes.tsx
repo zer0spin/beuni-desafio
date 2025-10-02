@@ -27,6 +27,7 @@ export default function Configuracoes() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageError, setImageError] = useState(false); // SECURITY: Track image load errors safely
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -232,15 +233,17 @@ export default function Configuracoes() {
                     alt="Preview"
                     className="w-full h-full object-cover"
                   />
+                ) : imageError ? (
+                  // SECURITY: Safe fallback using React component instead of innerHTML
+                  <span className="text-3xl">
+                    {profile?.nome?.charAt(0).toUpperCase() || <User className="h-8 w-8" />}
+                  </span>
                 ) : (
                   <img
                     src={getProfileImageUrl(profile?.imagemPerfil)}
                     alt="Perfil"
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.innerHTML = profile?.nome?.charAt(0) || '<svg class="h-8 w-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
-                    }}
+                    onError={() => setImageError(true)} // SECURITY: Use state instead of DOM manipulation
                   />
                 )}
               </div>

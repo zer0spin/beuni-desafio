@@ -43,21 +43,23 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       console.log('Login: Enviando dados', data);
-      const response = await api.post<AuthResponse>(endpoints.login, data);
-      const { access_token, user } = response.data;
+      // SECURITY: Backend now sets httpOnly cookie automatically
+      const response = await api.post<{ user: any }>(endpoints.login, data);
+      const { user } = response.data;
 
-      console.log('Login: Resposta recebida', { access_token: access_token.substring(0, 10) + '...', user });
-      setAuthToken(access_token, user);
-      console.log('Login: Token definido, atualizando UserContext...');
-      
+      console.log('Login: Resposta recebida', { user });
+      // SECURITY: Only store user data (token is httpOnly from backend)
+      setAuthToken(user);
+      console.log('Login: Cookie de usuário definido, atualizando UserContext...');
+
       // Atualizar UserContext
       refreshUser();
-      
+
       toast.success(`Bem-vindo, ${user.nome}!`);
-      
+
       // Marcar login como bem-sucedido para triggerar o useEffect
       setLoginSuccess(true);
-      
+
       console.log('Login: Processo concluído');
     } catch (error) {
       console.error('Login: Erro no login', error);

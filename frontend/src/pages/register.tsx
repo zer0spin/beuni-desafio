@@ -26,14 +26,16 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterCredentials) => {
     setIsLoading(true);
     try {
-      const response = await api.post<AuthResponse>(endpoints.register, {
+      // SECURITY: Backend now sets httpOnly cookie automatically
+      const response = await api.post<{ user: any }>(endpoints.register, {
         name: data.nome,
         email: data.email,
         password: data.password,
       });
-      const { access_token, user } = response.data;
+      const { user } = response.data;
 
-      setAuthToken(access_token, user);
+      // SECURITY: Only store user data (token is httpOnly from backend)
+      setAuthToken(user);
       toast.success(`Bem-vindo, ${user.nome}! Conta criada com sucesso.`);
       router.push('/dashboard');
     } catch (error) {

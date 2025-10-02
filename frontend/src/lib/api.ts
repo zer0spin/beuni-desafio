@@ -11,9 +11,15 @@ const api: AxiosInstance = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token and credentials
+// SECURITY: With httpOnly cookies, credentials must be included in requests
 api.interceptors.request.use(
   (config) => {
+    // HttpOnly cookies are automatically sent by the browser
+    // We need to ensure credentials are included
+    config.withCredentials = true;
+
+    // Fallback: Check if token exists in non-httpOnly cookie (for backward compatibility during transition)
     const token = Cookies.get('beuni_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -86,39 +92,41 @@ export const apiCall = async <T = any>(
   }
 };
 
-// Auth helpers with secure cookie configuration
-export const setAuthToken = (token: string, user: any) => {
-  console.log('setAuthToken: Definindo cookies', { token: token.substring(0, 10) + '...', user });
-  
+// SECURITY: Auth helpers updated for httpOnly cookies
+// Token is now set via httpOnly cookie by the backend (more secure)
+// We only store non-sensitive user data client-side
+export const setAuthToken = (user: any) => {
+  console.log('setAuthToken: Definindo cookie de usuário', { user });
+
   const cookieOptions = {
     expires: 7, // 7 days
-    secure: false, // Permitir HTTP em desenvolvimento
-    sameSite: 'lax' as const, // Mais permissivo para compatibility
+    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    sameSite: 'strict' as const, // CSRF protection
     path: '/', // Cookie available for entire site
   };
 
   try {
-    Cookies.set('beuni_token', token, cookieOptions);
+    // Only store user data (non-sensitive) - token is httpOnly from backend
     Cookies.set('beuni_user', JSON.stringify(user), cookieOptions);
-    console.log('setAuthToken: Cookies definidos com sucesso');
-    
-    // Verificar se foi setado corretamente
-    const tokenCheck = Cookies.get('beuni_token');
-    const userCheck = Cookies.get('beuni_user');
-    console.log('setAuthToken: Verificação', { tokenSet: !!tokenCheck, userSet: !!userCheck });
+    console.log('setAuthToken: Cookie de usuário definido com sucesso');
   } catch (error) {
-    console.error('setAuthToken: Erro ao definir cookies', error);
+    console.error('setAuthToken: Erro ao definir cookie de usuário', error);
   }
 };
 
 export const removeAuthToken = () => {
   const cookieOptions = { path: '/' };
-  Cookies.remove('beuni_token', cookieOptions);
+  // Remove user data cookie (token is httpOnly and cleared by backend)
   Cookies.remove('beuni_user', cookieOptions);
+
+  // For backward compatibility, also try to remove token if it exists
+  Cookies.remove('beuni_token', cookieOptions);
 };
 
+// SECURITY: Token is httpOnly, not accessible from JavaScript
+// This function is kept for backward compatibility but will return undefined with httpOnly cookies
 export const getAuthToken = (): string | undefined => {
-  return Cookies.get('beuni_token');
+  return Cookies.get('beuni_token'); // Will be undefined with httpOnly cookies
 };
 
 export const getUser = (): any | null => {
@@ -139,6 +147,7 @@ export const endpoints = {
   // Auth
   login: '/auth/login',
   register: '/auth/register',
+  logout: '/auth/logout', // NEW: Logout endpoint
   profile: '/auth/profile',
   updateProfile: '/auth/profile',
   uploadProfileImage: '/auth/upload-profile-image',

@@ -40,7 +40,6 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        access_token: { type: 'string' },
         user: {
           type: 'object',
           properties: {
@@ -68,8 +67,21 @@ export class AuthController {
     status: 429,
     description: 'Muitas tentativas de login. Tente novamente em alguns minutos.',
   })
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
+    const authResponse = await this.authService.login(loginDto);
+
+    // SECURITY: Set httpOnly cookie to prevent XSS attacks
+    // Token is not accessible via JavaScript (document.cookie)
+    response.cookie('beuni_token', authResponse.access_token, {
+      httpOnly: true, // Prevents JavaScript access (XSS protection)
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      sameSite: 'strict', // CSRF protection
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+
+    // Return user data only (no token in response body)
+    return { user: authResponse.user };
   }
 
   @Post('register')
@@ -82,7 +94,6 @@ export class AuthController {
     schema: {
       type: 'object',
       properties: {
-        access_token: { type: 'string' },
         user: {
           type: 'object',
           properties: {
@@ -106,8 +117,40 @@ export class AuthController {
     status: 409,
     description: 'Usuário com este e-mail já existe',
   })
-  async register(@Body() registerDto: RegisterDto) {
-    return this.authService.register(registerDto);
+  async register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) response: Response) {
+    const authResponse = await this.authService.register(registerDto);
+
+    // SECURITY: Set httpOnly cookie to prevent XSS attacks
+    response.cookie('beuni_token', authResponse.access_token, {
+      httpOnly: true, // Prevents JavaScript access (XSS protection)
+      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      sameSite: 'strict', // CSRF protection
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+
+    // Return user data only (no token in response body)
+    return { user: authResponse.user };
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('jwt')
+  @ApiOperation({ summary: 'Logout do usuário' })
+  @ApiResponse({
+    status: 200,
+    description: 'Logout realizado com sucesso',
+  })
+  async logout(@Res({ passthrough: true }) response: Response) {
+    // Clear httpOnly cookie
+    response.clearCookie('beuni_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    return { message: 'Logout realizado com sucesso' };
   }
 
   @Get('profile')
