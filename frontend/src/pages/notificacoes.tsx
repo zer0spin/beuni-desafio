@@ -158,7 +158,7 @@ export default function NotificacoesPage() {
     <Layout>
       <div className="p-6 lg:p-8">
         {/* Header */}
-        <div className="mb-8 bg-gradient-to-r from-purple-500 to-purple-600 rounded-3xl p-8 text-white relative overflow-hidden shadow-lg">
+  <div className="mb-8 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl p-8 text-white relative overflow-hidden shadow-xl">
           <div className="absolute top-0 right-0 -mr-10 -mt-10 w-40 h-40 bg-white/10 rounded-full"></div>
           <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-60 h-60 bg-white/5 rounded-full"></div>
           <div className="relative z-10">
@@ -167,12 +167,12 @@ export default function NotificacoesPage() {
                 <BellRing className="h-8 w-8 mr-3" />
                 <div>
                   <h1 className="text-3xl font-bold">Notificações</h1>
-                  <p className="text-purple-100 text-lg mt-1">
+                  <p className="text-white/80 text-lg mt-1">
                     Acompanhe aniversários e atualizações do sistema
                   </p>
                 </div>
               </div>
-              <div className="bg-white/20 px-4 py-2 rounded-xl backdrop-blur-sm">
+              <div className="bg-white/15 px-4 py-2 rounded-xl backdrop-blur-sm border border-white/20 shadow-md">
                 <span className="text-sm font-medium">
                   {unreadCount} não lida{unreadCount !== 1 ? 's' : ''}
                 </span>
@@ -182,7 +182,7 @@ export default function NotificacoesPage() {
         </div>
 
         {/* Filters and Actions */}
-        <div className="mb-6 bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
+  <div className="mb-6 bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             {/* Search */}
             <div className="relative flex-1 max-w-md">
@@ -192,7 +192,7 @@ export default function NotificacoesPage() {
                 placeholder="Buscar notificações..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-beuni-orange-200 rounded-xl focus:ring-2 focus:ring-beuni-orange-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 bg-white border border-beuni-orange-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 transition-all"
               />
             </div>
 
@@ -210,8 +210,8 @@ export default function NotificacoesPage() {
                   onClick={() => setFilter(key as any)}
                   className={`flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filter === key
-                      ? 'bg-beuni-orange-500 text-white'
-                      : 'bg-beuni-cream text-beuni-text hover:bg-beuni-orange-100'
+                      ? 'bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white shadow-md'
+                      : 'bg-beuni-cream text-beuni-text hover:bg-beuni-orange-50'
                   }`}
                 >
                   <Icon className="h-4 w-4 mr-1" />
@@ -224,7 +224,7 @@ export default function NotificacoesPage() {
             <div className="flex gap-2">
               <button
                 onClick={markAllAsRead}
-                className="flex items-center px-4 py-2 bg-beuni-orange-500 text-white rounded-lg hover:bg-beuni-orange-600 transition-colors text-sm font-medium"
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white rounded-xl hover:shadow-md transition-all text-sm font-semibold"
               >
                 <Check className="h-4 w-4 mr-1" />
                 Marcar todas como lidas
@@ -317,7 +317,7 @@ export default function NotificacoesPage() {
                         {!notification.lida && (
                           <button
                             onClick={() => markAsRead(notification.id)}
-                            className="flex items-center px-3 py-1 bg-beuni-orange-100 text-beuni-orange-700 rounded-lg hover:bg-beuni-orange-200 transition-colors text-sm"
+                            className="flex items-center px-3 py-1.5 bg-beuni-orange-100 text-beuni-orange-700 rounded-lg hover:bg-beuni-orange-200 transition-colors text-sm font-medium"
                           >
                             <Check className="h-3 w-3 mr-1" />
                             Marcar como lida
@@ -327,7 +327,7 @@ export default function NotificacoesPage() {
                         {notification.dadosColaborador && (
                           <button
                             onClick={() => router.push(`/colaboradores/editar/${notification.dadosColaborador!.id}`)}
-                            className="flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                            className="flex items-center px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
                           >
                             <Users className="h-3 w-3 mr-1" />
                             Ver colaborador
@@ -336,7 +336,7 @@ export default function NotificacoesPage() {
 
                         <button
                           onClick={() => deleteNotification(notification.id)}
-                          className="flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm"
+                          className="flex items-center px-3 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium"
                         >
                           <Trash2 className="h-3 w-3 mr-1" />
                           Excluir
@@ -363,7 +363,7 @@ export default function NotificacoesPage() {
               {filter !== 'todos' && (
                 <button
                   onClick={() => setFilter('todos')}
-                  className="px-4 py-2 bg-beuni-orange-500 text-white rounded-lg hover:bg-beuni-orange-600 transition-colors"
+                  className="px-4 py-2 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white rounded-xl hover:shadow-md transition-all"
                 >
                   Ver todas as notificações
                 </button>

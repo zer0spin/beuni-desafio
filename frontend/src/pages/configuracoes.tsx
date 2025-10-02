@@ -201,12 +201,28 @@ export default function Configuracoes() {
 
   return (
     <Layout>
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        <h1 className="text-2xl font-bold mb-8">Configurações</h1>
+      <div className="max-w-5xl mx-auto p-6 lg:p-8">
+        {/* Header - gradient style to match other pages */}
+        <div className="mb-8">
+          <div className="bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl shadow-xl p-6 text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-bold flex items-center">
+                  Configurações
+                </h1>
+                <p className="text-white/80 mt-1">Gerencie seus dados e preferências da conta</p>
+              </div>
+              <div className="flex items-center space-x-2 bg-white/15 backdrop-blur-sm px-5 py-2.5 rounded-xl shadow-md border border-white/20">
+                <User className="h-5 w-5" />
+                <span className="font-bold text-sm truncate max-w-[200px]">{formData.email || '—'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Foto de Perfil */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-6">Foto de Perfil</h2>
+        <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-6 text-beuni-text">Foto de Perfil</h2>
           <div className="flex items-center space-x-6">
             <div className="relative">
               <div className="w-24 h-24 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold text-2xl overflow-hidden">
@@ -244,7 +260,7 @@ export default function Configuracoes() {
                 <button
                   onClick={triggerImageUpload}
                   disabled={isUploadingImage}
-                  className="flex items-center px-4 py-2 bg-beuni-orange-500 hover:bg-beuni-orange-600 text-white rounded-lg transition-colors disabled:bg-gray-400"
+                  className="flex items-center px-4 py-2 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white rounded-lg transition-all shadow-sm hover:shadow-md disabled:opacity-50"
                 >
                   <Camera className="h-4 w-4 mr-2" />
                   {isUploadingImage ? 'Enviando...' : profile?.imagemPerfil ? 'Alterar Foto' : 'Adicionar Foto'}
@@ -254,7 +270,7 @@ export default function Configuracoes() {
                   <button
                     onClick={handleRemoveImage}
                     disabled={isUploadingImage}
-                    className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors disabled:bg-gray-400"
+                    className="flex items-center px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all shadow-sm hover:shadow-md disabled:opacity-50"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Remover
@@ -264,7 +280,7 @@ export default function Configuracoes() {
                 {imagePreview && (
                   <button
                     onClick={removeImagePreview}
-                    className="flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-colors"
+                    className="flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg transition-all shadow-sm hover:shadow-md"
                   >
                     <X className="h-4 w-4 mr-2" />
                     Cancelar
@@ -283,13 +299,13 @@ export default function Configuracoes() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-semibold">Dados Cadastrais</h2>
+            <h2 className="text-xl font-semibold text-beuni-text">Dados Cadastrais</h2>
             {!isEditing && (
               <button
                 onClick={() => setIsEditing(true)}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded"
+                className="bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white px-4 py-2 rounded-xl font-semibold shadow-sm hover:shadow-md"
               >
                 Editar
               </button>
@@ -309,7 +325,7 @@ export default function Configuracoes() {
                     setFormData({ ...formData, name: e.target.value })
                   }
                   disabled={!isEditing}
-                  className="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100"
+                  className="mt-1 block w-full rounded-xl border border-beuni-orange-100 shadow-sm focus:border-beuni-orange-500 focus:ring-2 focus:ring-beuni-orange-500 disabled:bg-gray-100 px-3 py-2"
                 />
               </div>
 
@@ -321,7 +337,7 @@ export default function Configuracoes() {
                   type="email"
                   value={formData.email}
                   disabled
-                  className="mt-1 block w-full rounded border-gray-300 shadow-sm bg-gray-100"
+                  className="mt-1 block w-full rounded-xl border border-beuni-orange-100 shadow-sm bg-gray-100 px-3 py-2"
                 />
                 <p className="mt-1 text-sm text-gray-500">
                   O e-mail não pode ser alterado
@@ -339,7 +355,7 @@ export default function Configuracoes() {
                     setFormData({ ...formData, organizationName: e.target.value })
                   }
                   disabled={!isEditing}
-                  className="mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 disabled:bg-gray-100"
+                  className="mt-1 block w-full rounded-xl border border-beuni-orange-100 shadow-sm focus:border-beuni-orange-500 focus:ring-2 focus:ring-beuni-orange-500 disabled:bg-gray-100 px-3 py-2"
                 />
               </div>
 
@@ -357,17 +373,17 @@ export default function Configuracoes() {
                         });
                       }
                     }}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded"
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl shadow-sm hover:shadow-md"
                   >
                     Cancelar
                   </button>
                   <button
                     type="submit"
                     disabled={isSaving}
-                    className={`px-4 py-2 rounded text-white ${
+                    className={`px-4 py-2 rounded-xl text-white font-semibold shadow-sm ${
                       isSaving
                         ? 'bg-gray-400 cursor-not-allowed'
-                        : 'bg-green-500 hover:bg-green-600'
+                        : 'bg-green-500 hover:bg-green-600 hover:shadow-md'
                     }`}
                   >
                     {isSaving ? 'Salvando...' : 'Salvar'}
