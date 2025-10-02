@@ -168,7 +168,22 @@ export default function RelatoriosPage() {
       if (mesSelecionado > 0) {
         params.append('mes', mesSelecionado.toString());
       }
+      
+      console.log('🔍 Carregando relatórios:', { 
+        ano: anoSelecionado, 
+        mes: mesSelecionado,
+        url: `${endpoints.relatorios}?${params}` 
+      });
+      
       const response = await api.get(`${endpoints.relatorios}?${params}`);
+      
+      console.log('📊 Dados recebidos:', {
+        totalColaboradores: response.data.totalColaboradores,
+        aniversariantesEsteAno: response.data.aniversariantesEsteAno,
+        enviosPorMes: response.data.enviosPorMes,
+        totalItensEnviosPorMes: response.data.enviosPorMes?.length
+      });
+      
       setStats(response.data);
     } catch (error) {
       console.error('Erro ao carregar relatórios:', error);
@@ -291,10 +306,8 @@ export default function RelatoriosPage() {
   })) : [];
 
   // Filtrar dados mensais se um mês específico foi selecionado
-  const monthlyData = stats?.enviosPorMes?.filter(mes =>
-    mesSelecionado === 0 || mes.mes === mesSelecionado
-  ).map(mes => ({
-    month: mes.nomeDoMes.substring(0, 3),
+  const monthlyData = stats?.enviosPorMes?.map(mes => ({
+    month: mesSelecionado > 0 ? mes.nomeDoMes : mes.nomeDoMes.substring(0, 3),
     total: mes.total,
     enviados: mes.enviados,
     pendentes: mes.pendentes,
@@ -516,7 +529,10 @@ export default function RelatoriosPage() {
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-bold text-beuni-text flex items-center">
                     <Activity className="h-5 w-5 text-beuni-orange-600 mr-2" />
-                    Performance Mensal
+                    {mesSelecionado > 0 
+                      ? `Performance de ${MESES.find(m => m.value === mesSelecionado)?.label} ${anoSelecionado}`
+                      : `Performance Mensal ${anoSelecionado}`
+                    }
                   </h3>
                   <div className="flex items-center space-x-4 text-xs">
                     <div className="flex items-center">
@@ -544,6 +560,10 @@ export default function RelatoriosPage() {
                         axisLine={false}
                         tickLine={false}
                         tick={{ fontSize: 12, fill: '#64748b' }}
+                        angle={mesSelecionado > 0 ? -45 : 0}
+                        textAnchor={mesSelecionado > 0 ? 'end' : 'middle'}
+                        height={mesSelecionado > 0 ? 60 : 30}
+                        interval={mesSelecionado > 0 ? 0 : 'preserveStartEnd'}
                       />
                       <YAxis
                         axisLine={false}
@@ -557,6 +577,14 @@ export default function RelatoriosPage() {
                           borderRadius: '8px',
                           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                         }}
+                        formatter={(value: any, name: string) => [
+                          value,
+                          name === 'total' ? 'Aniversariantes' : 
+                          name === 'enviados' ? 'Enviados' : name
+                        ]}
+                        labelFormatter={(label: string) => 
+                          mesSelecionado > 0 ? label : `Mês: ${label}`
+                        }
                       />
                       <Area
                         type="monotone"
