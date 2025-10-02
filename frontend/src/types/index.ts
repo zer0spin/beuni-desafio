@@ -12,6 +12,7 @@ export interface User {
   nome: string;
   email: string;
   imagemPerfil?: string;
+  imageTimestamp?: number;
   organizationId: string;
   organizacao: {
     id: string;

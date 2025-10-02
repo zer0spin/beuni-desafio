@@ -45,6 +45,15 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const updateUser = (userData: Partial<User>) => {
     if (!user) return;
 
+    // Se a imagem foi atualizada, adicionar timestamp para forçar refresh
+    if (userData.imagemPerfil) {
+      userData = { 
+        ...userData, 
+        imagemPerfil: userData.imagemPerfil,
+        imageTimestamp: Date.now()
+      };
+    }
+
     const updatedUser = { ...user, ...userData };
     setUser(updatedUser);
     

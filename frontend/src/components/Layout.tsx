@@ -35,6 +35,12 @@ export default function Layout({ children }: LayoutProps) {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // Função para gerar URL da imagem com timestamp para evitar cache
+  const getProfileImageUrl = (imagemPerfil: string) => {
+    const timestamp = user?.imageTimestamp || Date.now();
+    return `${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${imagemPerfil}?t=${timestamp}`;
+  };
+
   useEffect(() => {
     if (!isLoading && !user) {
       router.push('/login');
@@ -197,7 +203,7 @@ export default function Layout({ children }: LayoutProps) {
                 <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 overflow-hidden">
                   {user.imagemPerfil ? (
                     <img 
-                      src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`}
+                      src={getProfileImageUrl(user.imagemPerfil)}
                       alt={user.nome}
                       className="w-full h-full object-cover"
                     />
@@ -236,7 +242,7 @@ export default function Layout({ children }: LayoutProps) {
                 <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
                   {user.imagemPerfil ? (
                     <img 
-                      src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`}
+                      src={getProfileImageUrl(user.imagemPerfil)}
                       alt={user.nome}
                       className="w-full h-full object-cover"
                     />
@@ -324,7 +330,7 @@ export default function Layout({ children }: LayoutProps) {
                     <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
                       {user.imagemPerfil ? (
                         <img 
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`} 
+                          src={getProfileImageUrl(user.imagemPerfil)} 
                           alt="Perfil" 
                           className="w-full h-full object-cover"
                         />
@@ -546,7 +552,7 @@ export default function Layout({ children }: LayoutProps) {
                     <div className="w-10 h-10 bg-gradient-to-br from-beuni-orange-500 via-beuni-orange-600 to-beuni-orange-700 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden shadow-lg">
                       {user.imagemPerfil ? (
                         <img 
-                          src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`}
+                          src={getProfileImageUrl(user.imagemPerfil)}
                           alt={user.nome}
                           className="w-full h-full object-cover"
                         />
@@ -576,7 +582,7 @@ export default function Layout({ children }: LayoutProps) {
                             <div className="w-12 h-12 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
                               {user.imagemPerfil ? (
                                 <img 
-                                  src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`}
+                                  src={getProfileImageUrl(user.imagemPerfil)}
                                   alt={user.nome}
                                   className="w-full h-full object-cover"
                                 />

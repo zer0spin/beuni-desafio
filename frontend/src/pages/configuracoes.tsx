@@ -33,6 +33,12 @@ export default function Configuracoes() {
     organizationName: '',
   });
 
+  // Função para gerar URL da imagem com timestamp para evitar cache
+  const getProfileImageUrl = (imagemPerfil: string) => {
+    const timestamp = Date.now();
+    return `${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${imagemPerfil}?t=${timestamp}`;
+  };
+
   const { data: profile, refetch } = useQuery<UserProfile>(
     'userProfile',
     async () => {
@@ -211,7 +217,7 @@ export default function Configuracoes() {
                   />
                 ) : profile?.imagemPerfil ? (
                   <img 
-                    src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${profile.imagemPerfil}`}
+                    src={getProfileImageUrl(profile.imagemPerfil)}
                     alt="Perfil" 
                     className="w-full h-full object-cover"
                   />
