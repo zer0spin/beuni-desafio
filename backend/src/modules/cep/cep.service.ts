@@ -1,11 +1,10 @@
-import { Injectable, BadRequestException, Inject } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
 import { firstValueFrom } from 'rxjs';
 import { ConfigService } from '@nestjs/config';
 
 import { CepResponseDto } from './dto/cep-response.dto';
+import { RedisService } from '../../shared/redis.service';
 
 interface ViaCepResponse {
   cep: string;
@@ -27,7 +26,7 @@ export class CepService {
 
   constructor(
     private httpService: HttpService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private redisService: RedisService,
     private configService: ConfigService,
   ) {
     this.viaCepUrl = this.configService.get<string>('VIACEP_API_URL') || 'https://viacep.com.br/ws';
@@ -42,13 +41,19 @@ export class CepService {
 
     // Verificar cache primeiro
     const cacheKey = `cep:${cepLimpo}`;
-    const cachedResult = await this.cacheManager.get<CepResponseDto>(cacheKey);
+    const cachedResult = await this.redisService.get(cacheKey);
 
     if (cachedResult) {
-      return {
-        ...cachedResult,
-        fromCache: true,
-      };
+      try {
+        const parsedResult = JSON.parse(cachedResult) as CepResponseDto;
+        return {
+          ...parsedResult,
+          fromCache: true,
+        };
+      } catch (error) {
+        // Se falhar ao parsear, limpar cache inválido
+        await this.redisService.del(cacheKey);
+      }
     }
 
     try {
@@ -76,7 +81,7 @@ export class CepService {
       };
 
       // Save in cache for 24 hours (ZIP codes don't change frequently)
-      await this.cacheManager.set(cacheKey, result, 24 * 60 * 60 * 1000);
+      await this.redisService.set(cacheKey, JSON.stringify(result), 24 * 60 * 60); // TTL in seconds
 
       return result;
     } catch (error) {
@@ -95,12 +100,11 @@ export class CepService {
   async limparCache(cep?: string): Promise<void> {
     if (cep) {
       const cepLimpo = cep.replace(/\D/g, '');
-      await this.cacheManager.del(`cep:${cepLimpo}`);
+      await this.redisService.del(`cep:${cepLimpo}`);
     } else {
-      // In cache-manager v6+, there's no reset() method.
-      // We'll use del() for each key individually if needed
-      // For now, we do nothing when clearing all cache
-      console.warn('Limpar todo o cache não está implementado na v6 do cache-manager');
+      // Note: RedisService doesn't have a method to clear all keys
+      // This would require implementing a pattern-based deletion
+      console.warn('Clear all cache not implemented for RedisService');
     }
   }
 
@@ -109,7 +113,7 @@ export class CepService {
     cepsRecentes: string[];
   }> {
     // This is a basic example - real implementation would depend on Redis
-    // For now, we return mock data
+    // For now, we return mock data since we don't have pattern-based queries
     return {
       totalCeps: 0,
       cepsRecentes: [],

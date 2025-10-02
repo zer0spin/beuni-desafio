@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { RedisService } from './shared/redis.service';
+import { PrismaService } from './shared/prisma.service';
 
 @Injectable()
 export class AppService {
+  constructor(
+    private redisService?: RedisService,
+    private prismaService?: PrismaService,
+  ) {}
+
   getHealthCheck() {
     return {
       message: '🎉 Beuni API está funcionando!',
@@ -18,8 +25,8 @@ export class AppService {
       environment: process.env.NODE_ENV || 'development',
       version: '1.0.0',
       services: {
-        database: 'connected', // TODO: Add real database health check
-        redis: 'connected',    // TODO: Add real Redis health check
+        database: this.prismaService ? 'connected' : 'not_available',
+        redis: this.redisService?.getConnectionStatus() ? 'connected' : 'disconnected',
       },
     };
   }

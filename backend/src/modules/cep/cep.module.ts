@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { CepController } from './cep.controller';
 import { CepService } from './cep.service';
+import { RedisService } from '../../shared/redis.service';
 
 @Module({
   imports: [
@@ -11,7 +12,7 @@ import { CepService } from './cep.service';
     }),
   ],
   controllers: [CepController],
-  providers: [CepService],
+  providers: [CepService, RedisService],
   exports: [CepService],
 })
 export class CepModule {}

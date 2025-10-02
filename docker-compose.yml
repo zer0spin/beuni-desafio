@@ -26,6 +26,7 @@ services:
     image: redis:7-alpine
     container_name: beuni-redis
     restart: unless-stopped
+    command: redis-server --appendonly yes --tcp-keepalive 60 --timeout 300 --maxmemory 256mb --maxmemory-policy allkeys-lru
     ports:
       - "6379:6379"
     volumes:
@@ -37,6 +38,7 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+      start_period: 10s
 
   # Backend API (NestJS)
   backend:

@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
-import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-redis-yet';
 
 // Configuration
 import { DatabaseModule } from './config/database.module';
@@ -20,6 +18,7 @@ import { NotificacoesModule } from './modules/notificacoes/notificacoes.module';
 // Global services
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { RedisService } from './shared/redis.service';
 
 @Module({
   imports: [
@@ -31,24 +30,6 @@ import { AppService } from './app.service';
 
     // Database (Prisma)
     DatabaseModule,
-
-    // Cache with Redis
-    CacheModule.registerAsync({
-      isGlobal: true,
-      useFactory: async () => {
-        const store = await redisStore({
-          socket: {
-            host: process.env.REDIS_URL?.split('//')[1]?.split(':')[0] || 'localhost',
-            port: parseInt(process.env.REDIS_URL?.split(':')[2] || '6379'),
-          },
-        });
-
-        return {
-          store: () => store,
-          ttl: 300000, // 5 minutes default TTL
-        };
-      },
-    }),
 
     // Rate limiting
     ThrottlerModule.forRootAsync({
@@ -67,6 +48,6 @@ import { AppService } from './app.service';
     NotificacoesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, RedisService],
 })
 export class AppModule {}
