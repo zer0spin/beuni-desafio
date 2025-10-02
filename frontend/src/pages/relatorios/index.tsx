@@ -12,9 +12,34 @@ import {
   Activity,
   CheckCircle,
   Clock,
-  XCircle
+  XCircle,
+  Target,
+  Zap,
+  AlertTriangle,
+  Award,
+  MousePointer,
+  Eye
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart as RechartsPieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  RadialBarChart,
+  RadialBar,
+  Legend
+} from 'recharts';
 
 import Layout from '@/components/Layout';
 import api, { endpoints } from '@/lib/api';
@@ -37,6 +62,26 @@ interface EstatisticasRelatorio {
     pendentes: number;
   }>;
 }
+
+// Cores para os gráficos
+const COLORS = {
+  primary: '#ea580c',
+  secondary: '#f97316', 
+  success: '#22c55e',
+  warning: '#f59e0b',
+  danger: '#ef4444',
+  info: '#3b82f6',
+  purple: '#8b5cf6',
+  gray: '#6b7280'
+};
+
+const STATUS_COLORS = {
+  PENDENTE: COLORS.warning,
+  PRONTO_PARA_ENVIO: COLORS.info,
+  ENVIADO: COLORS.purple,
+  ENTREGUE: COLORS.success,
+  CANCELADO: COLORS.danger,
+};
 
 export default function RelatoriosPage() {
   const router = useRouter();
@@ -160,235 +205,339 @@ export default function RelatoriosPage() {
     ? Object.values(stats.enviosPorStatus).reduce((a, b) => a + b, 0)
     : 0;
 
+  // Dados para gráficos
+  const pieData = stats?.enviosPorStatus ? Object.entries(stats.enviosPorStatus).map(([status, value]) => ({
+    name: status.replace(/_/g, ' '),
+    value,
+    color: STATUS_COLORS[status as keyof typeof STATUS_COLORS]
+  })) : [];
+
+  const monthlyData = stats?.enviosPorMes?.map(mes => ({
+    month: mes.nomeDoMes.substring(0, 3),
+    total: mes.total,
+    enviados: mes.enviados,
+    pendentes: mes.pendentes,
+    taxaEnvio: mes.total > 0 ? ((mes.enviados / mes.total) * 100).toFixed(1) : 0
+  })) || [];
+
+  // Cálculos de insights
+  const taxaSucesso = totalEnvios > 0 
+    ? ((((stats?.enviosPorStatus?.ENTREGUE || 0) + (stats?.enviosPorStatus?.ENVIADO || 0)) / totalEnvios) * 100) 
+    : 0;
+
+  const produtividadeAnual = stats?.aniversariantesEsteAno || 0;
+  const pendentesTotal = (stats?.enviosPorStatus?.PENDENTE || 0) + (stats?.enviosPorStatus?.PRONTO_PARA_ENVIO || 0);
+  const melhorMes = monthlyData.reduce((prev, current) => prev.total > current.total ? prev : current, { total: 0, month: 'N/A' });
+  
+  // Dados para gráfico radial
+  const radialData = [
+    { name: 'Taxa de Sucesso', value: taxaSucesso, fill: COLORS.success },
+    { name: 'Taxa de Pendentes', value: totalEnvios > 0 ? (pendentesTotal / totalEnvios) * 100 : 0, fill: COLORS.warning },
+    { name: 'Taxa de Cancelados', value: totalEnvios > 0 ? ((stats?.enviosPorStatus?.CANCELADO || 0) / totalEnvios) * 100 : 0, fill: COLORS.danger }
+  ];
+
   return (
     <Layout>
-      <div className="p-6 lg:p-8">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-beuni-text flex items-center">
-                <BarChart3 className="h-8 w-8 mr-3 text-beuni-orange-600" />
-                Relatórios e Análises
-              </h1>
-              <p className="text-beuni-text/60 mt-1">
-                Visualize estatísticas e insights dos envios de brindes
-              </p>
-            </div>
-            <div className="flex items-center space-x-3">
-              <select
-                value={anoSelecionado}
-                onChange={(e) => setAnoSelecionado(Number(e.target.value))}
-                className="px-4 py-2 border border-beuni-orange-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 bg-white"
-              >
-                {[2024, 2025, 2026].map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-              <button
-                onClick={exportToCSV}
-                className="flex items-center px-4 py-2 bg-beuni-orange-600 text-white font-semibold rounded-xl hover:bg-beuni-orange-700 transition-all shadow-md"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Exportar CSV
-              </button>
-            </div>
+      <div className="p-4 lg:p-6 space-y-6">
+        {/* Header Compacto */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-beuni-text flex items-center">
+              <BarChart3 className="h-6 w-6 lg:h-8 lg:w-8 mr-2 text-beuni-orange-600" />
+              Analytics Dashboard
+            </h1>
+            <p className="text-sm text-beuni-text/60 mt-1">
+              Insights e métricas de performance dos envios
+            </p>
           </div>
-
-          {/* Quick Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-4">
-                <Users className="h-8 w-8" />
-                <div className="text-right">
-                  <p className="text-sm opacity-90">Total</p>
-                  <p className="text-3xl font-bold">{stats?.totalColaboradores || 0}</p>
-                </div>
-              </div>
-              <p className="text-sm opacity-90">Colaboradores</p>
-            </div>
-
-            <div className="bg-gradient-to-br from-beuni-orange-500 to-beuni-orange-600 rounded-2xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-4">
-                <Calendar className="h-8 w-8" />
-                <div className="text-right">
-                  <p className="text-sm opacity-90">Este Ano</p>
-                  <p className="text-3xl font-bold">{stats?.aniversariantesEsteAno || 0}</p>
-                </div>
-              </div>
-              <p className="text-sm opacity-90">Aniversariantes</p>
-            </div>
-
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-4">
-                <Package className="h-8 w-8" />
-                <div className="text-right">
-                  <p className="text-sm opacity-90">Total</p>
-                  <p className="text-3xl font-bold">{totalEnvios}</p>
-                </div>
-              </div>
-              <p className="text-sm opacity-90">Envios</p>
-            </div>
-
-            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-6 text-white shadow-lg">
-              <div className="flex items-center justify-between mb-4">
-                <CheckCircle className="h-8 w-8" />
-                <div className="text-right">
-                  <p className="text-sm opacity-90">Sucesso</p>
-                  <p className="text-3xl font-bold">
-                    {stats?.enviosPorStatus?.ENTREGUE || 0}
-                  </p>
-                </div>
-              </div>
-              <p className="text-sm opacity-90">Entregas</p>
-            </div>
+          <div className="flex items-center space-x-3">
+            <select
+              value={anoSelecionado}
+              onChange={(e) => setAnoSelecionado(Number(e.target.value))}
+              className="px-3 py-2 text-sm border border-beuni-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 bg-white"
+            >
+              {[2024, 2025, 2026].map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+            <button
+              onClick={exportToCSV}
+              className="flex items-center px-3 py-2 bg-beuni-orange-600 text-white text-sm font-medium rounded-lg hover:bg-beuni-orange-700 transition-all shadow-sm"
+            >
+              <Download className="h-4 w-4 mr-1" />
+              Export
+            </button>
           </div>
         </div>
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beuni-orange-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-beuni-orange-500"></div>
           </div>
         ) : (
-          <div className="space-y-6">
-            {/* Status Distribution */}
-            <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
-              <div className="flex items-center mb-6">
-                <PieChart className="h-6 w-6 text-beuni-orange-600 mr-2" />
-                <h2 className="text-xl font-bold text-beuni-text">Distribuição por Status</h2>
+          <>
+            {/* KPI Cards Grid */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Colaboradores */}
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-4 text-white shadow-lg">
+                <div className="flex items-center justify-between">
+                  <Users className="h-6 w-6 opacity-80" />
+                  <div className="text-right">
+                    <p className="text-lg lg:text-2xl font-bold">{stats?.totalColaboradores || 0}</p>
+                    <p className="text-xs opacity-90">Colaboradores</p>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                {stats?.enviosPorStatus &&
-                  Object.entries(stats.enviosPorStatus).map(([status, count]) => {
-                    const Icon = getStatusIcon(status);
-                    const percentage = totalEnvios > 0 ? ((count / totalEnvios) * 100).toFixed(1) : 0;
-                    return (
-                      <div
-                        key={status}
-                        className="bg-beuni-cream rounded-xl p-4 hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex items-center justify-between mb-3">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getStatusColor(status)}`}>
-                            <Icon className="h-5 w-5" />
-                          </div>
-                          <span className="text-2xl font-bold text-beuni-text">{count}</span>
-                        </div>
-                        <p className="text-sm font-medium text-beuni-text mb-1">
-                          {status.replace(/_/g, ' ')}
-                        </p>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                          <div
-                            className="bg-beuni-orange-500 h-2 rounded-full transition-all"
-                            style={{ width: `${percentage}%` }}
-                          ></div>
-                        </div>
-                        <p className="text-xs text-beuni-text/60">{percentage}% do total</p>
-                      </div>
-                    );
-                  })}
+              {/* Aniversariantes */}
+              <div className="bg-gradient-to-br from-beuni-orange-500 to-beuni-orange-600 rounded-xl p-4 text-white shadow-lg">
+                <div className="flex items-center justify-between">
+                  <Calendar className="h-6 w-6 opacity-80" />
+                  <div className="text-right">
+                    <p className="text-lg lg:text-2xl font-bold">{produtividadeAnual}</p>
+                    <p className="text-xs opacity-90">Aniversários {anoSelecionado}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Total Envios */}
+              <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-4 text-white shadow-lg">
+                <div className="flex items-center justify-between">
+                  <Package className="h-6 w-6 opacity-80" />
+                  <div className="text-right">
+                    <p className="text-lg lg:text-2xl font-bold">{totalEnvios}</p>
+                    <p className="text-xs opacity-90">Total Envios</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Taxa de Sucesso */}
+              <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 text-white shadow-lg">
+                <div className="flex items-center justify-between">
+                  <Target className="h-6 w-6 opacity-80" />
+                  <div className="text-right">
+                    <p className="text-lg lg:text-2xl font-bold">{taxaSucesso.toFixed(1)}%</p>
+                    <p className="text-xs opacity-90">Taxa Sucesso</p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Monthly Chart */}
-            <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
-              <div className="flex items-center mb-6">
-                <Activity className="h-6 w-6 text-beuni-orange-600 mr-2" />
-                <h2 className="text-xl font-bold text-beuni-text">Envios por Mês</h2>
-              </div>
-
-              <div className="space-y-4">
-                {stats?.enviosPorMes?.map((mes) => {
-                  const maxValue = Math.max(...(stats.enviosPorMes?.map((m) => m.total) || [1]));
-                  const percentage = (mes.total / maxValue) * 100;
-
-                  return (
-                    <div key={mes.mes} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-beuni-text w-24">
-                          {mes.nomeDoMes}
-                        </span>
-                        <div className="flex-1 mx-4">
-                          <div className="relative h-10 bg-beuni-cream rounded-xl overflow-hidden">
-                            {/* Enviados */}
-                            <div
-                              className="absolute left-0 top-0 h-full bg-gradient-to-r from-green-400 to-green-500 transition-all duration-500"
-                              style={{
-                                width: `${mes.total > 0 ? (mes.enviados / mes.total) * percentage : 0}%`,
-                              }}
-                            ></div>
-                            {/* Pendentes */}
-                            <div
-                              className="absolute left-0 top-0 h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-500"
-                              style={{
-                                width: `${percentage}%`,
-                                opacity: 0.6,
-                              }}
-                            ></div>
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <span className="text-sm font-semibold text-beuni-text">
-                                {mes.total}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-4 text-xs">
-                          <div className="flex items-center">
-                            <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                            <span className="text-beuni-text/70">{mes.enviados} enviados</span>
-                          </div>
-                          <div className="flex items-center">
-                            <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                            <span className="text-beuni-text/70">{mes.pendentes} pendentes</span>
-                          </div>
-                        </div>
-                      </div>
+            {/* Main Charts Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Performance Mensal */}
+              <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-bold text-beuni-text flex items-center">
+                    <Activity className="h-5 w-5 text-beuni-orange-600 mr-2" />
+                    Performance Mensal
+                  </h3>
+                  <div className="flex items-center space-x-4 text-xs">
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-beuni-orange-500 rounded-full mr-2"></div>
+                      <span>Total</span>
                     </div>
-                  );
-                })}
+                    <div className="flex items-center">
+                      <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                      <span>Enviados</span>
+                    </div>
+                  </div>
+                </div>
+                <ResponsiveContainer width="100%" height={280}>
+                  <AreaChart data={monthlyData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="month" 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <YAxis 
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#64748b' }}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="total"
+                      stackId="1"
+                      stroke={COLORS.primary}
+                      fill={COLORS.primary}
+                      fillOpacity={0.6}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="enviados"
+                      stackId="2"
+                      stroke={COLORS.success}
+                      fill={COLORS.success}
+                      fillOpacity={0.8}
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Status Distribution */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h3 className="text-lg font-bold text-beuni-text flex items-center mb-6">
+                  <PieChart className="h-5 w-5 text-beuni-orange-600 mr-2" />
+                  Status Distribution
+                </h3>
+                <ResponsiveContainer width="100%" height={280}>
+                  <RechartsPieChart>
+                    <Pie
+                      data={pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={100}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'white',
+                        border: '1px solid #e2e8f0',
+                        borderRadius: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                  </RechartsPieChart>
+                </ResponsiveContainer>
               </div>
             </div>
 
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-gradient-to-br from-beuni-orange-50 to-beuni-brown-50 rounded-2xl p-6 border border-beuni-orange-200">
-                <div className="flex items-center mb-4">
-                  <TrendingUp className="h-6 w-6 text-beuni-orange-600 mr-2" />
-                  <h3 className="font-bold text-beuni-text">Taxa de Sucesso</h3>
+            {/* Insights Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Melhor Mês */}
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl p-4 border border-indigo-200">
+                <div className="flex items-center justify-between mb-3">
+                  <Award className="h-6 w-6 text-indigo-600" />
+                  <span className="text-xs font-medium text-indigo-600 bg-indigo-100 px-2 py-1 rounded-full">
+                    DESTAQUE
+                  </span>
                 </div>
-                <p className="text-4xl font-bold text-beuni-text mb-2">
-                  {totalEnvios > 0
-                    ? ((((stats?.enviosPorStatus?.ENTREGUE || 0) + (stats?.enviosPorStatus?.ENVIADO || 0)) / totalEnvios) * 100).toFixed(1)
-                    : 0}%
-                </p>
-                <p className="text-sm text-beuni-text/60">Enviados + Entregues</p>
+                <p className="text-2xl font-bold text-gray-900">{melhorMes.month}</p>
+                <p className="text-sm text-gray-600">Melhor mês ({melhorMes.total} envios)</p>
               </div>
 
-              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
-                <div className="flex items-center mb-4">
-                  <Clock className="h-6 w-6 text-blue-600 mr-2" />
-                  <h3 className="font-bold text-beuni-text">Pendentes</h3>
+              {/* Pendências */}
+              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border border-yellow-200">
+                <div className="flex items-center justify-between mb-3">
+                  <Clock className="h-6 w-6 text-yellow-600" />
+                  <span className="text-xs font-medium text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full">
+                    ATENÇÃO
+                  </span>
                 </div>
-                <p className="text-4xl font-bold text-beuni-text mb-2">
-                  {(stats?.enviosPorStatus?.PENDENTE || 0) + (stats?.enviosPorStatus?.PRONTO_PARA_ENVIO || 0)}
-                </p>
-                <p className="text-sm text-beuni-text/60">Aguardando processamento</p>
+                <p className="text-2xl font-bold text-gray-900">{pendentesTotal}</p>
+                <p className="text-sm text-gray-600">Envios pendentes</p>
               </div>
 
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-200">
-                <div className="flex items-center mb-4">
-                  <CheckCircle className="h-6 w-6 text-green-600 mr-2" />
-                  <h3 className="font-bold text-beuni-text">Concluídos</h3>
+              {/* Eficiência */}
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200">
+                <div className="flex items-center justify-between mb-3">
+                  <Zap className="h-6 w-6 text-green-600" />
+                  <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-1 rounded-full">
+                    PERFORMANCE
+                  </span>
                 </div>
-                <p className="text-4xl font-bold text-beuni-text mb-2">
+                <p className="text-2xl font-bold text-gray-900">
                   {stats?.enviosPorStatus?.ENTREGUE || 0}
                 </p>
-                <p className="text-sm text-beuni-text/60">Entregas confirmadas</p>
+                <p className="text-sm text-gray-600">Entregas confirmadas</p>
+              </div>
+
+              {/* Alertas */}
+              <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-4 border border-red-200">
+                <div className="flex items-center justify-between mb-3">
+                  <AlertTriangle className="h-6 w-6 text-red-600" />
+                  <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
+                    ALERTA
+                  </span>
+                </div>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats?.enviosPorStatus?.CANCELADO || 0}
+                </p>
+                <p className="text-sm text-gray-600">Envios cancelados</p>
               </div>
             </div>
-          </div>
+
+            {/* Detailed Performance Metrics */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-lg font-bold text-beuni-text flex items-center mb-6">
+                <MousePointer className="h-5 w-5 text-beuni-orange-600 mr-2" />
+                Métricas Detalhadas de Performance
+              </h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Taxa de Conversão */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Taxa de Entrega</span>
+                    <span className="text-sm font-bold text-green-600">
+                      {totalEnvios > 0 ? (((stats?.enviosPorStatus?.ENTREGUE || 0) / totalEnvios) * 100).toFixed(1) : 0}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-500 h-2 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${totalEnvios > 0 ? (((stats?.enviosPorStatus?.ENTREGUE || 0) / totalEnvios) * 100) : 0}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Taxa de Cancelamento */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Taxa de Cancelamento</span>
+                    <span className="text-sm font-bold text-red-600">
+                      {totalEnvios > 0 ? (((stats?.enviosPorStatus?.CANCELADO || 0) / totalEnvios) * 100).toFixed(1) : 0}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-red-500 h-2 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${totalEnvios > 0 ? (((stats?.enviosPorStatus?.CANCELADO || 0) / totalEnvios) * 100) : 0}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Taxa de Processamento */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">Em Processamento</span>
+                    <span className="text-sm font-bold text-yellow-600">
+                      {totalEnvios > 0 ? ((pendentesTotal / totalEnvios) * 100).toFixed(1) : 0}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-yellow-500 h-2 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${totalEnvios > 0 ? ((pendentesTotal / totalEnvios) * 100) : 0}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </Layout>
