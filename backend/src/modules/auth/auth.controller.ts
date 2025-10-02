@@ -15,6 +15,7 @@ import {
 } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
+import { SkipCsrf } from '../../common/decorators/skip-csrf.decorator';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -67,6 +68,7 @@ export class AuthController {
     status: 429,
     description: 'Muitas tentativas de login. Tente novamente em alguns minutos.',
   })
+  @SkipCsrf()
   async login(@Body() loginDto: LoginDto, @Res({ passthrough: true }) response: Response) {
     const authResponse = await this.authService.login(loginDto);
 
@@ -81,7 +83,7 @@ export class AuthController {
     });
 
     // CSRF: set non-httpOnly cookie with CSRF token that mirrors server-side token check
-    const csrfToken = authResponse.csrf_token || Math.random().toString(36).slice(2);
+  const csrfToken = Math.random().toString(36).slice(2);
     response.cookie('csrf_token', csrfToken, {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
@@ -127,6 +129,7 @@ export class AuthController {
     status: 409,
     description: 'Usuário com este e-mail já existe',
   })
+  @SkipCsrf()
   async register(@Body() registerDto: RegisterDto, @Res({ passthrough: true }) response: Response) {
     const authResponse = await this.authService.register(registerDto);
 
@@ -140,7 +143,7 @@ export class AuthController {
     });
 
     // CSRF: set token cookie
-    const csrfToken = authResponse.csrf_token || Math.random().toString(36).slice(2);
+  const csrfToken = Math.random().toString(36).slice(2);
     response.cookie('csrf_token', csrfToken, {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
