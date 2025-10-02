@@ -17,12 +17,6 @@ export class OrganizacoesController {
     status: 200,
     description: 'Organização atualizada com sucesso',
   })
-  @Patch(':id')
-  @ApiOperation({ summary: 'Atualizar dados da organização' })
-  @ApiResponse({
-    status: 200,
-    description: 'Organização atualizada com sucesso',
-  })
   async update(
     @Param('id') id: string,
     @Body() updateOrganizacaoDto: UpdateOrganizacaoDto,
