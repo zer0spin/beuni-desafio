@@ -195,11 +195,21 @@ export default function Layout({ children }: LayoutProps) {
                   )}
                 </div>
                 <div className="ml-3 flex-1 min-w-0">
-                  <p className="text-sm font-medium text-beuni-text truncate">
-                    {user.nome}
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <p className="text-xs font-semibold text-green-600 uppercase tracking-wide">
+                      Online
+                    </p>
+                  </div>
+                  <p className="text-sm font-bold text-beuni-text truncate">
+                    {user.organizacao.nome}
                   </p>
-                  <p className="text-xs text-beuni-text/60 truncate">
-                    {user.email}
+                  <p className="text-xs text-beuni-text/50 truncate">
+                    {new Date().toLocaleDateString('pt-BR', { 
+                      weekday: 'short', 
+                      month: 'short', 
+                      day: 'numeric' 
+                    })}
                   </p>
                 </div>
                 <button
@@ -303,7 +313,7 @@ export default function Layout({ children }: LayoutProps) {
                     <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
                       {user.imagemPerfil ? (
                         <img 
-                          src={user.imagemPerfil} 
+                          src={`${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${user.imagemPerfil}`} 
                           alt="Perfil" 
                           className="w-full h-full object-cover"
                         />
@@ -372,15 +382,17 @@ export default function Layout({ children }: LayoutProps) {
                 <Menu className="h-6 w-6" />
               </button>
 
-              {/* Organization Name - Destaque Maior */}
+              {/* Organization Name - Design Moderno */}
               <div className="hidden lg:block">
-                <div className="flex items-center space-x-3 bg-gradient-to-r from-beuni-cream to-beuni-orange-50 px-5 py-2.5 rounded-xl border border-beuni-orange-200 shadow-sm">
-                  <div className="w-8 h-8 bg-gradient-to-br from-beuni-orange-500 to-beuni-orange-600 rounded-lg flex items-center justify-center shadow-md">
-                    <Gift className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-beuni-text/60 font-semibold uppercase tracking-wide">Organização</p>
-                    <p className="text-base font-bold text-beuni-text">{user.organizacao.nome}</p>
+                <div className="flex items-center space-x-3 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-lg border border-gray-200/50 shadow-sm hover:shadow-md transition-all duration-200">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-6 h-6 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-md flex items-center justify-center">
+                      <div className="w-3 h-3 bg-white rounded-sm"></div>
+                    </div>
+                    <div className="flex flex-col">
+                      <p className="text-sm font-bold text-beuni-text leading-none">{user.organizacao.nome}</p>
+                      <p className="text-xs text-beuni-text/50 leading-none">Dashboard</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -522,7 +534,7 @@ export default function Layout({ children }: LayoutProps) {
                 <div className="relative">
                   <button
                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                    className="flex items-center gap-2 p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors"
+                    className="flex items-center gap-3 p-2 text-beuni-text/60 hover:text-beuni-orange-500 hover:bg-beuni-orange-50 rounded-xl transition-colors"
                   >
                     <div className="w-8 h-8 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden">
                       {user.imagemPerfil ? (
@@ -534,6 +546,11 @@ export default function Layout({ children }: LayoutProps) {
                       ) : (
                         user.nome.charAt(0)
                       )}
+                    </div>
+                    <div className="hidden md:block text-left">
+                      <p className="text-sm font-semibold text-beuni-text">
+                        {user.nome}
+                      </p>
                     </div>
                     <ChevronDown className={`h-4 w-4 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>

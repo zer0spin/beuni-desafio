@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, NotFoundException, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 
@@ -155,39 +155,65 @@ export class AuthService {
       id: user.id,
       nome: user.nome,
       email: user.email,
+      imagemPerfil: user.imagemPerfil, // Incluindo a imagem de perfil
       organizationId: user.organizationId,
       organizacao: user.organizacao,
     };
   }
 
-  async updateProfile(userId: string, updateProfileDto: UpdateProfileDto) {
-    const updateData: any = {};
-    
-    if (updateProfileDto.name !== undefined) {
-      updateData.nome = updateProfileDto.name;
-    }
-    
-    if (updateProfileDto.imagemPerfil !== undefined) {
-      updateData.imagemPerfil = updateProfileDto.imagemPerfil;
-    }
+  async updateProfile(userId: string, updateData: UpdateProfileDto): Promise<{ user: any; message: string }> {
+    try {
+      const existingUser = await this.prisma.usuario.findUnique({
+        where: { id: userId },
+        include: { organizacao: true },
+      });
 
-    const updatedUser = await this.prisma.usuario.update({
-      where: { id: userId },
-      data: updateData,
-      include: {
-        organizacao: {
-          select: { id: true, nome: true },
+      if (!existingUser) {
+        throw new NotFoundException('Usuário não encontrado');
+      }
+
+      // Atualizar organização se fornecida
+      if (updateData.organizationName && updateData.organizationName !== existingUser.organizacao.nome) {
+        await this.prisma.organizacao.update({
+          where: { id: existingUser.organizationId },
+          data: { nome: updateData.organizationName },
+        });
+      }
+
+      // Preparar dados para atualização
+      const updatePayload: any = {};
+      if (updateData.name) updatePayload.nome = updateData.name;
+      if (updateData.email) updatePayload.email = updateData.email;
+      if (updateData.imagemPerfil !== undefined) updatePayload.imagemPerfil = updateData.imagemPerfil;
+
+      // Atualizar usuário
+      const updatedUser = await this.prisma.usuario.update({
+        where: { id: userId },
+        data: updatePayload,
+        include: {
+          organizacao: true,
         },
-      },
-    });
+      });
 
-    return {
-      id: updatedUser.id,
-      nome: updatedUser.nome,
-      email: updatedUser.email,
-      imagemPerfil: updatedUser.imagemPerfil,
-      organizationId: updatedUser.organizationId,
-      organizacao: updatedUser.organizacao,
-    };
+      // Retornar dados formatados
+      const userResponse = {
+        id: updatedUser.id,
+        nome: updatedUser.nome,
+        email: updatedUser.email,
+        imagemPerfil: updatedUser.imagemPerfil,
+        organizacao: {
+          id: updatedUser.organizacao.id,
+          nome: updatedUser.organizacao.nome,
+        },
+      };
+
+      return {
+        user: userResponse,
+        message: 'Perfil atualizado com sucesso',
+      };
+    } catch (error) {
+      console.error('Erro ao atualizar perfil:', error);
+      throw new InternalServerErrorException('Erro interno do servidor');
+    }
   }
 }
