@@ -117,6 +117,19 @@ export class ColaboradoresController {
     );
   }
 
+  @Get('aniversariantes-proximos-30-dias')
+  @ApiOperation({ summary: 'Listar aniversariantes dos próximos 30 dias' })
+  @ApiResponse({
+    status: 200,
+    description: 'Aniversariantes dos próximos 30 dias',
+    type: [ColaboradorResponseDto],
+  })
+  async getAniversariantesProximos30Dias(@Request() req) {
+    return this.colaboradoresService.getAniversariantesProximos30Dias(
+      req.user.organizationId,
+    );
+  }
+
   @Get('estatisticas/departamentos')
   @ApiOperation({ summary: 'Estatísticas por departamento' })
   @ApiQuery({

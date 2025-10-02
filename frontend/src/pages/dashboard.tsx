@@ -49,52 +49,18 @@ export default function DashboardPage() {
 
       const [colaboradoresRes, proximosRes, statsRes] = await Promise.all([
         api.get<ColaboradoresResponse>(endpoints.colaboradores + '?limit=1'),
-        api.get(endpoints.colaboradoresProximos),
+        api.get(endpoints.colaboradoresProximos30Dias), // Usando novo endpoint
         api.get<EstatisticasEnvio>(endpoints.estatisticas),
       ]);
 
-      // Filtrar colaboradores com aniversário nos próximos 30 dias
+      // Com o novo endpoint, já temos os aniversariantes dos próximos 30 dias corretos
+      const upcomingBirthdays = proximosRes.data || [];
+
+      // Calcular aniversariantes de hoje
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Zera as horas para comparação apenas de data
+      today.setHours(0, 0, 0, 0);
 
-      const thirtyDaysFromNow = new Date(today);
-      thirtyDaysFromNow.setDate(today.getDate() + 30);
-
-      const parseBrDate = (dateStr?: string) => {
-        if (!dateStr) return null;
-        const parts = dateStr.split('/');
-        if (parts.length !== 3) return null;
-        const [dd, mm, yyyy] = parts.map(Number);
-        if (!dd || !mm || !yyyy) return null;
-        return new Date(yyyy, mm - 1, dd);
-      };
-
-      const upcomingBirthdays = proximosRes.data.filter((p: any) => {
-        if (!p.data_nascimento || !p.nome_completo) return false;
-
-        const birthday = parseBrDate(p.data_nascimento);
-        if (!birthday) return false;
-
-        const thisYearBirthday = new Date(today.getFullYear(), birthday.getMonth(), birthday.getDate());
-        const nextYearBirthday = new Date(today.getFullYear() + 1, birthday.getMonth(), birthday.getDate());
-
-        // Verifica se o aniversário está dentro dos próximos 30 dias (considerando virada de ano)
-        return (thisYearBirthday >= today && thisYearBirthday <= thirtyDaysFromNow) ||
-               (nextYearBirthday >= today && nextYearBirthday <= thirtyDaysFromNow);
-      }).sort((a: any, b: any) => {
-        // Ordena por data mais próxima
-        const dateA = parseBrDate(a.data_nascimento)!;
-        const dateB = parseBrDate(b.data_nascimento)!;
-        const birthdayA = new Date(today.getFullYear(), dateA.getMonth(), dateA.getDate());
-        const birthdayB = new Date(today.getFullYear(), dateB.getMonth(), dateB.getDate());
-
-        if (birthdayA < today) birthdayA.setFullYear(today.getFullYear() + 1);
-        if (birthdayB < today) birthdayB.setFullYear(today.getFullYear() + 1);
-
-        return birthdayA.getTime() - birthdayB.getTime();
-      });
-
-      const birthdaysToday = proximosRes.data.filter((p: any) => {
+      const birthdaysToday = upcomingBirthdays.filter((p: any) => {
         if (!p.data_nascimento || !p.nome_completo) return false;
         const birthday = parseBrDate(p.data_nascimento);
         return birthday &&

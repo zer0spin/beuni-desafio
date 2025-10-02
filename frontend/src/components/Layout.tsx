@@ -16,8 +16,9 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { getUser, removeAuthToken } from '@/lib/api';
+import { removeAuthToken } from '@/lib/api';
 import api, { endpoints } from '@/lib/api';
+import { useUser } from '@/contexts/UserContext';
 import type { User } from '@/types';
 
 interface LayoutProps {
@@ -26,7 +27,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user, isLoading } = useUser();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -35,25 +36,25 @@ export default function Layout({ children }: LayoutProps) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    const currentUser = getUser();
-    if (!currentUser) {
+    if (!isLoading && !user) {
       router.push('/login');
       return;
     }
-    setUser(currentUser);
 
-    // Carregar notificações da API
-    loadNotifications();
-    loadUnreadCount();
-
-    // Atualizar notificações a cada 5 minutos
-    const interval = setInterval(() => {
+    if (user) {
+      // Carregar notificações da API
       loadNotifications();
       loadUnreadCount();
-    }, 5 * 60 * 1000);
 
-    return () => clearInterval(interval);
-  }, [router]);
+      // Atualizar notificações a cada 5 minutos
+      const interval = setInterval(() => {
+        loadNotifications();
+        loadUnreadCount();
+      }, 5 * 60 * 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [user, isLoading, router]);
 
   const loadNotifications = async () => {
     try {
@@ -125,6 +126,14 @@ export default function Layout({ children }: LayoutProps) {
   const isActive = (href: string) => {
     return router.pathname === href || router.pathname.startsWith(href + '/');
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-beuni-cream">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beuni-orange-500" />
+      </div>
+    );
+  }
 
   if (!user) {
     return (

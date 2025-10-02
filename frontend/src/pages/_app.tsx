@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import Head from 'next/head';
 import '@/styles/globals.css';
+import { UserProvider } from '@/contexts/UserContext';
 
 // Create a query client
 const queryClient = new QueryClient({
@@ -18,31 +19,33 @@ const queryClient = new QueryClient({
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <Head>
-        <title>Beuni - Sistema de Brindes</title>
-        <link rel="icon" href="/images/logos/favicon.ico" />
-      </Head>
-      <Component {...pageProps} />
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#363636',
-            color: '#fff',
-          },
-          success: {
+      <UserProvider>
+        <Head>
+          <title>Beuni - Sistema de Brindes</title>
+          <link rel="icon" href="/images/logos/favicon.ico" />
+        </Head>
+        <Component {...pageProps} />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
             style: {
-              background: '#22c55e',
+              background: '#363636',
+              color: '#fff',
             },
-          },
-          error: {
-            style: {
-              background: '#ef4444',
+            success: {
+              style: {
+                background: '#22c55e',
+              },
             },
-          },
-        }}
-      />
+            error: {
+              style: {
+                background: '#ef4444',
+              },
+            },
+          }}
+        />
+      </UserProvider>
     </QueryClientProvider>
   );
 }

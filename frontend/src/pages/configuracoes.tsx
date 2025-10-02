@@ -5,6 +5,7 @@ import api, { endpoints } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 import Cookies from 'js-cookie';
 import { Camera, Upload, X, User } from 'lucide-react';
+import { useUser } from '@/contexts/UserContext';
 
 interface UserProfile {
   id: string;
@@ -21,6 +22,7 @@ interface UserProfile {
 export default function Configuracoes() {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { updateUser, refreshUser } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -74,15 +76,14 @@ export default function Configuracoes() {
         name: formData.organizationName,
       });
 
-      // Atualizar cookie do usuário com os novos dados
-      const updatedUser = userResponse.data;
-      const cookieOptions = {
-        expires: 7,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict' as const,
-        path: '/',
-      };
-      Cookies.set('beuni_user', JSON.stringify(updatedUser), cookieOptions);
+      // Atualizar contexto do usuário
+      updateUser({
+        nome: formData.name,
+        organizacao: {
+          ...userResponse.data.organizacao,
+          nome: formData.organizationName,
+        },
+      });
 
       // Invalidar cache e refetch para atualizar os dados na tela
       await queryClient.invalidateQueries('userProfile');
@@ -90,11 +91,6 @@ export default function Configuracoes() {
 
       toast.success('Dados atualizados com sucesso!');
       setIsEditing(false);
-      
-      // Recarregar a página para garantir atualização completa
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     } catch (error) {
       console.error('Erro ao atualizar:', error);
       toast.error('Erro ao atualizar dados');
@@ -137,15 +133,10 @@ export default function Configuracoes() {
         },
       });
 
-      // Atualizar cookie do usuário
-      const updatedUser = response.data.user;
-      const cookieOptions = {
-        expires: 7,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict' as const,
-        path: '/',
-      };
-      Cookies.set('beuni_user', JSON.stringify(updatedUser), cookieOptions);
+      // Atualizar contexto do usuário
+      updateUser({
+        imagemPerfil: response.data.user.imagemPerfil,
+      });
 
       // Invalidar cache
       await queryClient.invalidateQueries('userProfile');
@@ -153,11 +144,6 @@ export default function Configuracoes() {
 
       toast.success('Foto de perfil atualizada com sucesso!');
       setImagePreview(null);
-      
-      // Recarregar a página para garantir atualização
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
     } catch (error) {
       console.error('Erro ao fazer upload da imagem:', error);
       setImagePreview(null);
@@ -181,22 +167,14 @@ export default function Configuracoes() {
         imagemPerfil: null,
       });
 
-      // Atualizar cookie do usuário
-      const updatedUser = response.data;
-      const cookieOptions = {
-        expires: 7,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict' as const,
-        path: '/',
-      };
-      Cookies.set('beuni_user', JSON.stringify(updatedUser), cookieOptions);
+      // Atualizar contexto do usuário
+      updateUser({
+        imagemPerfil: undefined,
+      });
 
       // Invalidar cache e recarregar
       await queryClient.invalidateQueries('userProfile');
       await refetch();
-      
-      // Recarregar a página para garantir atualização
-      window.location.reload();
 
       toast.success('Foto de perfil removida com sucesso!');
     } catch (error) {

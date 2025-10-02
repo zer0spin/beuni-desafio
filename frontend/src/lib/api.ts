@@ -135,6 +135,7 @@ export const endpoints = {
   // Colaboradores
   colaboradores: '/colaboradores',
   colaboradoresProximos: '/colaboradores/aniversariantes-proximos',
+  colaboradoresProximos30Dias: '/colaboradores/aniversariantes-proximos-30-dias',
 
   // CEP
   cep: (cep: string) => `/cep/${cep}`,

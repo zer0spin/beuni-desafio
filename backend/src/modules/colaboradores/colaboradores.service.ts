@@ -214,6 +214,60 @@ export class ColaboradoresService {
     return colaboradores.map((c) => this.mapToResponseDto(c));
   }
 
+  async getAniversariantesProximos30Dias(organizationId: string) {
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0); // Zerar horas para comparação precisa
+    
+    const em30Dias = new Date(hoje);
+    em30Dias.setDate(hoje.getDate() + 30);
+
+    // Buscar todos os colaboradores da organização
+    const colaboradores = await this.prisma.colaborador.findMany({
+      where: {
+        organizationId,
+      },
+      include: {
+        endereco: true,
+        enviosBrinde: {
+          where: {
+            anoAniversario: hoje.getFullYear(),
+          },
+          take: 1,
+        },
+      },
+    });
+
+    // Filtrar no código para lidar com lógica de aniversário complexa
+    const aniversariantesProximos = colaboradores.filter(colaborador => {
+      const dataNascimento = colaborador.dataNascimento;
+      if (!dataNascimento) return false;
+
+      // Criar aniversário deste ano
+      const aniversarioEsteAno = new Date(hoje.getFullYear(), dataNascimento.getMonth(), dataNascimento.getDate());
+      
+      // Se o aniversário já passou este ano, considerar o próximo ano
+      if (aniversarioEsteAno < hoje) {
+        aniversarioEsteAno.setFullYear(hoje.getFullYear() + 1);
+      }
+
+      // Verificar se está nos próximos 30 dias
+      return aniversarioEsteAno >= hoje && aniversarioEsteAno <= em30Dias;
+    });
+
+    // Ordenar por proximidade da data
+    aniversariantesProximos.sort((a, b) => {
+      const dataA = new Date(hoje.getFullYear(), a.dataNascimento.getMonth(), a.dataNascimento.getDate());
+      const dataB = new Date(hoje.getFullYear(), b.dataNascimento.getMonth(), b.dataNascimento.getDate());
+      
+      if (dataA < hoje) dataA.setFullYear(hoje.getFullYear() + 1);
+      if (dataB < hoje) dataB.setFullYear(hoje.getFullYear() + 1);
+      
+      return dataA.getTime() - dataB.getTime();
+    });
+
+    return aniversariantesProximos.map((c) => this.mapToResponseDto(c));
+  }
+
   async update(
     id: string,
     updateColaboradorDto: UpdateColaboradorDto,
