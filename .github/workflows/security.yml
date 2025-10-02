@@ -1,0 +1,81 @@
+name: 🛡️ Security Scanning
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly security scan
+
+jobs:
+  npm-audit:
+    name: 📦 Dependency Security
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🛎️ Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+
+    - name: 🔍 NPM Audit
+      run: npm audit --audit-level=high
+
+  snyk-security:
+    name: 🕵️ Snyk Security Scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🛎️ Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 🛡️ Run Snyk Scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        command: test
+        args: --severity-threshold=high
+
+  dependency-review:
+    name: 🔍 Dependency Review
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🛎️ Checkout repository
+      uses: actions/checkout@v4
+
+    - name: 📦 Dependency Review
+      uses: actions/dependency-review-action@v4
+      with:
+        fail-on-severity: high
+        deny-licenses: 
+          - AGPL-1.0-only
+          - AGPL-1.0-or-later
+          - AGPL-3.0-only
+          - AGPL-3.0-or-later
+
+  sast-security:
+    name: 🕵️ SAST Analysis
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🛎️ Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🔍 CodeQL Analysis
+      uses: github/codeql-action/init@v3
+      with:
+        languages: javascript, typescript
+        config-file: ./.github/codeql-config.yml
+
+    - name: 🏗️ CodeQL Autobuild
+      uses: github/codeql-action/autobuild@v3
+
+    - name: 📊 CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+
+# 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+# Co-Authored-By: Claude <noreply@anthropic.com>

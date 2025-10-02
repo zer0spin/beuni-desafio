@@ -1,0 +1,58 @@
+name: "CodeQL Security Configuration"
+description: "Security scanning configuration for beuni-desafio"
+
+paths-ignore:
+  - node_modules
+  - coverage
+  - dist
+  - build
+
+queries:
+  # Default security and quality queries
+  - uses: security-and-quality
+
+# Disable queries for test files and generated code
+query-filters:
+  - exclude:
+      name: "Test code"
+      paths: 
+        - "**/*.test.ts"
+        - "**/*.spec.ts"
+
+# Language-specific configurations
+languages:
+  javascript:
+    - security-extended
+  typescript:
+    - security-extended
+
+# Security severity levels to focus on
+security-severity: 
+  - high
+  - critical
+
+# Maximum allowed complexity and cognitive complexity
+max-complexity: 15
+max-cognitive-complexity: 20
+
+# Scanning strategy
+scanning:
+  mode: auto
+  exclude-paths:
+    - '**/*.d.ts'
+    - '**/*.config.js'
+    - 'scripts/**'
+    - 'config/**'
+
+# Exceptions and known safe patterns
+exceptions:
+  - id: js/weak-cryptographic-algorithm
+    reason: "Allowed in specific contexts with strong justification"
+
+# Baseline configuration
+baseline:
+  create-if-not-exists: true
+  update-on-scan: true
+
+# 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+# Co-Authored-By: Claude <noreply@anthropic.com>

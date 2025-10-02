@@ -1,0 +1,65 @@
+name: 📊 SonarCloud Analysis
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  sonarcloud:
+    name: 🕵️ SonarCloud Scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: 🛎️ Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for better relevancy
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18.x
+
+    - name: 📦 Install Dependencies
+      run: |
+        npm ci
+        npm run bootstrap
+
+    - name: 🧪 Run Tests with Coverage
+      run: npm run test:coverage
+
+    - name: 🛡️ SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Provided by GitHub
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}    # Configured in repository secrets
+      with:
+        projectBaseDir: .
+        args: >
+          -Dsonar.organization=${{ vars.SONAR_ORGANIZATION }}
+          -Dsonar.projectKey=${{ vars.SONAR_PROJECT_KEY }}
+          -Dsonar.sources=.
+          -Dsonar.exclusions=**/*.test.ts,**/*.spec.ts,**/node_modules/**
+          -Dsonar.tests=.
+          -Dsonar.test.exclusions=**/*.test.ts,**/*.spec.ts
+          -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+          -Dsonar.coverage.exclusions=**/*.test.ts,**/*.spec.ts
+          -Dsonar.qualitygate.wait=true
+          -Dsonar.sourceEncoding=UTF-8
+          -Dsonar.core.codeCoveragePlugin=lcov
+          -Dsonar.javascript.environments=node
+          -Dsonar.projectDescription='Beuni Challenge Project'
+
+    - name: 🚦 Quality Gate Status
+      uses: sonarsource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      with:
+        projectBaseDir: .
+        args: >
+          -Dsonar.qualitygate.activate=true
+
+# 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+# Co-Authored-By: Claude <noreply@anthropic.com>

@@ -1,106 +1,151 @@
-# Beuni Corporate Gifting - Incident Response Playbook
+# Beuni Incident Response Playbook
 
-## Overview
-This playbook provides a structured approach to handling security incidents in the Beuni Corporate Gifting platform.
+## 🚨 Purpose
+This playbook provides a structured approach to handling security incidents, ensuring rapid, effective response.
 
-## Incident Classification Levels
-1. **Level 1 (Low)**: Minor security issue, no immediate risk
-2. **Level 2 (Medium)**: Potential data exposure, requires investigation
-3. **Level 3 (High)**: Active breach or significant vulnerability
-4. **Level 4 (Critical)**: Major data breach, system compromise
+## 🔍 Incident Classification Levels
 
-## Common Incident Types
+| Level | Description | Response Time | Escalation |
+|-------|-------------|---------------|------------|
+| 1 - Low | Minor vulnerability, no active exploit | 24-48 hours | Team Lead |
+| 2 - Medium | Potential active exploit, limited impact | 4-12 hours | Security Team |
+| 3 - High | Active exploit, significant risk | 1-4 hours | CISO, Legal |
+| 4 - Critical | Major breach, data compromise | Immediate | Executive, Legal, Forensics |
 
-### 1. Unauthorized Access Attempts
-**Detection Triggers:**
-- Multiple failed login attempts
-- Access from suspicious IP addresses
-- Unusual login patterns
+## 🛡️ Specific Incident Types
 
-**Response Steps:**
-1. Block suspicious IP
-2. Disable compromised user accounts
-3. Force password reset
-4. Log and investigate
+### 1. SQL Injection Incident
 
-### 2. Data Exposure
-**Detection Triggers:**
-- Unusual data export patterns
+#### Detection
+- Unusual database query patterns
+- Unexpected database changes
 - Unauthorized data access logs
-- Potential PII exposure
 
-**Response Steps:**
-1. Immediately restrict data access
-2. Identify scope of exposure
-3. Prepare breach notification
-4. Conduct forensic analysis
-
-### 3. System Compromise
-**Detection Triggers:**
-- Unexpected system changes
-- Unknown process execution
-- Suspicious network traffic
-
-**Response Steps:**
+#### Immediate Actions
 1. Isolate affected systems
-2. Preserve forensic evidence
-3. Conduct comprehensive system audit
-4. Restore from clean backup
+2. Capture forensic logs
+3. Block malicious IP addresses
+4. Temporarily disable vulnerable endpoints
 
-### 4. Brute Force Attack
-**Detection Triggers:**
-- Repeated login failures
-- High-volume authentication requests
-- Rate limiting violations
+#### Investigation Steps
+- Trace injection point
+- Analyze payload
+- Review database access logs
+- Check for data exfiltration
 
-**Response Steps:**
-1. Implement temporary IP blocking
-2. Enable multi-factor authentication
-3. Review and enhance authentication mechanisms
-4. Log and report attack details
+#### Mitigation
+- Patch SQL injection vulnerability
+- Implement prepared statements
+- Update input validation
+- Rotate compromised credentials
 
-## Incident Response Team
+#### Post-Incident
+- Conduct comprehensive code review
+- Update security testing procedures
+- Retrain development team
 
-### Roles
-- **Incident Commander**: Overall coordination
-- **Technical Lead**: Technical investigation
-- **Compliance Officer**: Legal and regulatory reporting
-- **Communications Lead**: External communication
+### 2. Authentication Breach
 
-### Contact Information
-[INSERT ACTUAL CONTACT DETAILS]
+#### Detection
+- Multiple failed login attempts
+- Unauthorized account access
+- Suspicious login geolocation
 
-## Reporting Workflow
-1. Incident Detection
-2. Initial Assessment
-3. Containment
-4. Eradication
-5. Recovery
-6. Post-Incident Review
+#### Immediate Actions
+1. Freeze affected accounts
+2. Force password reset
+3. Revoke active sessions
+4. Enable additional authentication factors
 
-## Monitoring and Alerting
-- Continuous security monitoring
-- Real-time alert configuration
-- Regular vulnerability scans
+#### Investigation Steps
+- Review authentication logs
+- Analyze breach source
+- Check for credential stuffing
+- Verify no data was exfiltrated
 
-## Documentation Requirements
-- Detailed incident log
-- Root cause analysis
-- Remediation steps
-- Lessons learned report
+#### Mitigation
+- Implement multi-factor authentication
+- Add adaptive authentication
+- Update password policies
+- Implement login attempt throttling
 
-## Compliance Considerations
-- GDPR data breach notification
-- PCI-DSS reporting requirements
-- Notification timelines
+#### Post-Incident
+- Conduct security awareness training
+- Update authentication mechanisms
+- Perform penetration testing
 
-## Appendix: Emergency Contacts
-- Security Team: [CONTACT]
-- Management Escalation: [CONTACT]
-- Legal Department: [CONTACT]
-- External Incident Response Support: [CONTACT]
+## 🔄 General Incident Response Workflow
 
----
+### Preparation
+- Maintain up-to-date incident response plan
+- Regular security training
+- Updated contact lists
+- Configured monitoring tools
 
-**Last Updated:** [CURRENT_DATE]
-**Version:** 1.0
+### Detection & Analysis
+- Monitor security logs
+- Use SIEM tools
+- Implement real-time alerting
+- Conduct initial impact assessment
+
+### Containment
+- Short-term containment
+- System isolation
+- Prevent further damage
+
+### Eradication
+- Remove threat completely
+- Patch vulnerabilities
+- Clean infected systems
+
+### Recovery
+- Restore systems safely
+- Validate system integrity
+- Monitor for reoccurrence
+
+### Lessons Learned
+- Comprehensive post-incident review
+- Update security procedures
+- Share learnings with team
+
+## 📋 Incident Response Checklist
+
+### Initial Response
+- [ ] Identify and validate the incident
+- [ ] Assemble incident response team
+- [ ] Document initial findings
+- [ ] Establish communication channels
+
+### Ongoing Management
+- [ ] Continuously update incident log
+- [ ] Preserve evidence
+- [ ] Maintain clear communication
+- [ ] Manage stakeholder expectations
+
+### Closure
+- [ ] Complete incident report
+- [ ] Conduct lessons learned session
+- [ ] Update security controls
+- [ ] Close incident ticket
+
+## 🔒 Contact Information
+
+### Incident Response Team
+- Security Lead: security-lead@beuni.com
+- On-Call Engineer: oncall@beuni.com
+- CISO: ciso@beuni.com
+
+### External Support
+- Forensics Partner: forensics@securitypartner.com
+- Legal Counsel: legal@beuni.com
+
+## 📜 Compliance & Reporting
+
+- Maintain detailed incident logs
+- Prepare regulatory breach notifications
+- Follow GDPR, CCPA reporting requirements
+
+**Version:** 1.0.0
+**Last Updated:** 2025-10-02
+
+🛡️ Stay vigilant, respond swiftly

@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsDateString, ValidateNested, MaxLength } from 'class-validator';
+import { IsNotEmpty, IsString, IsDateString, ValidateNested, MaxLength, Matches } from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
@@ -10,6 +10,8 @@ class CreateEnderecoDto {
   })
   @IsString({ message: 'CEP deve ser uma string' })
   @IsNotEmpty({ message: 'CEP é obrigatório' })
+  @MaxLength(8, { message: 'CEP deve ter exatamente 8 caracteres' })
+  @Matches(/^[0-9]{8}$/, { message: 'CEP deve conter apenas 8 dígitos numéricos' })
   cep: string;
 
   @ApiProperty({

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Run linter
+npm run lint
+
+# Run tests for changed files
+npm run test:staged
+
+# Check TypeScript types
+npm run typecheck
+
+# Prevent commit if any checks fail
+exit $?

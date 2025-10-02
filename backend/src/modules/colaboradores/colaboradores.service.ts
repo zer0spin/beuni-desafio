@@ -175,45 +175,43 @@ export class ColaboradoresService {
     const mesAtual = hoje.getMonth() + 1; // 0-11, então +1 para 1-12
     const proximoMes = mesAtual > 11 ? 1 : mesAtual + 1; // Se dezembro, próximo mês é janeiro
 
-    // Buscar aniversariantes do mês atual e próximo mês (próximos 60 dias)
-    const aniversariantes = await this.prisma.$queryRaw`
-      SELECT c.*,
-             e.id as endereco_id, e.cep, e.logradouro, e.numero, e.complemento, e.bairro, e.cidade, e.uf
-      FROM colaboradores c
-      LEFT JOIN enderecos e ON c.address_id = e.id
-      WHERE c.organization_id = ${organizationId}
-      AND (EXTRACT(MONTH FROM c.data_nascimento) = ${mesAtual} OR EXTRACT(MONTH FROM c.data_nascimento) = ${proximoMes})
-      ORDER BY
-        CASE
-          WHEN EXTRACT(MONTH FROM c.data_nascimento) = ${mesAtual} THEN 0
-          ELSE 1
-        END,
-        EXTRACT(DAY FROM c.data_nascimento) ASC
-      LIMIT 50
-    `;
-
-    // Transformar os resultados no formato esperado
-    const colaboradoresFormatados = (aniversariantes as any[]).map((c) => ({
-      id: c.id,
-      nomeCompleto: c.nome_completo,
-      dataNascimento: c.data_nascimento,
-      cargo: c.cargo,
-      departamento: c.departamento,
-      organizationId: c.organization_id,
-      endereco: {
-        id: c.endereco_id,
-        cep: c.cep,
-        logradouro: c.logradouro,
-        numero: c.numero,
-        complemento: c.complemento,
-        bairro: c.bairro,
-        cidade: c.cidade,
-        uf: c.uf,
+    // SECURITY FIX: Using Prisma Query Builder instead of raw SQL to prevent SQL injection
+    const colaboradores = await this.prisma.colaborador.findMany({
+      where: {
+        organizationId,
+        OR: [
+          {
+            dataNascimento: {
+              gte: new Date(hoje.getFullYear(), mesAtual - 1, 1),
+              lt: new Date(hoje.getFullYear(), mesAtual, 1),
+            },
+          },
+          {
+            dataNascimento: {
+              gte: new Date(hoje.getFullYear(), proximoMes - 1, 1),
+              lt: new Date(hoje.getFullYear(), proximoMes, 1),
+            },
+          },
+        ],
       },
-      enviosBrinde: [], // Será preenchido depois se necessário
-    }));
+      include: {
+        endereco: true,
+        enviosBrinde: {
+          where: {
+            anoAniversario: hoje.getFullYear(),
+          },
+          take: 1,
+        },
+      },
+      orderBy: [
+        {
+          dataNascimento: 'asc',
+        },
+      ],
+      take: 50,
+    });
 
-    return colaboradoresFormatados.map((c) => this.mapToResponseDto(c));
+    return colaboradores.map((c) => this.mapToResponseDto(c));
   }
 
   async update(
@@ -386,39 +384,52 @@ export class ColaboradoresService {
 
     const estatisticas = [];
 
+    // SECURITY FIX: Using Prisma Query Builder instead of raw SQL to prevent SQL injection
     for (const mesInfo of meses) {
       // Contar colaboradores que fazem aniversário no mês
-      const totalColaboradores = await this.prisma.$queryRaw<[{ count: bigint }]>`
-        SELECT COUNT(*) as count FROM colaboradores c
-        WHERE c.organization_id = ${organizationId}
-        AND EXTRACT(MONTH FROM c.data_nascimento) = ${mesInfo.mes}
-      `;
-
-      const total = Number(totalColaboradores[0].count);
+      const total = await this.prisma.colaborador.count({
+        where: {
+          organizationId,
+          dataNascimento: {
+            gte: new Date(new Date().getFullYear(), mesInfo.mes - 1, 1),
+            lt: new Date(new Date().getFullYear(), mesInfo.mes, 1),
+          },
+        },
+      });
 
       // Contar envios realizados para este mês
-      const enviadosResult = await this.prisma.$queryRaw<[{ count: bigint }]>`
-        SELECT COUNT(*) as count FROM envios_brinde eb
-        JOIN colaboradores c ON eb.colaborador_id = c.id
-        WHERE c.organization_id = ${organizationId}
-        AND eb.ano_aniversario = ${anoConsulta}
-        AND eb.status IN ('ENVIADO', 'ENTREGUE')
-        AND EXTRACT(MONTH FROM c.data_nascimento) = ${mesInfo.mes}
-      `;
-
-      const enviados = Number(enviadosResult[0].count);
+      const enviados = await this.prisma.envioBrinde.count({
+        where: {
+          anoAniversario: anoConsulta,
+          status: {
+            in: ['ENVIADO', 'ENTREGUE'],
+          },
+          colaborador: {
+            organizationId,
+            dataNascimento: {
+              gte: new Date(new Date().getFullYear(), mesInfo.mes - 1, 1),
+              lt: new Date(new Date().getFullYear(), mesInfo.mes, 1),
+            },
+          },
+        },
+      });
 
       // Contar envios pendentes para este mês
-      const pendentesResult = await this.prisma.$queryRaw<[{ count: bigint }]>`
-        SELECT COUNT(*) as count FROM envios_brinde eb
-        JOIN colaboradores c ON eb.colaborador_id = c.id
-        WHERE c.organization_id = ${organizationId}
-        AND eb.ano_aniversario = ${anoConsulta}
-        AND eb.status IN ('PENDENTE', 'PRONTO_PARA_ENVIO')
-        AND EXTRACT(MONTH FROM c.data_nascimento) = ${mesInfo.mes}
-      `;
-
-      const pendentes = Number(pendentesResult[0].count);
+      const pendentes = await this.prisma.envioBrinde.count({
+        where: {
+          anoAniversario: anoConsulta,
+          status: {
+            in: ['PENDENTE', 'PRONTO_PARA_ENVIO'],
+          },
+          colaborador: {
+            organizationId,
+            dataNascimento: {
+              gte: new Date(new Date().getFullYear(), mesInfo.mes - 1, 1),
+              lt: new Date(new Date().getFullYear(), mesInfo.mes, 1),
+            },
+          },
+        },
+      });
 
       estatisticas.push({
         mes: mesInfo.mes,

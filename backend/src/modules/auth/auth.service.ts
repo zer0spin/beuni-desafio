@@ -90,8 +90,9 @@ export class AuthService {
       throw new ConflictException('Usuário com este e-mail já existe');
     }
 
-    // Hash password
-    const saltRounds = 10;
+    // SECURITY: Hash password with 12 salt rounds (OWASP recommendation)
+    // Salt rounds: 12 provides strong security while maintaining acceptable performance
+    const saltRounds = 12;
     const senhaHash = await bcrypt.hash(registerDto.password, saltRounds);
 
       // Create organization and user in a transaction
