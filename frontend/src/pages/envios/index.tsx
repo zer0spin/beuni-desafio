@@ -6,6 +6,76 @@ import { toast } from 'react-hot-toast';
 import Layout from '@/components/Layout';
 import api, { getUser } from '@/lib/api';
 
+// Business days utilities (frontend-only) mirroring backend logic
+// NOTE: We cannot import backend services into the frontend, so we replicate
+// a minimal, deterministic subset of the holiday/business-day rules here to
+// compute "business days left" for display purposes only. We DO NOT mutate
+// any persisted timestamps; this is purely a UI calculation.
+const FIXED_HOLIDAYS = [
+  '01-01', // Confraternização Universal
+  '04-21', // Tiradentes
+  '05-01', // Dia do Trabalho
+  '09-07', // Independência do Brasil
+  '10-12', // Nossa Senhora Aparecida
+  '11-02', // Finados
+  '11-15', // Proclamação da República
+  '11-20', // Consciência Negra (national holiday since 2024)
+  '12-25', // Natal
+];
+
+// Movable holidays by year, mirroring backend HolidaysService (subset used by UI)
+const MOVABLE_HOLIDAYS_BY_YEAR: Record<number, string[]> = {
+  2024: ['2024-02-12', '2024-02-13', '2024-03-29', '2024-03-31', '2024-05-30'],
+  2025: ['2025-03-03', '2025-03-04', '2025-04-18', '2025-04-20', '2025-06-19'],
+  2026: ['2026-02-16', '2026-02-17', '2026-04-03', '2026-04-05', '2026-06-04'],
+};
+
+function ymd(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+function isHoliday(date: Date): boolean {
+  const year = date.getFullYear();
+  const monthDay = ymd(date).slice(5); // MM-DD
+  if (FIXED_HOLIDAYS.includes(monthDay)) return true;
+  const movable = MOVABLE_HOLIDAYS_BY_YEAR[year] || [];
+  return movable.includes(ymd(date));
+}
+
+function isWeekend(date: Date): boolean {
+  const dow = date.getDay();
+  return dow === 0 || dow === 6; // Sunday or Saturday
+}
+
+function isBusinessDay(date: Date): boolean {
+  return !isWeekend(date) && !isHoliday(date);
+}
+
+function addDaysLocal(date: Date, days: number): Date {
+  const copy = new Date(date);
+  copy.setDate(copy.getDate() + days);
+  copy.setHours(0, 0, 0, 0);
+  return copy;
+}
+
+// Counts business days between two dates (inclusive of end, exclusive of start)
+// i.e., from (start + 1 day) up to end
+function countBusinessDaysBetween(startDate: Date, endDate: Date): number {
+  if (endDate < startDate) return 0;
+  let count = 0;
+  let cur = addDaysLocal(startDate, 1);
+  const end = new Date(endDate);
+  end.setHours(0, 0, 0, 0);
+  while (cur <= end) {
+    if (isBusinessDay(cur)) count++;
+    cur = addDaysLocal(cur, 1);
+  }
+  return count;
+}
+
 interface EnvioBrinde {
   id: string;
   colaboradorId: string;
@@ -112,7 +182,10 @@ export default function EnviosPage() {
     }
   };
 
-  // Retorna informações de prazo sempre SEM alterar dados no backend
+  // Returns deadline info for UI ONLY (no backend mutation)
+  // - businessDaysUntilBirthday: business days left from today until birthday (exclusive of today)
+  // - passouAniversario: whether birthday already passed
+  // - dataGatilho: ideal deadline (7 business days before birthday) if provided by backend
   const getPrazoInfo = (envio: EnvioBrinde) => {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
@@ -121,15 +194,17 @@ export default function EnviosPage() {
     const dataAniversario = new Date(envio.anoAniversario, dataNascimento.getMonth(), dataNascimento.getDate());
     dataAniversario.setHours(0, 0, 0, 0);
 
-    const diasParaAniversario = Math.floor((dataAniversario.getTime() - hoje.getTime()) / (1000 * 60 * 60 * 24));
-    const passouAniversario = diasParaAniversario < 0;
+    const passouAniversario = dataAniversario.getTime() < hoje.getTime();
+    const businessDaysUntilBirthday = passouAniversario
+      ? 0
+      : countBusinessDaysBetween(hoje, dataAniversario);
 
-    // Usado apenas para sinalização visual do prazo ideal de envio (7 dias úteis antes)
+    // Only for visual guidance about the ideal deadline (7 business days before)
     const dataGatilho = envio.dataGatilhoEnvio ? new Date(envio.dataGatilhoEnvio) : null;
     if (dataGatilho) dataGatilho.setHours(0, 0, 0, 0);
     const passouGatilho = dataGatilho ? hoje.getTime() > dataGatilho.getTime() : false;
 
-    return { diasParaAniversario, passouAniversario, passouGatilho, dataGatilho } as const;
+    return { businessDaysUntilBirthday, passouAniversario, passouGatilho, dataGatilho } as const;
   };
 
   const getStatusConfig = (status: string) => {
@@ -262,7 +337,7 @@ export default function EnviosPage() {
               .map((envio) => {
               const statusConfig = getStatusConfig(envio.status);
               const StatusIcon = statusConfig.icon;
-              const { diasParaAniversario, passouAniversario, passouGatilho, dataGatilho } = getPrazoInfo(envio);
+              const { businessDaysUntilBirthday, passouAniversario, passouGatilho, dataGatilho } = getPrazoInfo(envio);
 
               return (
                 <div
@@ -334,7 +409,7 @@ export default function EnviosPage() {
                       </div>
                     </div>
 
-                    {/* Prazo / Datas - lógica visual revisada */}
+                    {/* Deadline / Dates - visual logic (business-day aware) */}
                     {envio.status === 'ENTREGUE' ? (
                       <div className="flex items-center space-x-2 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
                         <CheckCircle className="h-4 w-4 text-emerald-600 flex-shrink-0" />
@@ -365,24 +440,24 @@ export default function EnviosPage() {
                       </div>
                     ) : (
                       (() => {
-                        // Para PENDENTE/PRONTO_PARA_ENVIO, exibimos contagem regressiva até o ANIVERSÁRIO
+                        // For PENDENTE/PRONTO_PARA_ENVIO, show countdown to BIRTHDAY in business days
                         const bgClass = passouAniversario
                           ? 'bg-red-50 border border-red-200'
-                          : diasParaAniversario === 0
+                          : businessDaysUntilBirthday === 0
                           ? 'bg-red-50 border border-red-200'
-                          : diasParaAniversario <= 2
+                          : businessDaysUntilBirthday <= 2
                           ? 'bg-orange-50 border border-orange-200'
-                          : diasParaAniversario <= 5
+                          : businessDaysUntilBirthday <= 5
                           ? 'bg-yellow-50 border border-yellow-200'
                           : 'bg-blue-50 border border-blue-200';
 
                         const textTone = passouAniversario
                           ? { small: 'text-red-700', big: 'text-red-900' }
-                          : diasParaAniversario === 0
+                          : businessDaysUntilBirthday === 0
                           ? { small: 'text-red-700', big: 'text-red-900' }
-                          : diasParaAniversario <= 2
+                          : businessDaysUntilBirthday <= 2
                           ? { small: 'text-orange-700', big: 'text-orange-900' }
-                          : diasParaAniversario <= 5
+                          : businessDaysUntilBirthday <= 5
                           ? { small: 'text-yellow-700', big: 'text-yellow-900' }
                           : { small: 'text-blue-700', big: 'text-blue-900' };
 
@@ -392,11 +467,11 @@ export default function EnviosPage() {
                               <AlertCircle className="h-4 w-4 flex-shrink-0 text-red-600" />
                             ) : (
                               <Clock className={`h-4 w-4 flex-shrink-0 ${
-                                diasParaAniversario === 0
+                                businessDaysUntilBirthday === 0
                                   ? 'text-red-600'
-                                  : diasParaAniversario <= 2
+                                  : businessDaysUntilBirthday <= 2
                                   ? 'text-orange-600'
-                                  : diasParaAniversario <= 5
+                                  : businessDaysUntilBirthday <= 5
                                   ? 'text-yellow-600'
                                   : 'text-blue-600'
                               }`} />
@@ -405,16 +480,16 @@ export default function EnviosPage() {
                               <p className={`text-xs font-semibold uppercase ${textTone.small}`}>
                                 {passouAniversario
                                   ? 'ATRASADO'
-                                  : diasParaAniversario === 0
+                                  : businessDaysUntilBirthday === 0
                                   ? 'ÚLTIMO DIA!'
                                   : 'FALTAM'}
                               </p>
                               <p className={`text-sm font-bold truncate ${textTone.big}`}>
                                 {passouAniversario
-                                  ? `${Math.abs(diasParaAniversario)} dias atrás`
-                                  : diasParaAniversario === 0
+                                  ? '—'
+                                  : businessDaysUntilBirthday === 0
                                   ? 'Hoje!'
-                                  : `${diasParaAniversario} dias`}
+                                  : `${businessDaysUntilBirthday} dias úteis`}
                               </p>
                               {dataGatilho && (
                                 <p className="text-[11px] text-beuni-text/70 mt-0.5">
@@ -425,15 +500,7 @@ export default function EnviosPage() {
                           </div>
                         );
                       })()
-                    ) : (
-                      <div className="flex items-center space-x-2 bg-beuni-cream rounded-lg px-3 py-2">
-                        <Clock className="h-4 w-4 text-beuni-orange-600 flex-shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs text-beuni-text/60 font-semibold uppercase">Prazo</p>
-                          <p className="text-sm font-bold text-beuni-text truncate">-</p>
-                        </div>
-                      </div>
-                    )
+                    )}
                   </div>
                 </div>
               );
