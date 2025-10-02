@@ -68,6 +68,8 @@ model Colaborador {
   enviosBrinde EnvioBrinde[]
 
   @@map("colaboradores")
+  @@index([organizationId])
+  @@index([organizationId, dataNascimento])
 }
 
 model Endereco {
@@ -86,6 +88,7 @@ model Endereco {
   colaborador Colaborador?
 
   @@map("enderecos")
+  @@index([cep])
 }
 
 // ============================================================================
@@ -118,6 +121,9 @@ model EnvioBrinde {
 
   // Índice composto para garantir unicidade: um colaborador só pode ter um envio por ano
   @@unique([colaboradorId, anoAniversario])
+  @@index([anoAniversario])
+  @@index([status])
+  @@index([colaboradorId])
   @@map("envios_brinde")
 }
 

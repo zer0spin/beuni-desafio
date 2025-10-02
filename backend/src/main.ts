@@ -1,12 +1,15 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
+import cookieParser from 'cookie-parser';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { CsrfGuard } from './common/guards/csrf.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser());
 
   // SECURITY: Global exception filter to prevent information disclosure
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -43,7 +46,7 @@ async function bootstrap() {
     origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token'],
     exposedHeaders: ['X-Total-Count'],
     maxAge: 3600, // Cache preflight requests for 1 hour
   });
@@ -80,6 +83,8 @@ async function bootstrap() {
   });
 
   const port = process.env.PORT || 3001;
+  // Register global CSRF guard
+  app.useGlobalGuards(new CsrfGuard());
   await app.listen(port);
 
   console.log('🚀 Beuni Backend API rodando em:', `http://localhost:${port}`);

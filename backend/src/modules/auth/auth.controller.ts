@@ -80,6 +80,16 @@ export class AuthController {
       path: '/',
     });
 
+    // CSRF: set non-httpOnly cookie with CSRF token that mirrors server-side token check
+    const csrfToken = authResponse.csrf_token || Math.random().toString(36).slice(2);
+    response.cookie('csrf_token', csrfToken, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
     // Return user data only (no token in response body)
     return { user: authResponse.user };
   }
@@ -129,6 +139,16 @@ export class AuthController {
       path: '/',
     });
 
+    // CSRF: set token cookie
+    const csrfToken = authResponse.csrf_token || Math.random().toString(36).slice(2);
+    response.cookie('csrf_token', csrfToken, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
     // Return user data only (no token in response body)
     return { user: authResponse.user };
   }
@@ -145,6 +165,13 @@ export class AuthController {
     // Clear httpOnly cookie
     response.clearCookie('beuni_token', {
       httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+    });
+
+    response.clearCookie('csrf_token', {
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       path: '/',
