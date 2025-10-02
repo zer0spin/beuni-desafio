@@ -51,7 +51,7 @@ export const mockColaboradorWithEnvioBrinde = {
   ],
 };
 
-export const mockCreateColaboradorDto = {
+export const createColaboradorDto = {
   nome_completo: 'Maria Santos',
   data_nascimento: '1990-06-15',
   cargo: 'Desenvolvedora Sênior',
@@ -63,7 +63,7 @@ export const mockCreateColaboradorDto = {
   },
 };
 
-export const mockUpdateColaboradorDto = {
+export const updateColaboradorDto = {
   nome_completo: 'Maria Santos Updated',
   cargo: 'Desenvolvedora Principal',
   departamento: 'Tecnologia',
@@ -73,6 +73,10 @@ export const mockUpdateColaboradorDto = {
     complemento: 'Sala 200',
   },
 };
+
+// Mantendo compatibilidade
+export const mockCreateColaboradorDto = createColaboradorDto;
+export const mockUpdateColaboradorDto = updateColaboradorDto;
 
 export const mockAniversarianteProximo = {
   ...mockColaborador,

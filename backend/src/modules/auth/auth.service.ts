@@ -214,6 +214,10 @@ export class AuthService {
       };
     } catch (error) {
       console.error('Erro ao atualizar perfil:', error);
+      // Re-throw known exceptions instead of wrapping them
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       throw new InternalServerErrorException('Erro interno do servidor');
     }
   }

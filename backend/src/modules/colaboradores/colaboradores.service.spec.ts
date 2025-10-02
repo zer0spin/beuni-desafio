@@ -1,11 +1,10 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 
 import { ColaboradoresService } from './colaboradores.service';
 import { PrismaService } from '../../shared/prisma.service';
 import { CepService } from '../cep/cep.service';
-import { mockPrismaService } from '../../../test/mocks/prisma.mock';
+import { createMockPrismaService } from '../../../test/mocks/prisma.mock';
 import { mockColaborador, mockEndereco, createColaboradorDto, updateColaboradorDto } from '../../../test/fixtures/colaborador.fixture';
 import { CreateColaboradorDto } from './dto/create-colaborador.dto';
 import { UpdateColaboradorDto } from './dto/update-colaborador.dto';
@@ -20,31 +19,24 @@ const mockCepService = {
 
 describe('ColaboradoresService', () => {
   let service: ColaboradoresService;
-  let prisma: typeof mockPrismaService;
+  let prisma: ReturnType<typeof createMockPrismaService>;
   let cepService: typeof mockCepService;
 
   const organizationId = 'org-123';
 
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.clearAllMocks();
+    
+    // Create fresh mocks for each test
+    prisma = createMockPrismaService();
+    cepService = {
+      consultarCep: vi.fn(),
+      limparCache: vi.fn(),
+      obterEstatisticasCache: vi.fn(),
+    };
 
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        ColaboradoresService,
-        {
-          provide: PrismaService,
-          useValue: mockPrismaService,
-        },
-        {
-          provide: CepService,
-          useValue: mockCepService,
-        },
-      ],
-    }).compile();
-
-    service = module.get<ColaboradoresService>(ColaboradoresService);
-    prisma = module.get(PrismaService);
-    cepService = module.get(CepService);
+    // Create the service directly with mocks to avoid NestJS DI issues
+    service = new ColaboradoresService(prisma as any, cepService as any);
   });
 
   describe('create', () => {
@@ -450,6 +442,15 @@ describe('ColaboradoresService', () => {
         endereco: mockEndereco,
       };
 
+      const mockCepData = {
+        cep: '01310100',
+        logradouro: 'Avenida Paulista',
+        bairro: 'Bela Vista',
+        cidade: 'São Paulo',
+        uf: 'SP',
+      };
+
+      cepService.consultarCep.mockResolvedValue(mockCepData);
       prisma.colaborador.findFirst.mockResolvedValue(existingColaborador);
       prisma.colaborador.update.mockResolvedValue({
         ...existingColaborador,
@@ -515,7 +516,7 @@ describe('ColaboradoresService', () => {
       await service.update(id, dto, organizationId);
 
       // Assert
-      expect(cepService.consultarCep).toHaveBeenCalledWith(dto.endereco.cep);
+      expect(cepService.consultarCep).toHaveBeenCalledWith(dto.endereco!.cep);
       expect(prisma.colaborador.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
@@ -620,8 +621,10 @@ describe('ColaboradoresService', () => {
     it('should filter by year if provided', async () => {
       // Arrange
       const ano = 2024;
-      prisma.colaborador.groupBy.mockResolvedValue([]);
-      prisma.envioBrinde.count.mockResolvedValue(0);
+      prisma.colaborador.groupBy.mockResolvedValue([
+        { departamento: 'Tecnologia', _count: { departamento: 5 } },
+      ]);
+      prisma.envioBrinde.count.mockResolvedValue(2);
 
       // Act
       await service.getEstatisticasDepartamentos(organizationId, ano);
@@ -639,8 +642,10 @@ describe('ColaboradoresService', () => {
     it('should use current year if year not provided', async () => {
       // Arrange
       const currentYear = new Date().getFullYear();
-      prisma.colaborador.groupBy.mockResolvedValue([]);
-      prisma.envioBrinde.count.mockResolvedValue(0);
+      prisma.colaborador.groupBy.mockResolvedValue([
+        { departamento: 'Marketing', _count: { departamento: 3 } },
+      ]);
+      prisma.envioBrinde.count.mockResolvedValue(1);
 
       // Act
       await service.getEstatisticasDepartamentos(organizationId);
