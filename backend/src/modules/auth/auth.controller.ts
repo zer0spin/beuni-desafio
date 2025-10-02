@@ -164,15 +164,16 @@ export class AuthController {
     }
 
     const imageUrl = await this.uploadService.uploadProfileImage(file, req.user.id);
-    
+
     // Atualizar o usuário com a nova URL da imagem
-    const updatedUser = await this.authService.updateProfile(req.user.id, {
+    const result = await this.authService.updateProfile(req.user.id, {
       imagemPerfil: imageUrl,
     });
 
     return {
       imageUrl,
-      user: updatedUser,
+      user: result.user,
+      message: result.message,
     };
   }
 
