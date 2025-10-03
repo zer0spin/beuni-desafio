@@ -317,74 +317,189 @@ export default function HomePage() {
       </section>
 
       {/* Seção Cases - "Veja o que fazemos" */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-gradient-to-br from-beuni-cream to-white">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-12">
-            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">CASES</span>
-            <h2 className="text-4xl lg:text-5xl font-bold text-beuni-text mb-4 mt-3">
+          <div className="text-center mb-12">
+            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide animate-fade-up">CASES</span>
+            <h2 className="text-4xl lg:text-5xl font-bold text-beuni-text mb-4 mt-3 animate-fade-up" style={{ ['--delay' as any]: '100ms' }}>
               Veja o que fazemos
             </h2>
-            <p className="text-lg lg:text-xl text-beuni-text/80 max-w-3xl leading-relaxed">
-              Atendemos a todas as suas necessidades de brindes.
+            <p className="text-lg lg:text-xl text-beuni-text/80 max-w-3xl mx-auto leading-relaxed animate-fade-up" style={{ ['--delay' as any]: '200ms' }}>
+              Atendemos a todas as suas necessidades de brindes corporativos com soluções personalizadas e inovadoras.
             </p>
           </div>
 
-          {/* Grid de imagens de cases com produtos reais */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-8">
+          {/* Grid de cases mais elaborado */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 stagger">
             {[
-              { icon: Gift, bg: 'from-orange-100 to-orange-200', text: 'Kits Personalizados' },
-              { icon: Users, bg: 'from-blue-100 to-blue-200', text: 'Eventos Corporativos' },
-              { icon: Package, bg: 'from-green-100 to-green-200', text: 'Brindes Sustentáveis' },
-              { icon: Star, bg: 'from-yellow-100 to-yellow-200', text: 'Presentes VIP' },
-              { icon: Heart, bg: 'from-pink-100 to-pink-200', text: 'Reconhecimento' },
-              { icon: Award, bg: 'from-purple-100 to-purple-200', text: 'Celebrações' }
+              { 
+                icon: Gift, 
+                title: 'Kits Personalizados',
+                desc: 'Soluções completas para sua marca',
+                gradient: 'from-orange-400 to-red-500',
+                bgPattern: 'from-orange-50 to-orange-100'
+              },
+              { 
+                icon: Users, 
+                title: 'Eventos Corporativos',
+                desc: 'Brindes especiais para cada ocasião',
+                gradient: 'from-blue-400 to-indigo-500',
+                bgPattern: 'from-blue-50 to-blue-100'
+              },
+              { 
+                icon: Package, 
+                title: 'Brindes Sustentáveis',
+                desc: 'Produtos eco-friendly e responsáveis',
+                gradient: 'from-green-400 to-emerald-500',
+                bgPattern: 'from-green-50 to-green-100'
+              },
+              { 
+                icon: Star, 
+                title: 'Presentes VIP',
+                desc: 'Itens exclusivos para clientes especiais',
+                gradient: 'from-yellow-400 to-orange-500',
+                bgPattern: 'from-yellow-50 to-yellow-100'
+              },
+              { 
+                icon: Heart, 
+                title: 'Reconhecimento',
+                desc: 'Valorize sua equipe com brindes únicos',
+                gradient: 'from-pink-400 to-rose-500',
+                bgPattern: 'from-pink-50 to-pink-100'
+              },
+              { 
+                icon: Award, 
+                title: 'Celebrações',
+                desc: 'Marcos importantes merecem presentes especiais',
+                gradient: 'from-purple-400 to-violet-500',
+                bgPattern: 'from-purple-50 to-purple-100'
+              }
             ].map((item, index) => (
               <div
                 key={index}
-                className="group aspect-square rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer transform hover:-translate-y-2"
+                className={`group relative bg-gradient-to-br ${item.bgPattern} rounded-3xl p-8 hover-lift animate-bounce-in border border-white/50 shadow-lg hover:shadow-2xl`}
+                style={{ ['--delay' as any]: `${index * 150}ms` }}
               >
-                <div className={`w-full h-full bg-gradient-to-br ${item.bg} flex flex-col items-center justify-center p-4 transition-transform duration-300 group-hover:scale-110`}>
-                  <item.icon className="h-10 w-10 lg:h-12 lg:w-12 text-beuni-orange-600 mb-2" />
-                  <span className="text-xs lg:text-sm font-semibold text-beuni-text text-center">{item.text}</span>
+                {/* Ícone com gradiente */}
+                <div className={`w-16 h-16 bg-gradient-to-br ${item.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:animate-pulse-glow`}>
+                  <item.icon className="h-8 w-8 text-white" />
                 </div>
+                
+                {/* Conteúdo */}
+                <h3 className="text-xl font-bold text-beuni-text mb-3 group-hover:text-beuni-orange-600 transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-beuni-text/70 leading-relaxed">
+                  {item.desc}
+                </p>
+
+                {/* Elemento decorativo */}
+                <div className="absolute top-4 right-4 w-12 h-12 bg-white/20 rounded-full opacity-50 group-hover:opacity-100 transition-opacity"></div>
               </div>
             ))}
+          </div>
+
+          {/* CTA da seção */}
+          <div className="text-center mt-12 animate-fade-up" style={{ ['--delay' as any]: '800ms' }}>
+            <button className="px-8 py-4 bg-beuni-orange-500 text-white text-lg font-semibold rounded-2xl hover:bg-beuni-orange-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+              Ver todos os nossos cases
+            </button>
           </div>
         </div>
       </section>
 
       {/* Seção Kits (grid de 4) */}
-      <section className="py-20 bg-white">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-white relative overflow-hidden">
+        {/* Elementos decorativos de fundo */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-beuni-orange-500 rounded-full"></div>
+          <div className="absolute bottom-10 right-10 w-24 h-24 bg-beuni-brown-600 rounded-full"></div>
+          <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-beuni-orange-400 rounded-full"></div>
+        </div>
+        
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="mb-12 text-center">
-            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">KITS</span>
-            <h2 className="text-4xl lg:text-5xl font-bold text-beuni-text mb-4 mt-3">Escolha o tipo de kit</h2>
-            <p className="text-lg text-beuni-text/80">Selecione uma categoria para explorar opções e personalizações.</p>
+            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide animate-fade-up">KITS</span>
+            <h2 className="text-4xl lg:text-5xl font-bold text-beuni-text mb-4 mt-3 animate-slide-in-left" style={{ ['--delay' as any]: '150ms' }}>
+              Escolha o tipo de kit
+            </h2>
+            <p className="text-lg text-beuni-text/80 animate-slide-in-right" style={{ ['--delay' as any]: '300ms' }}>
+              Selecione uma categoria para explorar opções e personalizações exclusivas.
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger">
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 stagger">
             {[
-              { title: 'Kit para Colaboradores', image: '/images/kits/kit-colaboradores.png', href: 'https://beuni.com.br/contato/' },
-              { title: 'Kit para Eventos', image: '/images/kits/kit-eventos.png', href: 'https://beuni.com.br/contato/' },
-              { title: 'Kit para Clientes', image: '/images/kits/kit-clientes.png', href: 'https://beuni.com.br/contato/' },
-              { title: 'Kit para Diversos', image: '/images/kits/kit-diversos.png', href: 'https://beuni.com.br/contato/' },
+              { 
+                title: 'Kit para Colaboradores', 
+                image: '/images/kits/kit-colaboradores.png', 
+                href: 'https://beuni.com.br/contato/',
+                color: 'from-blue-500 to-indigo-600',
+                desc: 'Fortaleça o engajamento da sua equipe'
+              },
+              { 
+                title: 'Kit para Eventos', 
+                image: '/images/kits/kit-eventos.png', 
+                href: 'https://beuni.com.br/contato/',
+                color: 'from-purple-500 to-pink-600',
+                desc: 'Momentos especiais merecem brindes únicos'
+              },
+              { 
+                title: 'Kit para Clientes', 
+                image: '/images/kits/kit-clientes.png', 
+                href: 'https://beuni.com.br/contato/',
+                color: 'from-green-500 to-teal-600',
+                desc: 'Impressione e fidelize seus clientes'
+              },
+              { 
+                title: 'Kit para Diversos', 
+                image: '/images/kits/kit-diversos.png', 
+                href: 'https://beuni.com.br/contato/',
+                color: 'from-orange-500 to-red-600',
+                desc: 'Soluções versáteis para toda ocasião'
+              },
             ].map((k, idx) => (
               <div
                 key={idx}
-                className="bg-white border border-beuni-orange-100 rounded-2xl shadow-sm hover:shadow-lg transition-all overflow-hidden flex flex-col transform hover:-translate-y-1.5 animate-zoom-in"
-                style={{ ['--delay' as any]: `${idx * 100}ms` }}
+                className="group relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden hover-lift animate-float-up border border-gray-100"
+                style={{ ['--delay' as any]: `${idx * 150}ms` }}
               >
-                <div className="relative aspect-[4/3]
-                ">
-                  <Image src={k.image} alt={k.title} fill className="object-cover" />
+                {/* Imagem com efeito overlay */}
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <Image 
+                    src={k.image} 
+                    alt={k.title} 
+                    fill 
+                    className="object-cover transition-transform duration-500 group-hover:scale-110" 
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
-                <div className="p-5 flex-1 flex flex-col">
-                  <h3 className="font-bold text-beuni-text mb-2">{k.title}</h3>
+                
+                {/* Conteúdo do card */}
+                <div className="p-6 flex-1 flex flex-col">
+                  <h3 className="text-xl font-bold text-beuni-text mb-2 group-hover:text-beuni-orange-600 transition-colors">
+                    {k.title}
+                  </h3>
+                  <p className="text-sm text-beuni-text/70 mb-4 leading-relaxed">
+                    {k.desc}
+                  </p>
+                  
                   <div className="mt-auto">
-                    <a href={k.href} target="_blank" rel="noreferrer" className="inline-flex items-center px-4 py-2 bg-beuni-orange-500 text-white rounded-lg font-semibold hover:bg-beuni-orange-600 transition-colors">
+                    <a 
+                      href={k.href} 
+                      target="_blank" 
+                      rel="noreferrer" 
+                      className={`inline-flex items-center px-6 py-3 bg-gradient-to-r ${k.color} text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5 group-hover:animate-pulse-glow`}
+                    >
                       Ver kits
-                      <ArrowRight className="h-4 w-4 ml-2" />
+                      <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
                     </a>
                   </div>
+                </div>
+
+                {/* Elemento decorativo */}
+                <div className="absolute top-4 right-4 w-8 h-8 bg-white/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+                  <div className={`w-3 h-3 bg-gradient-to-r ${k.color} rounded-full`}></div>
                 </div>
               </div>
             ))}
@@ -392,69 +507,52 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção "O que podemos fazer para você?" - reduzida */}
-      <section id="solucoes" className="py-16 bg-beuni-cream">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">TIPOS DE BRINDES</span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-3 mt-2">
+      {/* Seção "O que podemos fazer para você?" - layout moderno e compacto */}
+      <section id="solucoes" className="py-16 bg-gradient-to-br from-beuni-cream to-beuni-orange-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <span className="inline-block px-3 py-1 bg-beuni-orange-100 text-beuni-orange-600 font-semibold text-xs uppercase tracking-wide rounded-full mb-4">
+              TIPOS DE BRINDES
+            </span>
+            <h2 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-3">
               O que podemos fazer para você?
             </h2>
-            <p className="text-base lg:text-lg text-beuni-text/80 max-w-4xl leading-relaxed">
-              Uma gestão eficiente de brindes é essencial para qualquer organização. Na beuni, desenvolvemos uma plataforma que elimina a complexidade da compra, armazenamento e envio de brindes personalizados, oferecendo total visibilidade e controle.
+            <p className="text-base text-beuni-text/70 max-w-2xl mx-auto">
+              Soluções completas de brindes personalizados com tecnologia e design únicos.
             </p>
           </div>
 
-          {/* Sistema de abas */}
-          <div className="flex flex-wrap justify-center gap-2.5 mb-8">
-            {solutionTabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as SolutionKey)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all duration-200 text-sm ${
-                  activeTab === tab.id
-                    ? 'bg-beuni-orange-500 text-white shadow-lg'
-                    : 'bg-white text-beuni-text hover:bg-beuni-orange-50 border border-beuni-orange-200'
-                }`}
+          {/* Grid de soluções moderno */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {[
+              { icon: Users, title: 'Colaboradores', desc: 'Engaje sua equipe' },
+              { icon: Star, title: 'Clientes', desc: 'Fidelize relacionamentos' },
+              { icon: Calendar, title: 'Eventos', desc: 'Momentos especiais' },
+              { icon: Gift, title: 'Personalizados', desc: 'Brindes únicos' },
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                className="group bg-white/70 backdrop-blur-sm rounded-2xl p-6 hover:bg-white hover:shadow-xl transition-all duration-300 border border-white/20 animate-fade-up"
+                style={{ ['--delay' as any]: `${idx * 100}ms` }}
               >
-                <tab.icon className="h-4 w-4" />
-                <span>{tab.label}</span>
-              </button>
+                <div className="w-12 h-12 bg-gradient-to-br from-beuni-orange-400 to-beuni-orange-600 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <item.icon className="h-6 w-6 text-white" />
+                </div>
+                <h3 className="font-bold text-beuni-text mb-2">{item.title}</h3>
+                <p className="text-sm text-beuni-text/70">{item.desc}</p>
+              </div>
             ))}
           </div>
 
-          {/* Cards de solução */}
-          <div className="bg-white rounded-3xl p-6 shadow-lg border border-beuni-orange-100">
-            <div className="grid md:grid-cols-2 gap-8 items-center">
-              {/* Coluna de Texto */}
-              <div>
-                <h3 className="text-2xl lg:text-3xl font-bold text-beuni-text mb-3">
-                  {solutions[activeTab].title}
-                </h3>
-                <p className="text-base lg:text-lg text-beuni-text/80 mb-5">
-                  {solutions[activeTab].description}
-                </p>
-                <div className="grid gap-3">
-                  {solutions[activeTab].features.map((feature, index) => (
-                    <div key={index} className="flex items-center space-x-3">
-                      <CheckCircle className="h-5 w-5 text-beuni-orange-500 flex-shrink-0" />
-                      <span className="text-beuni-text">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Coluna de Imagem */}
-              <div className="rounded-2xl overflow-hidden shadow-lg">
-                <Image
-                  src={solutions[activeTab].image}
-                  alt={solutions[activeTab].title}
-                  width={800}
-                  height={400}
-                  className="w-full h-auto"
-                />
-              </div>
-            </div>
+          {/* CTA centralizado */}
+          <div className="text-center">
+            <button
+              onClick={() => router.push('/login')}
+              className="inline-flex items-center px-8 py-4 bg-beuni-brown-800 text-white font-semibold rounded-2xl hover:bg-beuni-brown-900 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              Explore todas as soluções
+              <ArrowRight className="h-5 w-5 ml-2" />
+            </button>
           </div>
         </div>
       </section>
@@ -507,92 +605,272 @@ export default function HomePage() {
       </section>
 
       {/* Seção Integrações */}
-      <section className="py-20 bg-beuni-cream">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-3xl p-8 lg:p-12 shadow-xl border border-beuni-orange-100">
-            <div className="text-center mb-10">
-              <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">INTEGRAÇÕES</span>
-              <h2 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-4 mt-2">
-                Melhore sua experiência com integrações.
-              </h2>
-              <p className="text-base lg:text-lg text-beuni-text/80 max-w-3xl mx-auto">
-                Integramos a beuni às mais diversas plataformas do mercado para permitir que os processos de envio aconteçam de forma automática e personalizada, tudo para tornar a experiência ainda melhor.
-              </p>
+      <section className="py-24 bg-gradient-to-br from-beuni-cream via-white to-beuni-cream relative overflow-hidden">
+        {/* Elementos de fundo animados */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-40 h-40 bg-beuni-orange-400 rounded-full animate-bounce" style={{animationDuration: '3s'}}></div>
+          <div className="absolute bottom-20 right-20 w-32 h-32 bg-beuni-brown-400 rounded-full animate-bounce" style={{animationDuration: '4s', animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-beuni-orange-300 rounded-full animate-bounce" style={{animationDuration: '2.5s', animationDelay: '0.5s'}}></div>
+        </div>
+
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          {/* Header da seção */}
+          <div className="text-center mb-16">
+            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide animate-fade-up">INTEGRAÇÕES</span>
+            <h2 className="text-4xl lg:text-5xl font-bold text-beuni-text mb-6 mt-3 animate-slide-in-left" style={{ ['--delay' as any]: '150ms' }}>
+              Conecte-se com suas ferramentas favoritas
+            </h2>
+            <p className="text-lg lg:text-xl text-beuni-text/80 max-w-4xl mx-auto leading-relaxed animate-slide-in-right" style={{ ['--delay' as any]: '300ms' }}>
+              Integramos a beuni às principais plataformas do mercado para automatizar seus processos de envio e personalizar cada experiência.
+            </p>
+          </div>
+
+          {/* Container principal com design mais elaborado */}
+          <div className="bg-white rounded-4xl p-12 shadow-2xl border-2 border-beuni-orange-100 relative overflow-hidden animate-zoom-in" style={{ ['--delay' as any]: '450ms' }}>
+            {/* Padrão de fundo sutil */}
+            <div className="absolute inset-0 opacity-5">
+              <div className="grid grid-cols-8 gap-4 h-full">
+                {Array.from({length: 32}).map((_, i) => (
+                  <div key={i} className="bg-beuni-orange-500 rounded-full w-2 h-2"></div>
+                ))}
+              </div>
             </div>
 
-            {/* Grid de integrações com ícones e nomes */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 stagger">
+            {/* Grid de integrações mais elaborado */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 mb-12 stagger relative">
               {[
-                { name: 'Salesforce', icon: '☁️', color: 'from-blue-50 to-cyan-50' },
-                { name: 'HubSpot', icon: '🎯', color: 'from-orange-50 to-red-50' },
-                { name: 'Slack', icon: '💬', color: 'from-purple-50 to-pink-50' },
-                { name: 'Zapier', icon: '⚡', color: 'from-orange-50 to-yellow-50' },
-                { name: 'Google Suite', icon: '🔧', color: 'from-green-50 to-blue-50' },
-                { name: 'Microsoft', icon: '🪟', color: 'from-blue-50 to-indigo-50' }
+                { 
+                  name: 'Salesforce', 
+                  icon: '☁️', 
+                  gradient: 'from-blue-500 to-cyan-500',
+                  desc: 'CRM Integration'
+                },
+                { 
+                  name: 'HubSpot', 
+                  icon: '🎯', 
+                  gradient: 'from-orange-500 to-red-500',
+                  desc: 'Marketing Hub'
+                },
+                { 
+                  name: 'Slack', 
+                  icon: '💬', 
+                  gradient: 'from-purple-500 to-pink-500',
+                  desc: 'Team Communication'
+                },
+                { 
+                  name: 'Zapier', 
+                  icon: '⚡', 
+                  gradient: 'from-orange-400 to-yellow-500',
+                  desc: 'Workflow Automation'
+                },
+                { 
+                  name: 'Google Suite', 
+                  icon: '🔧', 
+                  gradient: 'from-green-500 to-blue-500',
+                  desc: 'Productivity Tools'
+                },
+                { 
+                  name: 'Microsoft', 
+                  icon: '🪟', 
+                  gradient: 'from-blue-600 to-indigo-600',
+                  desc: 'Enterprise Solutions'
+                }
               ].map((integration, index) => (
                 <div
                   key={index}
-                  className={`group bg-gradient-to-br ${integration.color} rounded-xl p-6 flex flex-col items-center justify-center aspect-square hover:shadow-lg transition-all duration-300 cursor-pointer border border-beuni-orange-100 hover:border-beuni-orange-300 transform hover:-translate-y-1 animate-fade-up`}
-                  style={{ ['--delay' as any]: `${index * 90}ms` }}
+                  className="group relative bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 hover:shadow-2xl transition-all duration-500 cursor-pointer border-2 border-gray-100 hover:border-beuni-orange-300 hover-lift animate-bounce-in hover-glow"
+                  style={{ ['--delay' as any]: `${index * 120}ms` }}
                 >
-                  <div className={`text-4xl mb-3 transform group-hover:scale-110 transition-transform duration-300`}>
-                    {integration.icon}
+                  {/* Gradiente superior */}
+                  <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${integration.gradient} rounded-t-2xl`}></div>
+                  
+                  {/* Ícone principal */}
+                  <div className="flex flex-col items-center text-center">
+                    <div className={`w-16 h-16 bg-gradient-to-r ${integration.gradient} rounded-2xl flex items-center justify-center mb-4 group-hover:animate-pulse-glow transform group-hover:scale-110 transition-transform duration-300`}>
+                      <span className="text-2xl">{integration.icon}</span>
+                    </div>
+                    
+                    <h3 className="font-bold text-beuni-text mb-2 group-hover:text-beuni-orange-600 transition-colors">
+                      {integration.name}
+                    </h3>
+                    <p className="text-xs text-beuni-text/60 group-hover:text-beuni-text/80 transition-colors">
+                      {integration.desc}
+                    </p>
                   </div>
-                  <span className="text-xs lg:text-sm font-semibold text-beuni-text text-center">
-                    {integration.name}
-                  </span>
+
+                  {/* Elemento decorativo de canto */}
+                  <div className="absolute top-3 right-3 w-3 h-3 bg-beuni-orange-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-10 text-center">
-              <button className="px-6 py-3 bg-beuni-orange-500 text-white font-semibold rounded-xl hover:bg-beuni-orange-600 transition-all duration-200 shadow-md">
+            {/* Seção de conectores visuais */}
+            <div className="relative mb-12">
+              <div className="flex items-center justify-center">
+                <div className="flex items-center space-x-4 animate-fade-up" style={{ ['--delay' as any]: '800ms' }}>
+                  <div className="w-3 h-3 bg-beuni-orange-500 rounded-full animate-pulse"></div>
+                  <div className="w-16 h-0.5 bg-gradient-to-r from-beuni-orange-500 to-beuni-brown-500"></div>
+                  <div className="w-6 h-6 bg-gradient-to-r from-beuni-orange-500 to-beuni-brown-500 rounded-full flex items-center justify-center">
+                    <Zap className="w-3 h-3 text-white" />
+                  </div>
+                  <div className="w-16 h-0.5 bg-gradient-to-r from-beuni-brown-500 to-beuni-orange-500"></div>
+                  <div className="w-3 h-3 bg-beuni-brown-500 rounded-full animate-pulse" style={{animationDelay: '0.5s'}}></div>
+                </div>
+              </div>
+            </div>
+
+            {/* CTAs da seção */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fade-up" style={{ ['--delay' as any]: '1000ms' }}>
+              <button className="px-8 py-4 bg-gradient-to-r from-beuni-orange-500 to-beuni-brown-600 text-white text-lg font-semibold rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:scale-105">
                 Ver todas as integrações
               </button>
+              <button className="px-8 py-4 border-2 border-beuni-orange-500 text-beuni-orange-600 text-lg font-semibold rounded-2xl hover:bg-beuni-orange-50 transition-all duration-300">
+                Solicitar nova integração
+              </button>
             </div>
+          </div>
+
+          {/* Elementos decorativos externos */}
+          <div className="mt-12 grid grid-cols-3 gap-8 opacity-30">
+            <div className="h-0.5 bg-gradient-to-r from-transparent via-beuni-orange-300 to-transparent animate-fade-up" style={{ ['--delay' as any]: '1200ms' }}></div>
+            <div className="h-0.5 bg-gradient-to-r from-transparent via-beuni-brown-300 to-transparent animate-fade-up" style={{ ['--delay' as any]: '1300ms' }}></div>
+            <div className="h-0.5 bg-gradient-to-r from-transparent via-beuni-orange-300 to-transparent animate-fade-up" style={{ ['--delay' as any]: '1400ms' }}></div>
           </div>
         </div>
       </section>
 
-      {/* Seção Contato - grid de opções */}
-      <section className="py-20 bg-white">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">CONTATO</span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-3">Adeus tarefas manuais.</h2>
-            <p className="text-beuni-text/80 max-w-2xl mx-auto">Escolha como gostaria de entrar em contato com a gente.</p>
+      {/* Seção Contato - redesign completo */}
+      <section className="py-24 bg-gradient-to-br from-white via-beuni-cream to-white relative overflow-hidden">
+        {/* Elementos decorativos de fundo */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-20 w-32 h-32 bg-beuni-orange-400 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-40 h-40 bg-beuni-brown-400 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-beuni-orange-300 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          {/* Header impactante */}
+          <div className="text-center mb-16">
+            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide animate-fade-up">FALE CONOSCO</span>
+            <h2 className="text-4xl lg:text-6xl font-bold text-beuni-text mb-6 mt-3 animate-slide-in-left" style={{ ['--delay' as any]: '150ms' }}>
+              Adeus tarefas manuais
+            </h2>
+            <p className="text-lg lg:text-xl text-beuni-text/80 max-w-3xl mx-auto mb-8 animate-slide-in-right" style={{ ['--delay' as any]: '300ms' }}>
+              Escolha a forma mais conveniente para começar sua jornada com a beuni. Nossa equipe está pronta para transformar sua gestão de brindes.
+            </p>
+            
+            {/* Badge de resposta rápida */}
+            <div className="inline-flex items-center px-4 py-2 bg-white rounded-full shadow-lg border border-beuni-orange-200 animate-bounce-in" style={{ ['--delay' as any]: '450ms' }}>
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
+              <span className="text-sm font-semibold text-beuni-text">Respondemos em até 2 horas</span>
+            </div>
           </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
-            {[
-              { title: 'Marcar uma reunião', desc: 'Converse com nosso time', href: 'https://materiais.beuni.com.br/plataforma', icon: Calendar },
-              { title: 'Formulário de contato', desc: 'Fale sobre seu projeto', href: 'https://beuni.com.br/contato/', icon: FileText },
-              { title: 'WhatsApp', desc: 'Atendimento rápido', href: 'https://beuni.com.br/contato/', icon: MessageSquare },
-              { title: 'E-mail', desc: 'Envie sua mensagem', href: 'mailto:contato@beuni.com.br', icon: Mail },
-              { title: 'Telefone', desc: 'Fale com a gente', href: 'https://beuni.com.br/contato/', icon: Phone },
-              { title: 'Central de ajuda', desc: 'Dúvidas frequentes', href: 'https://beuni.com.br/contato/', icon: HelpCircle },
-            ].map((c, idx) => (
-              <a
-                key={idx}
-                href={c.href}
-                target={c.href.startsWith('http') ? '_blank' : undefined}
-                rel={c.href.startsWith('http') ? 'noreferrer' : undefined}
-                className="group block bg-beuni-cream hover:bg-beuni-orange-50 border border-beuni-orange-100 rounded-2xl p-6 transition-colors animate-fade-up"
-                style={{ ['--delay' as any]: `${idx * 90}ms` }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-start space-x-4">
-                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
-                      <c.icon className="h-5 w-5 text-beuni-orange-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-beuni-text mb-1">{c.title}</h3>
-                      <p className="text-beuni-text/70 text-sm">{c.desc}</p>
-                    </div>
+
+          {/* Grid principal de contatos */}
+          <div className="grid lg:grid-cols-3 gap-8 mb-16">
+            {/* Seção principais (destaque) */}
+            <div className="lg:col-span-2 grid sm:grid-cols-2 gap-6">
+              {[
+                { 
+                  title: 'Marcar Reunião', 
+                  desc: 'Converse ao vivo com nossos especialistas', 
+                  href: 'https://materiais.beuni.com.br/plataforma', 
+                  icon: Calendar,
+                  gradient: 'from-blue-500 to-indigo-600',
+                  featured: true
+                },
+                { 
+                  title: 'Orçamento Express', 
+                  desc: 'Receba uma proposta personalizada', 
+                  href: 'https://beuni.com.br/contato/', 
+                  icon: FileText,
+                  gradient: 'from-green-500 to-emerald-600',
+                  featured: true
+                },
+              ].map((c, idx) => (
+                <a
+                  key={idx}
+                  href={c.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group relative bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border-2 border-beuni-orange-100 hover:border-beuni-orange-300 hover-lift animate-float-up"
+                  style={{ ['--delay' as any]: `${idx * 200}ms` }}
+                >
+                  {/* Gradiente superior */}
+                  <div className={`absolute top-0 left-0 right-0 h-2 bg-gradient-to-r ${c.gradient} rounded-t-3xl`}></div>
+                  
+                  {/* Ícone principal */}
+                  <div className={`w-16 h-16 bg-gradient-to-r ${c.gradient} rounded-2xl flex items-center justify-center mb-6 group-hover:animate-pulse-glow`}>
+                    <c.icon className="h-8 w-8 text-white" />
                   </div>
-                  <ArrowRight className="h-6 w-6 text-beuni-orange-600 group-hover:translate-x-1 transition-transform" />
+                  
+                  <h3 className="text-2xl font-bold text-beuni-text mb-3 group-hover:text-beuni-orange-600 transition-colors">
+                    {c.title}
+                  </h3>
+                  <p className="text-beuni-text/70 mb-6 leading-relaxed">
+                    {c.desc}
+                  </p>
+                  
+                  <div className="flex items-center text-beuni-orange-600 font-semibold group-hover:translate-x-2 transition-transform">
+                    <span>Começar agora</span>
+                    <ArrowRight className="h-5 w-5 ml-2" />
+                  </div>
+
+                  {/* Elemento decorativo */}
+                  <div className="absolute top-6 right-6 w-12 h-12 bg-beuni-orange-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </a>
+              ))}
+            </div>
+
+            {/* Seção de contatos rápidos */}
+            <div className="bg-gradient-to-br from-beuni-orange-50 to-beuni-brown-50 rounded-3xl p-8 border-2 border-beuni-orange-200 animate-bounce-in" style={{ ['--delay' as any]: '400ms' }}>
+              <h3 className="text-xl font-bold text-beuni-text mb-6 text-center">Contato Direto</h3>
+              
+              <div className="space-y-4">
+                {[
+                  { title: 'WhatsApp', desc: '(11) 99999-9999', href: 'https://beuni.com.br/contato/', icon: MessageSquare, color: 'text-green-600' },
+                  { title: 'E-mail', desc: 'contato@beuni.com.br', href: 'mailto:contato@beuni.com.br', icon: Mail, color: 'text-blue-600' },
+                  { title: 'Telefone', desc: '(11) 3333-3333', href: 'https://beuni.com.br/contato/', icon: Phone, color: 'text-purple-600' },
+                  { title: 'Central de Ajuda', desc: 'FAQ e suporte', href: 'https://beuni.com.br/contato/', icon: HelpCircle, color: 'text-orange-600' },
+                ].map((c, idx) => (
+                  <a
+                    key={idx}
+                    href={c.href}
+                    target={c.href.startsWith('http') ? '_blank' : undefined}
+                    rel={c.href.startsWith('http') ? 'noreferrer' : undefined}
+                    className="group flex items-center space-x-3 p-3 bg-white rounded-xl hover:shadow-md transition-all duration-300 hover:-translate-y-0.5"
+                  >
+                    <div className={`w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-beuni-orange-100 transition-colors`}>
+                      <c.icon className={`h-5 w-5 ${c.color}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-beuni-text">{c.title}</p>
+                      <p className="text-xs text-beuni-text/60 truncate">{c.desc}</p>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-beuni-orange-600 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-1 group-hover:translate-x-0" />
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Seção de benefícios/garantias */}
+          <div className="bg-white rounded-3xl p-8 shadow-lg border border-beuni-orange-100 animate-fade-up" style={{ ['--delay' as any]: '600ms' }}>
+            <div className="grid md:grid-cols-3 gap-8 text-center">
+              {[
+                { icon: Shield, title: 'Atendimento Especializado', desc: 'Consultores dedicados para seu projeto' },
+                { icon: Zap, title: 'Resposta Rápida', desc: 'Retorno garantido em até 2 horas úteis' },
+                { icon: Heart, title: 'Suporte Completo', desc: 'Acompanhamento em todas as etapas' },
+              ].map((item, idx) => (
+                <div key={idx} className="group hover-tilt">
+                  <div className="w-12 h-12 bg-gradient-to-r from-beuni-orange-500 to-beuni-brown-600 rounded-xl flex items-center justify-center mx-auto mb-4 group-hover:animate-pulse-glow">
+                    <item.icon className="h-6 w-6 text-white" />
+                  </div>
+                  <h4 className="font-bold text-beuni-text mb-2">{item.title}</h4>
+                  <p className="text-sm text-beuni-text/70">{item.desc}</p>
                 </div>
-              </a>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
