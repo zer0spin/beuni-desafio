@@ -1,6 +1,7 @@
 # Railway-optimized Dockerfile for NestJS Backend
 FROM node:18-alpine AS deps
-RUN apk add --no-cache openssl
+# Install OpenSSL and required packages for Prisma
+RUN apk add --no-cache openssl openssl-dev libc6-compat
 WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
@@ -8,13 +9,16 @@ COPY prisma ./prisma/
 RUN npm ci && npm cache clean --force
 
 FROM node:18-alpine AS builder
-RUN apk add --no-cache openssl
+# Install OpenSSL and required packages for Prisma
+RUN apk add --no-cache openssl openssl-dev libc6-compat
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npx prisma generate && npm run build
 
 FROM node:18-alpine AS runner
+# Install OpenSSL and required packages for Prisma
+RUN apk add --no-cache openssl openssl-dev libc6-compat
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/node_modules ./node_modules

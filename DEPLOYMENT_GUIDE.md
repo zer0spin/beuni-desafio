@@ -483,17 +483,40 @@ npx prisma migrate deploy && npx prisma db seed
 # 3. Start (npm run start:prod)
 ```
 
-#### **5. Environment Variables Missing**
+#### **5. Environment Variables Missing ou Empty String**
 ```bash
-# Erro: DATABASE_URL não definido
-Error: Environment variable not found: DATABASE_URL
+# ❌ Erro: DATABASE_URL está vazio
+Error: Environment variable `DATABASE_URL` resolved to an empty string.
 
-# Solução: Usar referências Railway
-DATABASE_URL=${{Postgres.DATABASE_URL}}
-REDIS_URL=${{Redis.REDIS_URL}}
+# 🚨 PROBLEMA MAIS COMUM: Nomes dos serviços incorretos
+# Railway cria serviços com nomes específicos (ex: Redis--Hmj)
+# Você DEVE usar os nomes EXATOS que aparecem no dashboard
 
-# IMPORTANTE: Serviços devem estar no mesmo projeto
-# Para referenciar: ${{ServiceName.VARIABLE}}
+# ✅ SOLUÇÃO: Verificar nomes reais dos serviços
+# 1. No Railway Dashboard, anote os nomes EXATOS:
+#    - PostgreSQL: geralmente "Postgres"  
+#    - Redis: pode ser "Redis--Hmj" ou similar
+#    - Backend: nome do seu repositório
+
+# 2. Use os nomes corretos nas referências:
+DATABASE_URL="${{Postgres.DATABASE_URL}}"        # ✅ Correto
+REDIS_URL="${{Redis--Hmj.REDIS_URL}}"           # ✅ Use nome real
+# NÃO: REDIS_URL="${{Redis.REDIS_URL}}"          # ❌ Errado se nome é Redis--Hmj
+
+# 3. Configure nas Variables do SERVIÇO backend
+# Service → beuni-desafio → Variables → Raw Editor
+```
+
+#### **6. OpenSSL Warnings no Prisma**
+```bash
+# ❌ Warning: Prisma failed to detect libssl/openssl version
+prisma:warn Defaulting to "openssl-1.1.x"
+
+# 🔧 SOLUÇÃO: Dockerfile com pacotes necessários (já corrigido)
+FROM node:18-alpine
+RUN apk add --no-cache openssl openssl-dev libc6-compat
+
+# Isso resolve warnings de OpenSSL no Alpine Linux
 ```
 
 #### **5. Nixpacks Start Command Error**
