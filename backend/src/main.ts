@@ -48,10 +48,8 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000', // Local development
       'https://localhost:3000', // Local development with HTTPS
-      'https://beuni-desafio.railway.app', // Railway frontend (if used)
-      'https://beuni-frontend.vercel.app', // Vercel production
-      'https://beuni-frontend-git-main.vercel.app', // Vercel preview
-      /^https:\/\/beuni-frontend.*\.vercel\.app$/, // Any Vercel deployment
+      'https://beuni-frontend-one.vercel.app', // Vercel production domain
+      /^https:\/\/beuni-frontend.*\.vercel\.app$/, // Any Vercel deployment (preview, staging, etc)
       /^https:\/\/.*\.beuni\.app$/, // Custom domain pattern
       ...((process.env.CORS_ORIGIN?.split(',')) || []), // Additional domains from env
     ],
