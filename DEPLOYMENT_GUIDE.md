@@ -1,6 +1,26 @@
 # 🚀 Guia de Deploy para Produção - Beuni Platform
 
-> **Para Recrutadores:** Este guia fornece instruções completas para fazer o deploy da plataforma Beuni usando ferramentas 100% gratuitas e simples. O objetivo é permitir que você teste a aplicação em um ambiente de produção real durante o processo seletivo.
+> **Para Recrutadore### **Passo 3: Deploy Backend (NestJS)**
+
+1. **Add Service → Deploy from GitHub**
+2. **Conecte repositório: `seu-usuario/beuni-desafio`**
+3. **⚠️ ATENÇÃO: Configurações CRUCIAIS do Serviço Backend:**
+   - **Service Name:** `beuni-backend`
+   - **Root Directory:** `backend` ⚠️ **OBRIGATÓRIO** (evita build na raiz do monorepo)
+   - **Builder:** Railpack (padrão)
+   - **Build Command:** (deixe vazio - auto-detecta `npm run build`)
+   - **Start Command:** (deixe vazio - auto-detecta `npm run start:prod`)
+
+### **Passo 4: Deploy Frontend (Next.js)**
+
+1. **Add Service → Deploy from GitHub**
+2. **Mesmo repositório `beuni-desafio`**
+3. **⚠️ ATENÇÃO: Configurações CRUCIAIS do Serviço Frontend:**
+   - **Service Name:** `beuni-frontend`
+   - **Root Directory:** `frontend` ⚠️ **OBRIGATÓRIO** (evita build na raiz do monorepo)
+   - **Builder:** Railpack (padrão)
+   - **Build Command:** (deixe vazio - auto-detecta `npm run build`)
+   - **Start Command:** (deixe vazio - auto-detecta `npm start`)ece instruções completas para fazer o deploy da plataforma Beuni usando ferramentas 100% gratuitas e simples. O objetivo é permitir que você teste a aplicação em um ambiente de produção real durante o processo seletivo.
 
 ## 📋 Índice
 
@@ -383,17 +403,30 @@ npm install sharp --save
 
 #### **2. Build Failed - Backend**
 ```bash
-# Erro comum: NestJS CLI não encontrado
+# ❌ Erro: TypeScript Compiler não encontrado
+Error: sh: 1: tsc: not found
+BUILD FAILED: exit code 127
+
+# ❌ Problema: Railway está fazendo build na RAIZ do monorepo
+> beuni-desafio@1.0.0 build
+> npm run build:backend && npm run build:frontend
+
+# 🔧 SOLUÇÃO DEFINITIVA:
+# 1. Configure Root Directory = "backend" (SEM barra)
+#    - Service Settings → General → Root Directory: backend
+#    - Isso força Railway a fazer npm ci na pasta /backend
+#    - Não na raiz que usa --omit=dev
+
+# 2. Verifique se typescript está em dependencies (já corrigido)
+#    - backend/package.json deve ter typescript em dependencies
+#    - Não em devDependencies (omitido pelo Railway)
+
+# ❌ Erro anterior: NestJS CLI não encontrado  
 Error: sh: 1: nest: not found
 
-# Solução: Railway usa Railpack (não Nixpacks)
-# Railpack detecta automaticamente Node.js e NestJS
-# Não precisa configurar build command manualmente
-
-# Se necessário, verificar:
-# Settings → Deploy → Build Command: (deixar vazio)
-# Settings → Deploy → Start Command: (deixar vazio)
-# Railway detecta automaticamente via package.json
+# 🔧 Solução aplicada: build script usa tsc diretamente
+"build": "tsc -p tsconfig.json"
+# Em vez de: "build": "npx nest build"
 ```
 
 #### **3. Root Directory Incorreto**
