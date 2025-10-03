@@ -12,7 +12,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private configService: ConfigService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // Support both httpOnly cookie and Authorization header
+      jwtFromRequest: (req: any) => {
+        // Prefer cookie when present
+        const cookieToken = req?.cookies?.['beuni_token'];
+        if (cookieToken && typeof cookieToken === 'string') {
+          return cookieToken;
+        }
+        // Fallback to Authorization: Bearer <token>
+        return ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+      },
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET'),
     });
