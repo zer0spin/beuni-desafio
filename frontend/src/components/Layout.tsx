@@ -163,7 +163,7 @@ export default function Layout({ children }: LayoutProps) {
     <div className="min-h-screen bg-beuni-cream flex">
       {/* Sidebar - Desktop */}
       <aside
-        className={`hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 bg-white border-r border-beuni-orange-100 transition-all duration-300 ${
+        className={`hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 bg-white border-r border-beuni-orange-100 transition-all duration-300 relative ${
           sidebarOpen ? 'lg:w-64' : 'lg:w-20'
         }`}
       >
@@ -281,16 +281,22 @@ export default function Layout({ children }: LayoutProps) {
               </div>
             )}
           </div>
-
-          {/* Toggle Sidebar Button */}
-          <div className="border-t border-beuni-orange-100 p-3">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="w-full p-2 text-beuni-text/60 hover:text-beuni-orange-600 hover:bg-beuni-orange-50 rounded-lg transition-colors"
-            >
-              <Menu className="h-5 w-5 mx-auto" />
-            </button>
-          </div>
+          {/* Toggle Sidebar Button - centered */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className={`hidden lg:flex items-center justify-center absolute top-1/2 -translate-y-1/2 right-[-12px] h-8 w-8 rounded-full border shadow-md bg-white hover:bg-beuni-orange-50 text-beuni-text/70 hover:text-beuni-orange-600 transition-colors`}
+            title={sidebarOpen ? 'Recolher menu' : 'Expandir menu'}
+          >
+            {sidebarOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                <path fillRule="evenodd" d="M15.53 4.47a.75.75 0 0 1 0 1.06L10.06 11l5.47 5.47a.75.75 0 1 1-1.06 1.06l-6-6a.75.75 0 0 1 0-1.06l6-6a.75.75 0 0 1 1.06 0z" clipRule="evenodd" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                <path fillRule="evenodd" d="M8.47 19.53a.75.75 0 0 1 0-1.06L13.94 13 8.47 7.53a.75.75 0 0 1 1.06-1.06l6 6a.75.75 0 0 1 0 1.06l-6 6a.75.75 0 0 1-1.06 0z" clipRule="evenodd" />
+              </svg>
+            )}
+          </button>
         </div>
       </aside>
 

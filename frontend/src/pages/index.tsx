@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
-import { Gift, Users, Calendar, CheckCircle, Star, ArrowRight, Shield, Zap, Heart, TrendingUp, Award, Package, Sparkles } from 'lucide-react';
+import { Gift, Users, Calendar, CheckCircle, Star, ArrowRight, Shield, Zap, Heart, TrendingUp, Award, Package, Sparkles, Phone, Mail, MessageSquare, HelpCircle, FileText } from 'lucide-react';
 
 export default function HomePage() {
   const router = useRouter();
@@ -151,18 +151,18 @@ export default function HomePage() {
 
                   {/* Menu de navegação centralizado */}
                   <nav className="hidden md:flex space-x-10">
-                    <button className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
+                    <a href="#top" className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
                       Início
-                    </button>
-                    <button className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
-                      Serviços ▾
-                    </button>
-                    <button className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
-                      Sobre ▾
-                    </button>
-                    <button className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
+                    </a>
+                    <a href="#solucoes" className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
+                      Soluções
+                    </a>
+                    <a href="https://beuni.com.br/sobre-nos/" target="_blank" rel="noreferrer" className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
+                      Sobre
+                    </a>
+                    <a href="https://beuni.com.br/contato/" target="_blank" rel="noreferrer" className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
                       Contato
-                    </button>
+                    </a>
                   </nav>            {/* CTAs à direita */}
             <div className="flex space-x-3">
               <button
@@ -244,17 +244,29 @@ export default function HomePage() {
                 </button>
               </div>
 
-              {/* Logos de empresas parceiras com animação */}
+              {/* Logos de empresas - carrossel + métrica de confiança */}
               <div className="mt-12">
                 <p className="text-sm text-beuni-text/60 mb-4 font-medium">
                   Plataforma de Confiança das Principais Empresas em Diversos Setores:
                 </p>
-                <div className="flex flex-wrap items-center gap-8">
-                  <span className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer animate-fade-in" style={{ animationDelay: '0.1s' }}>MAERSK</span>
-                  <span className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer animate-fade-in" style={{ animationDelay: '0.2s' }}>Cargill</span>
-                  <span className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer animate-fade-in" style={{ animationDelay: '0.3s' }}>SOMOS</span>
-                  <span className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer animate-fade-in" style={{ animationDelay: '0.4s' }}>isaac</span>
-                  <span className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer animate-fade-in" style={{ animationDelay: '0.5s' }}>CONQUER</span>
+                <div className="relative overflow-hidden">
+                  <div className="flex animate-scroll">
+                    <div className="flex items-center gap-12 pr-12">
+                      {['MAERSK','Cargill','SOMOS','isaac','CONQUER'].map((brand, idx) => (
+                        <span key={`brand-a-${idx}`} className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">
+                          {brand}
+                        </span>
+                      ))}
+                      {['MAERSK','Cargill','SOMOS','isaac','CONQUER'].map((brand, idx) => (
+                        <span key={`brand-b-${idx}`} className="font-semibold text-gray-600 hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">
+                          {brand}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 inline-flex items-center px-4 py-2 bg-white rounded-full border border-beuni-orange-200 shadow-sm">
+                  <span className="text-sm font-semibold text-beuni-text">Confiável por 3.700 marcas empresariais e mais de 1,3 milhões</span>
                 </div>
               </div>
             </div>
@@ -341,26 +353,65 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção "O que podemos fazer para você?" */}
-      <section className="py-20 bg-beuni-cream">
+      {/* Seção Kits (grid de 4) */}
+      <section className="py-20 bg-white">
         <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-12">
+          <div className="mb-12 text-center">
+            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">KITS</span>
+            <h2 className="text-4xl lg:text-5xl font-bold text-beuni-text mb-4 mt-3">Escolha o tipo de kit</h2>
+            <p className="text-lg text-beuni-text/80">Selecione uma categoria para explorar opções e personalizações.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 stagger">
+            {[
+              { title: 'Kit para Colaboradores', image: '/images/kits/kit-colaboradores.png', href: 'https://beuni.com.br/contato/' },
+              { title: 'Kit para Eventos', image: '/images/kits/kit-eventos.png', href: 'https://beuni.com.br/contato/' },
+              { title: 'Kit para Clientes', image: '/images/kits/kit-clientes.png', href: 'https://beuni.com.br/contato/' },
+              { title: 'Kit para Diversos', image: '/images/kits/kit-diversos.png', href: 'https://beuni.com.br/contato/' },
+            ].map((k, idx) => (
+              <div
+                key={idx}
+                className="bg-white border border-beuni-orange-100 rounded-2xl shadow-sm hover:shadow-lg transition-all overflow-hidden flex flex-col transform hover:-translate-y-1.5 animate-zoom-in"
+                style={{ ['--delay' as any]: `${idx * 100}ms` }}
+              >
+                <div className="relative aspect-[4/3]
+                ">
+                  <Image src={k.image} alt={k.title} fill className="object-cover" />
+                </div>
+                <div className="p-5 flex-1 flex flex-col">
+                  <h3 className="font-bold text-beuni-text mb-2">{k.title}</h3>
+                  <div className="mt-auto">
+                    <a href={k.href} target="_blank" rel="noreferrer" className="inline-flex items-center px-4 py-2 bg-beuni-orange-500 text-white rounded-lg font-semibold hover:bg-beuni-orange-600 transition-colors">
+                      Ver kits
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Seção "O que podemos fazer para você?" - reduzida */}
+      <section id="solucoes" className="py-16 bg-beuni-cream">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
             <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">TIPOS DE BRINDES</span>
-            <h2 className="text-4xl lg:text-5xl font-bold text-beuni-text mb-4 mt-3">
+            <h2 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-3 mt-2">
               O que podemos fazer para você?
             </h2>
-            <p className="text-lg lg:text-xl text-beuni-text/80 max-w-4xl leading-relaxed">
+            <p className="text-base lg:text-lg text-beuni-text/80 max-w-4xl leading-relaxed">
               Uma gestão eficiente de brindes é essencial para qualquer organização. Na beuni, desenvolvemos uma plataforma que elimina a complexidade da compra, armazenamento e envio de brindes personalizados, oferecendo total visibilidade e controle.
             </p>
           </div>
 
           {/* Sistema de abas */}
-          <div className="flex flex-wrap justify-center gap-3 mb-12">
+          <div className="flex flex-wrap justify-center gap-2.5 mb-8">
             {solutionTabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as SolutionKey)}
-                className={`flex items-center space-x-2 px-5 py-2.5 rounded-full font-medium transition-all duration-200 text-sm ${
+                className={`flex items-center space-x-2 px-4 py-2 rounded-full font-medium transition-all duration-200 text-sm ${
                   activeTab === tab.id
                     ? 'bg-beuni-orange-500 text-white shadow-lg'
                     : 'bg-white text-beuni-text hover:bg-beuni-orange-50 border border-beuni-orange-200'
@@ -373,14 +424,14 @@ export default function HomePage() {
           </div>
 
           {/* Cards de solução */}
-          <div className="bg-white rounded-3xl p-8 shadow-lg border border-beuni-orange-100">
+          <div className="bg-white rounded-3xl p-6 shadow-lg border border-beuni-orange-100">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               {/* Coluna de Texto */}
               <div>
-                <h3 className="text-3xl font-bold text-beuni-text mb-4">
+                <h3 className="text-2xl lg:text-3xl font-bold text-beuni-text mb-3">
                   {solutions[activeTab].title}
                 </h3>
-                <p className="text-lg text-beuni-text/80 mb-6">
+                <p className="text-base lg:text-lg text-beuni-text/80 mb-5">
                   {solutions[activeTab].description}
                 </p>
                 <div className="grid gap-3">
@@ -419,18 +470,18 @@ export default function HomePage() {
           </div>
 
           <div className="relative">
-            <div className="grid md:grid-cols-3 gap-12">
+            <div className="grid md:grid-cols-3 gap-12 stagger">
               {processSteps.map((step, index) => (
-                <div key={index} className="text-center relative">
+                <div key={index} className="text-center relative animate-fade-up" style={{ ['--delay' as any]: `${index * 120}ms` }}>
                   {/* Linha conectora */}
                   {index < processSteps.length - 1 && (
                     <div className="hidden md:block absolute top-20 left-[60%] w-[80%] h-0.5 border-t-2 border-dashed border-beuni-orange-300 z-0"></div>
                   )}
 
                   {/* Card do passo */}
-                  <div className="relative z-10 bg-gradient-to-br from-beuni-orange-50 to-beuni-brown-50 rounded-3xl p-8 h-full border-2 border-beuni-orange-200">
+                  <div className="relative z-10 bg-gradient-to-br from-beuni-orange-50 to-beuni-brown-50 rounded-3xl p-8 h-full border-2 border-beuni-orange-200 transform hover:-translate-y-1 transition-transform duration-300">
                     {/* Número */}
-                    <div className="w-16 h-16 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                    <div className="w-16 h-16 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg animate-zoom-in" style={{ ['--delay' as any]: `${index * 120 + 80}ms` }}>
                       <span className="text-2xl font-bold text-white">{step.number}</span>
                     </div>
 
@@ -470,7 +521,7 @@ export default function HomePage() {
             </div>
 
             {/* Grid de integrações com ícones e nomes */}
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 stagger">
               {[
                 { name: 'Salesforce', icon: '☁️', color: 'from-blue-50 to-cyan-50' },
                 { name: 'HubSpot', icon: '🎯', color: 'from-orange-50 to-red-50' },
@@ -481,7 +532,8 @@ export default function HomePage() {
               ].map((integration, index) => (
                 <div
                   key={index}
-                  className="group bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 flex flex-col items-center justify-center aspect-square hover:shadow-lg transition-all duration-300 cursor-pointer border border-gray-200 hover:border-beuni-orange-300"
+                  className={`group bg-gradient-to-br ${integration.color} rounded-xl p-6 flex flex-col items-center justify-center aspect-square hover:shadow-lg transition-all duration-300 cursor-pointer border border-beuni-orange-100 hover:border-beuni-orange-300 transform hover:-translate-y-1 animate-fade-up`}
+                  style={{ ['--delay' as any]: `${index * 90}ms` }}
                 >
                   <div className={`text-4xl mb-3 transform group-hover:scale-110 transition-transform duration-300`}>
                     {integration.icon}
@@ -498,6 +550,49 @@ export default function HomePage() {
                 Ver todas as integrações
               </button>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Seção Contato - grid de opções */}
+      <section className="py-20 bg-white">
+        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">CONTATO</span>
+            <h2 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-3">Adeus tarefas manuais.</h2>
+            <p className="text-beuni-text/80 max-w-2xl mx-auto">Escolha como gostaria de entrar em contato com a gente.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 stagger">
+            {[
+              { title: 'Marcar uma reunião', desc: 'Converse com nosso time', href: 'https://materiais.beuni.com.br/plataforma', icon: Calendar },
+              { title: 'Formulário de contato', desc: 'Fale sobre seu projeto', href: 'https://beuni.com.br/contato/', icon: FileText },
+              { title: 'WhatsApp', desc: 'Atendimento rápido', href: 'https://beuni.com.br/contato/', icon: MessageSquare },
+              { title: 'E-mail', desc: 'Envie sua mensagem', href: 'mailto:contato@beuni.com.br', icon: Mail },
+              { title: 'Telefone', desc: 'Fale com a gente', href: 'https://beuni.com.br/contato/', icon: Phone },
+              { title: 'Central de ajuda', desc: 'Dúvidas frequentes', href: 'https://beuni.com.br/contato/', icon: HelpCircle },
+            ].map((c, idx) => (
+              <a
+                key={idx}
+                href={c.href}
+                target={c.href.startsWith('http') ? '_blank' : undefined}
+                rel={c.href.startsWith('http') ? 'noreferrer' : undefined}
+                className="group block bg-beuni-cream hover:bg-beuni-orange-50 border border-beuni-orange-100 rounded-2xl p-6 transition-colors animate-fade-up"
+                style={{ ['--delay' as any]: `${idx * 90}ms` }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-start space-x-4">
+                    <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-sm">
+                      <c.icon className="h-5 w-5 text-beuni-orange-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-beuni-text mb-1">{c.title}</h3>
+                      <p className="text-beuni-text/70 text-sm">{c.desc}</p>
+                    </div>
+                  </div>
+                  <ArrowRight className="h-6 w-6 text-beuni-orange-600 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </a>
+            ))}
           </div>
         </div>
       </section>
@@ -542,51 +637,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Seção Blog */}
-      <section className="py-20 bg-beuni-cream">
-        <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="text-beuni-orange-600 font-semibold text-sm uppercase tracking-wide">BLOG</span>
-            <h2 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-4 mt-2">
-              Fique por dentro das novidades da beuni
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-            {[
-              { title: "12 ideias de brindes de Natal corporativos para encantar no fim de ano", category: "IDEIAS DE BRINDES" },
-              { title: "8 lembranças de Natal para clientes: brindes que fortalecem relacionamentos", category: "IDEIAS DE BRINDES" },
-              { title: "Engajamento em cursos online: o que realmente funciona em 2025", category: "MARKETING" },
-              { title: "Os 7 itens mais usados por edtechs em kits para alunos (e por que funcionam)", category: "IDEIAS DE BRINDES" }
-            ].map((post, index) => (
-              <article key={index} className="group cursor-pointer">
-                <div className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform group-hover:scale-105">
-                  <div className="h-48 bg-gradient-to-br from-beuni-orange-100 to-beuni-brown-100 flex items-center justify-center">
-                    <Award className="h-12 w-12 text-beuni-orange-500" />
-                  </div>
-                  <div className="p-6">
-                    <span className="inline-block px-3 py-1 bg-beuni-orange-100 text-beuni-orange-600 text-xs font-semibold rounded-full mb-3">
-                      {post.category}
-                    </span>
-                    <h3 className="font-semibold text-beuni-text mb-2 group-hover:text-beuni-orange-600 transition-colors leading-tight">
-                      {post.title}
-                    </h3>
-                    <button className="text-sm text-beuni-orange-600 font-semibold hover:underline">
-                      Saiba Mais
-                    </button>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <button className="px-8 py-3 bg-beuni-brown-800 text-white font-semibold rounded-xl hover:bg-beuni-brown-900 transition-all duration-200 shadow-lg">
-              Ver todos os posts
-            </button>
-          </div>
-        </div>
-      </section>
+      {/* Blog removido por solicitação */}
 
       {/* Seção Investidores */}
       <section className="py-20 bg-white overflow-hidden">
@@ -596,19 +647,16 @@ export default function HomePage() {
             <h3 className="text-3xl lg:text-4xl font-bold text-beuni-text mb-10">
               Quem acredita e nos impulsiona
             </h3>
-            <div className="relative">
+            <div className="relative overflow-hidden">
               {/* Animação de scroll infinito */}
               <div className="flex animate-scroll">
-                <div className="flex space-x-12 items-center">
-                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">🎯 Sai do Papel</span>
-                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">💼 Investidores.vc</span>
-                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">👼 ERA Angels</span>
-                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">⚖️ EquityRio</span>
-                  {/* Duplicados para efeito de scroll contínuo */}
-                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">🎯 Sai do Papel</span>
-                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">💼 Investidores.vc</span>
-                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">👼 ERA Angels</span>
-                  <span className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">⚖️ EquityRio</span>
+                <div className="flex space-x-12 items-center pr-12">
+                  {['🎯 Sai do Papel','💼 Investidores.vc','👼 ERA Angels','⚖️ EquityRio'].map((name, idx) => (
+                    <span key={`inv-a-${idx}`} className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">{name}</span>
+                  ))}
+                  {['🎯 Sai do Papel','💼 Investidores.vc','👼 ERA Angels','⚖️ EquityRio'].map((name, idx) => (
+                    <span key={`inv-b-${idx}`} className="font-semibold text-gray-600 text-lg hover:text-beuni-orange-500 transition-all duration-300 transform hover:scale-110 cursor-pointer whitespace-nowrap">{name}</span>
+                  ))}
                 </div>
               </div>
             </div>
@@ -635,24 +683,21 @@ export default function HomePage() {
                 A beuni nasceu de uma simples vontade: aproximar ainda mais pessoas através de experiências incríveis e tecnologia.
               </p>
               <div className="flex space-x-4">
-                <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-beuni-orange-500 transition-colors cursor-pointer">
-                  <span className="text-white text-xs">ig</span>
-                </div>
-                <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-beuni-orange-500 transition-colors cursor-pointer">
-                  <span className="text-white text-xs">in</span>
-                </div>
-                <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-beuni-orange-500 transition-colors cursor-pointer">
-                  <span className="text-white text-xs">yt</span>
-                </div>
-                <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-beuni-orange-500 transition-colors cursor-pointer">
-                  <span className="text-white text-xs">fb</span>
-                </div>
-                <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-beuni-orange-500 transition-colors cursor-pointer">
-                  <span className="text-white text-xs">pi</span>
-                </div>
-                <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-beuni-orange-500 transition-colors cursor-pointer">
-                  <span className="text-white text-xs">tk</span>
-                </div>
+                {[
+                  { href: 'https://www.instagram.com/beunibr', label: 'Instagram', text: 'IG' },
+                  { href: 'https://www.linkedin.com/company/beuni/', label: 'LinkedIn', text: 'IN' },
+                  { href: 'https://www.youtube.com/@beunibr', label: 'YouTube', text: 'YT' },
+                  { href: 'https://www.facebook.com/beunibr', label: 'Facebook', text: 'FB' },
+                  { href: 'https://br.pinterest.com/beunibr/', label: 'Pinterest', text: 'PI' },
+                  { href: 'https://www.tiktok.com/@beunibr', label: 'TikTok', text: 'TK' },
+                ].map((s, idx) => (
+                  <a key={idx} href={s.href} target="_blank" rel="noreferrer" title={s.label} aria-label={s.label} className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-beuni-orange-500 transition-colors cursor-pointer">
+                    <svg viewBox="0 0 32 32" className="w-5 h-5">
+                      <circle cx="16" cy="16" r="14" fill="none" stroke="white" strokeWidth="2" />
+                      <text x="16" y="21" textAnchor="middle" fontSize="10" fill="white" fontFamily="Inter, sans-serif">{s.text}</text>
+                    </svg>
+                  </a>
+                ))}
               </div>
             </div>
 
@@ -661,7 +706,6 @@ export default function HomePage() {
               <h3 className="font-semibold text-white mb-4">A beuni</h3>
               <ul className="space-y-3 text-sm">
                 <li><a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Sobre</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Blog</a></li>
                 <li><a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Vagas</a></li>
               </ul>
             </div>
@@ -670,10 +714,10 @@ export default function HomePage() {
             <div>
               <h3 className="font-semibold text-white mb-4">Plataforma</h3>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Plataforma beuni</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Personalização</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Integrações</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Planos</a></li>
+                <li><a href="https://beuni.com.br/plataforma-beuni/" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Plataforma beuni</a></li>
+                <li><a href="https://beuni.com.br/contato" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Personalização</a></li>
+                <li><a href="https://beuni.com.br/integracoes" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Integrações</a></li>
+                <li><a href="https://beuni.com.br/planos/" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Planos</a></li>
               </ul>
             </div>
 
@@ -681,9 +725,9 @@ export default function HomePage() {
             <div>
               <h3 className="font-semibold text-white mb-4">Soluções</h3>
               <ul className="space-y-3 text-sm">
-                <li><a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Times de Marketing</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Times de RH</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Times de CX/CS</a></li>
+                <li><a href="https://beuni.com.br/times-de-marketing/" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Times de Marketing</a></li>
+                <li><a href="https://beuni.com.br/contato/" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Times de RH</a></li>
+                <li><a href="https://beuni.com.br/contato/" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Times de CX/CS</a></li>
               </ul>
             </div>
           </div>
@@ -694,12 +738,8 @@ export default function HomePage() {
               © 2025 BeUni. Todos os direitos reservados
             </p>
             <div className="flex space-x-6 text-sm">
-              <a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">
-                Política de Privacidade
-              </a>
-              <a href="#" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">
-                Termos e Condições
-              </a>
+              <a href="https://drive.google.com/file/d/1swP3ezdo3bPa-2mUHXzPL4UG94jYkypx/view" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Política de Privacidade</a>
+              <a href="https://drive.google.com/file/d/1r5cZDQcLyyY2eeOp_P1iUDqD2p6np1dj/view" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-beuni-orange-400 transition-colors">Termos e Condições</a>
             </div>
           </div>
         </div>
