@@ -4,9 +4,9 @@
 
 ### **🎨 FRONTEND (Para Usuários)**
 ```
-🌟 PRINCIPAL: https://beuni-desafio.vercel.app
-📱 Preview:   https://beuni-desafio-git-main.vercel.app
-🔧 Dashboard: https://vercel.com/dashboard
+🌟 PRINCIPAL: https://beuni-frontend.vercel.app
+📱 Preview:   https://beuni-frontend-1cbhuyp4o-zer0spins-projects.vercel.app
+🔧 Dashboard: https://vercel.com/zer0spins-projects/beuni-frontend
 ```
 
 ### **🚂 BACKEND (Para APIs)**  
@@ -22,10 +22,10 @@
 ## 🧭 **NAVEGAÇÃO RÁPIDA**
 
 ### **👥 Para Usuários Finais:**
-- **Aplicação**: https://beuni-desafio.vercel.app
-- **Login**: https://beuni-desafio.vercel.app/login  
-- **Registro**: https://beuni-desafio.vercel.app/register
-- **Dashboard**: https://beuni-desafio.vercel.app/dashboard
+- **Aplicação**: https://beuni-frontend.vercel.app
+- **Login**: https://beuni-frontend.vercel.app/login  
+- **Registro**: https://beuni-frontend.vercel.app/register
+- **Dashboard**: https://beuni-frontend.vercel.app/dashboard
 
 ### **👨‍💻 Para Desenvolvedores:**
 - **API Docs**: https://beuni-desafio-production.up.railway.app/api/docs
