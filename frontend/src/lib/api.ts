@@ -4,7 +4,9 @@ import Cookies from 'js-cookie';
 
 // Create axios instance
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
+  baseURL: process.env.NODE_ENV === 'production' 
+    ? '/api' // Use Vercel rewrites in production
+    : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'),
   timeout: parseInt(process.env.NEXT_PUBLIC_API_TIMEOUT || '10000'),
   headers: {
     'Content-Type': 'application/json',

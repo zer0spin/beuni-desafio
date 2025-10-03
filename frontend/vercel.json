@@ -10,12 +10,10 @@
     }
   },
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://beuni-desafio-production.up.railway.app",
     "NODE_ENV": "production"
   },
   "build": {
     "env": {
-      "NEXT_PUBLIC_API_URL": "https://beuni-desafio-production.up.railway.app",
       "NODE_ENV": "production"
     }
   },
