@@ -35,6 +35,12 @@ Este diretório contém toda a documentação relacionada ao deploy da aplicaç�
    - Funcionalidades implementadas
    - Resultado final da implementação
 
+6. **[github-integration-setup.md](./github-integration-setup.md)**
+   - 🔗 **Configuração GitHub Integration**
+   - Setup de deploy automático
+   - CI/CD pipeline configuration
+   - Instruções para web interface
+
 ---
 
 ## 🚀 **ORDEM RECOMENDADA DE LEITURA**
@@ -43,7 +49,8 @@ Este diretório contém toda a documentação relacionada ao deploy da aplicaç�
 1. `full-stack-architecture.md` - Entender a arquitetura
 2. `railway-backend.md` - Deploy do backend primeiro
 3. `vercel-frontend.md` - Deploy do frontend
-4. `PRODUCTION_URLS.md` - Testar URLs finais
+4. `github-integration-setup.md` - Configurar CI/CD automático
+5. `PRODUCTION_URLS.md` - Testar URLs finais
 
 ### **Para Troubleshooting:**
 1. `full-stack-architecture.md` - Troubleshooting geral
