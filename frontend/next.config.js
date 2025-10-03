@@ -8,6 +8,9 @@ const nextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
 
+  // Exclude test files from build
+  pageExtensions: ['page.tsx', 'page.ts', 'tsx', 'ts', 'jsx', 'js'],
+  
   // API routes configuration
   async rewrites() {
     return [
@@ -41,6 +44,18 @@ const nextConfig = {
 
   // Webpack configuration
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Exclude test files from build
+    config.module.rules.push({
+      test: /\.(test|spec)\.(ts|tsx|js|jsx)$/,
+      loader: 'ignore-loader',
+    });
+
+    // Exclude __tests__ directories
+    config.module.rules.push({
+      test: /.*(__tests__|\.test\.|\.spec\.).*/,
+      loader: 'ignore-loader',
+    });
+
     // Optimize for production
     if (!dev) {
       config.optimization.minimize = true;

@@ -1,8 +1,9 @@
 {
-  "buildCommand": "cd frontend && npm ci && npm run build",
+  "buildCommand": "cd frontend && npm ci --omit=dev && npm run build:vercel",
   "outputDirectory": "frontend/.next",
-  "installCommand": "cd frontend && npm ci",
+  "installCommand": "cd frontend && npm ci --omit=dev",
   "framework": "nextjs",
+  "cleanUrls": true,
   "functions": {
     "frontend/src/pages/api/**/*.js": {
       "maxDuration": 10
