@@ -407,29 +407,53 @@ npm install sharp --save
 Error: sh: 1: tsc: not found
 BUILD FAILED: exit code 127
 
-# ❌ Problema: Railway está fazendo build na RAIZ do monorepo
+# ❌ Problema RAIZ: Railway está fazendo build na RAIZ do monorepo
 > beuni-desafio@1.0.0 build
 > npm run build:backend && npm run build:frontend
 
-# 🔧 SOLUÇÃO DEFINITIVA:
-# 1. Configure Root Directory = "backend" (SEM barra)
-#    - Service Settings → General → Root Directory: backend
-#    - Isso força Railway a fazer npm ci na pasta /backend
-#    - Não na raiz que usa --omit=dev
+# � SOLUÇÃO OBRIGATÓRIA: Root Directory CORRETO
+# ⚠️ Configure Root Directory = "backend" (SEM barra /)
+#    Service Settings → General → Root Directory: backend
+#    Isso força Railway a executar npm ci na pasta /backend
+#    NÃO na raiz que usa --omit=dev e omite devDependencies
 
-# 2. Verifique se typescript está em dependencies (já corrigido)
-#    - backend/package.json deve ter typescript em dependencies
-#    - Não em devDependencies (omitido pelo Railway)
+# 🔧 SOLUÇÃO ADICIONAL: Use npx tsc (já aplicado)
+"build": "npx tsc -p tsconfig.json"
+# npx funciona com instalações locais (dependencies)
+# Não depende de instalação global de TypeScript
 
 # ❌ Erro anterior: NestJS CLI não encontrado  
 Error: sh: 1: nest: not found
-
-# 🔧 Solução aplicada: build script usa tsc diretamente
-"build": "tsc -p tsconfig.json"
-# Em vez de: "build": "npx nest build"
+# 🔧 Solução aplicada: build script não usa Nest CLI
 ```
 
-#### **3. Root Directory Incorreto**
+#### **3. ⚠️ CRITICAL: Root Directory Configuration**
+```bash
+# ❌ ERRO MAIS COMUM: Build na raiz do monorepo
+# Railway executa na raiz e encontra package.json do monorepo
+# Resultado: npm run build da RAIZ em vez do serviço específico
+
+# ✅ SOLUÇÃO OBRIGATÓRIA para CADA serviço:
+# Backend Service → Settings → General:
+Root Directory: backend
+
+# Frontend Service → Settings → General:  
+Root Directory: frontend
+
+# ⚠️ IMPORTANTE: SEM barra inicial!
+# ✅ Correto: backend
+# ❌ Errado: /backend
+# ❌ Errado: ./backend  
+# ❌ Errado: (vazio - usa raiz)
+
+# 🔍 Como verificar se está correto:
+# Nos logs do Railway, você deve ver:
+# "Context: /workspace/backend" (backend)
+# "Context: /workspace/frontend" (frontend)
+# NÃO: "Context: /workspace" (raiz - ERRADO)
+```
+
+#### **4. Root Directory Incorreto (Legacy)**
 ```bash
 # Erro: Deploy do monorepo inteiro
 Error: Multiple package.json found
