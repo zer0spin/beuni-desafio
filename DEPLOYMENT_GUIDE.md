@@ -71,38 +71,35 @@ git push origin production
 1. **Acesse [Railway.app](https://railway.app)**
 2. **Clique em "Login with GitHub"**
 3. **Clique em "New Project"**
-4. **Selecione "Deploy from GitHub repo"**
-5. **Escolha o repositório `beuni-desafio`**
 
-### **Passo 3: Configurar Serviços**
+### **Passo 3: Deploy Backend (NestJS)**
 
-Railway detectará automaticamente o projeto. Configure os serviços SEPARADAMENTE:
+1. **Deploy from GitHub repo**
+2. **Selecione o repositório `beuni-desafio`**
+3. **Configurações do Serviço Backend:**
+   - **Service Name:** `beuni-backend`
+   - **Root Directory:** `backend` (CRUCIAL - sem `/`)
+   - **Build Command:** (Railway detecta automaticamente `npm run build`)
+   - **Start Command:** (Railway detecta automaticamente `npm run start:prod`)
 
-#### **3.1 PostgreSQL**
-```yaml
-# Railway criará automaticamente
-Service: postgresql
-Plan: Hobby (Free)
-```
+### **Passo 4: Deploy Frontend (Next.js)**
 
-#### **3.2 Redis**
-```yaml
-# Railway criará automaticamente  
-Service: redis
-Plan: Hobby (Free)
-```
+1. **Add Service → Deploy from GitHub**
+2. **Mesmo repositório `beuni-desafio`**
+3. **Configurações do Serviço Frontend:**
+   - **Service Name:** `beuni-frontend`
+   - **Root Directory:** `frontend` (CRUCIAL - sem `/`)
+   - **Build Command:** (Railway detecta automaticamente `npm run build`)
+   - **Start Command:** (Railway detecta automaticamente `npm start`)
 
-#### **3.3 Backend (NestJS)**
-```yaml
-# Configurações do serviço backend
-Service Name: beuni-backend
-Root Directory: backend
-Build Command: npm install && npx prisma generate && npx nest build
-Start Command: node dist/main.js
-Port: $PORT (Railway detecta automaticamente)
-```
+### **Passo 5: Adicionar Banco de Dados**
 
-**Variáveis de Ambiente (Backend):**
+1. **Add Service → Database → PostgreSQL**
+2. **Add Service → Database → Redis**
+
+### **Passo 6: Configurar Variáveis de Ambiente**
+
+#### **Backend Environment Variables:**
 ```env
 NODE_ENV=production
 DATABASE_URL=${{Postgres.DATABASE_URL}}
@@ -111,74 +108,23 @@ JWT_SECRET=seu_jwt_secret_super_secreto_de_64_caracteres_aqui_123456
 FRONTEND_URL=https://your-frontend-url.up.railway.app
 ```
 
-#### **3.4 Frontend (Next.js)**
-```yaml
-# Configurações do serviço frontend
-Service Name: beuni-frontend
-Root Directory: frontend
-Build Command: npm install && npm run build
-Start Command: npm run start
-Port: $PORT (Railway detecta automaticamente)
-```
-
-**Variáveis de Ambiente (Frontend):**
+#### **Frontend Environment Variables:**
 ```env
 NODE_ENV=production
 NEXT_PUBLIC_API_URL=https://your-backend-url.up.railway.app
 ```
 
-### **⚠️ IMPORTANTE: Deploy Separado**
+### **Passo 7: Pre-Deploy Command (Backend Only)**
 
-**NÃO faça deploy do repositório inteiro!** O Railway deve deployar cada serviço separadamente:
+No Railway Dashboard → Backend Service → Settings → Deploy:
+- **Pre-Deploy Command:** `npx prisma migrate deploy && npx prisma db seed`
 
-1. **Primeiro Deploy - Backend:**
-   - New Project → Deploy from GitHub
-   - Repository: `beuni-desafio`
-   - **Root Directory: `backend`** ← CRUCIAL
-   - Service Name: `beuni-backend`
-
-2. **Segundo Deploy - Frontend:**
-   - Add Service → Deploy from GitHub
-   - Same Repository: `beuni-desafio`
-   - **Root Directory: `frontend`** ← CRUCIAL
-   - Service Name: `beuni-frontend`
-
-3. **Adicionar Database Services:**
-   - Add Service → PostgreSQL
-   - Add Service → Redis
-
-### **Passo 4: Deploy Automático**
+### **Passo 8: Deploy e Validação**
 
 1. **Railway fará o deploy automaticamente**
-2. **Aguarde ~5-10 minutos para build completo**
-3. **Verifique os logs em tempo real no dashboard**
-
-### **Passo 5: Configurar Banco de Dados**
-
-```bash
-# Conectar ao backend via Railway CLI ou dashboard
-npx prisma migrate deploy
-npx prisma db seed
-```
-
-**Ou usar Railway CLI:**
-```bash
-# Instalar Railway CLI
-npm install -g @railway/cli
-
-# Login e deploy
-railway login
-railway link
-railway run npx prisma migrate deploy
-railway run npx prisma db seed
-```
-
-### **Passo 6: URLs Finais**
-
-Após o deploy, você terá:
-- **Frontend:** `https://beuni-frontend-production.up.railway.app`
-- **Backend:** `https://beuni-backend-production.up.railway.app`
-- **Database:** Interno (Railway)
+2. **Aguarde ~10-15 minutos para build completo**
+3. **Generate Domain para ambos os serviços**
+4. **Verifique os logs em tempo real no dashboard**
 
 ---
 
@@ -440,59 +386,85 @@ npm install sharp --save
 # Erro comum: NestJS CLI não encontrado
 Error: sh: 1: nest: not found
 
-# Solução 1: Usar npx nos scripts do package.json
-"build": "npx nest build"
-"start": "npx nest start"
+# Solução: Railway usa Railpack (não Nixpacks)
+# Railpack detecta automaticamente Node.js e NestJS
+# Não precisa configurar build command manualmente
 
-# Solução 2: Instalar @nestjs/cli globalmente
-npm install -g @nestjs/cli
-
-# Solução 3: Verificar Root Directory no Railway
-# Deve ser "backend" não "/backend" ou raiz
+# Se necessário, verificar:
+# Settings → Deploy → Build Command: (deixar vazio)
+# Settings → Deploy → Start Command: (deixar vazio)
+# Railway detecta automaticamente via package.json
 ```
 
-#### **3. Prisma Connection Error**
+#### **3. Root Directory Incorreto**
 ```bash
-# Erro comum: Prisma não pode conectar
-Error: Can't reach database server
-
-# Solução: Verificar DATABASE_URL
-echo $DATABASE_URL
-# Deve mostrar: postgresql://user:pass@host:5432/db
-
-# Railway: Usar variáveis de referência
-DATABASE_URL=${{Postgres.DATABASE_URL}}
-```
-
-#### **4. Monorepo Build Issues**
-```bash
-# Erro: Railway tentando buildar projeto inteiro
+# Erro: Deploy do monorepo inteiro
 Error: Multiple package.json found
 
-# Solução: SEMPRE usar Root Directory
-Backend Service: Root Directory = "backend"
-Frontend Service: Root Directory = "frontend"
+# Solução CORRETA:
+# Backend: Root Directory = "backend" (SEM /)
+# Frontend: Root Directory = "frontend" (SEM /)
 
-# NUNCA deployar o repositório inteiro!
+# NUNCA usar:
+# - "/" (raiz)
+# - "/backend" (com /)
+# - "./backend" (relativo)
+```
+
+#### **4. Pre-Deploy Command Error**
+```bash
+# Erro: Prisma migrations falham
+Error: Can't reach database server during pre-deploy
+
+# Solução: Configurar Pre-Deploy Command
+# Backend Service → Settings → Deploy → Pre-Deploy Command:
+npx prisma migrate deploy && npx prisma db seed
+
+# Ordem de execução Railway:
+# 1. Build (npm install + npm run build)
+# 2. Pre-Deploy (migrations)
+# 3. Start (npm run start:prod)
+```
+
+#### **5. Environment Variables Missing**
+```bash
+# Erro: DATABASE_URL não definido
+Error: Environment variable not found: DATABASE_URL
+
+# Solução: Usar referências Railway
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+REDIS_URL=${{Redis.REDIS_URL}}
+
+# IMPORTANTE: Serviços devem estar no mesmo projeto
+# Para referenciar: ${{ServiceName.VARIABLE}}
 ```
 
 #### **5. Nixpacks Start Command Error**
 ```bash
-# Erro: No start command could be found
-Error: No start command could be found
+# IMPORTANTE: Railway agora usa RAILPACK por padrão
+# Nixpacks está deprecated e em maintenance mode
 
-# Solução 1: Configurar manualmente no Railway
-# Settings → Deploy → Start Command:
-# Backend: "node dist/main.js"
-# Frontend: "npm run start"
+# Railway detecta automaticamente:
+# - Node.js projects via package.json
+# - Build command: npm run build
+# - Start command: npm run start:prod (backend) / npm start (frontend)
 
-# Solução 2: Verificar package.json scripts
-# Backend deve ter: "start:prod": "node dist/main"
-# Frontend deve ter: "start": "next start"
+# Se ainda usando Nixpacks, migrar para Railpack:
+# Settings → Deploy → Builder → RAILPACK
 
-# Solução 3: Build Command completo
-# Backend: "npm install && npx prisma generate && npx nest build"
-# Frontend: "npm install && npm run build"
+# Não precisa configurar comandos manualmente!
+```
+
+#### **6. Dockerfile Detection Issues**
+```bash
+# Railway detecta automaticamente Dockerfile se existir
+# Logs mostram: "Using detected Dockerfile!"
+
+# Para usar package.json ao invés de Dockerfile:
+# - Renomear Dockerfile para Dockerfile.backup
+# - OU definir RAILWAY_DOCKERFILE_PATH=""
+
+# Railpack é recomendado para Node.js projects
 ```
 
 #### **3. 500 Error no Login**
@@ -709,7 +681,7 @@ Para uma demonstração/teste durante processo seletivo:
 
 ### **Opção 1: Deploy Instantâneo (Railway)**
 ```bash
-# ⚠️ MÉTODO CORRETO - Deploy Separado
+# ✅ MÉTODO OFICIAL RAILWAY - Baseado na documentação
 
 # 1. Clonar repositório
 git clone https://github.com/zer0spin/beuni-desafio.git
@@ -717,22 +689,33 @@ git clone https://github.com/zer0spin/beuni-desafio.git
 # 2. Railway.app → New Project
 
 # 3. Deploy Backend:
-#    - Deploy from GitHub repo
-#    - Root Directory: "backend" (SEM /)
-#    - Wait for build completion
+#    - Deploy from GitHub repo: beuni-desafio
+#    - Root Directory: "backend" (sem /)
+#    - Railway detecta Node.js automaticamente
+#    - Build: npm run build (automático)
+#    - Start: npm run start:prod (automático)
 
 # 4. Deploy Frontend:
-#    - Add Service → Deploy from GitHub  
+#    - Add Service → Deploy from GitHub
 #    - Same repo, Root Directory: "frontend"
-#    - Wait for build completion
+#    - Railway detecta Next.js automaticamente
+#    - Build: npm run build (automático)
+#    - Start: npm start (automático)
 
-# 5. Add Services:
+# 5. Add Database Services:
 #    - Add Service → PostgreSQL
 #    - Add Service → Redis
 
-# 6. Configure environment variables
+# 6. Configure environment variables com referências:
+#    DATABASE_URL=${{Postgres.DATABASE_URL}}
+#    REDIS_URL=${{Redis.REDIS_URL}}
 
-# 7. URLs finais em ~15 minutos:
+# 7. Pre-Deploy Command (Backend):
+#    npx prisma migrate deploy && npx prisma db seed
+
+# 8. Generate Domain para ambos serviços
+
+# 9. URLs finais em ~15 minutos:
 # Frontend: https://beuni-frontend.up.railway.app
 # Backend: https://beuni-backend.up.railway.app
 ```

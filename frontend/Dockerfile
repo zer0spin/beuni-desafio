@@ -1,30 +1,26 @@
+# Railway-optimized Dockerfile for Next.js Frontend
 FROM node:18-alpine
 
-# Install dependencies
+# Install dependencies for Next.js
 RUN apk add --no-cache libc6-compat
 
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json ./
+# Copy package files first for better layer caching
+COPY package*.json ./
 
-# Install dependencies including devDependencies
-RUN npm ci
+# Install dependencies
+RUN npm ci --only=production && npm cache clean --force
 
-# Copy the rest of the application
-COPY . .
+# Copy application code
+COPY . ./
 
-# Clear Next.js cache and build fresh
-RUN rm -rf .next
+# Build the application
+RUN npm run build
 
-# Expose port
-EXPOSE 3000
+# Expose the port Railway expects
+EXPOSE $PORT
 
-# Set environment variables
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
-ENV NODE_ENV development
-
-# Start development server
-CMD ["npm", "run", "dev"]
+# Start the application
+CMD ["npm", "start"]
