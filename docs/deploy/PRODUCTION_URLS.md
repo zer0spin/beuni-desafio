@@ -5,7 +5,7 @@
 ### **🎨 FRONTEND (Para Usuários)**
 ```
 🌟 PRINCIPAL: https://beuni-frontend-one.vercel.app
-📱 Preview:   https://beuni-frontend-q6ee7y798-zer0spins-projects.vercel.app
+📱 Atual:     https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
 🔧 Dashboard: https://vercel.com/zer0spins-projects/beuni-frontend
 ```
 
@@ -22,10 +22,10 @@
 ## 🧭 **NAVEGAÇÃO RÁPIDA**
 
 ### **👥 Para Usuários Finais:**
-- **Aplicação**: https://beuni-frontend-one.vercel.app
-- **Login**: https://beuni-frontend-one.vercel.app/login  
-- **Registro**: https://beuni-frontend-one.vercel.app/register
-- **Dashboard**: https://beuni-frontend-one.vercel.app/dashboard
+- **Aplicação**: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
+- **Login**: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app/login  
+- **Registro**: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app/register
+- **Dashboard**: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app/dashboard
 
 ### **👨‍💻 Para Desenvolvedores:**
 - **API Docs**: https://beuni-desafio-production.up.railway.app/api/docs
@@ -78,8 +78,8 @@ GET  /       - Info básica da API
 
 ### **1. Acesso Direto (Usuários)**
 ```
-1. Abra: https://beuni-frontend-one.vercel.app
-2. Registre-se ou faça login
+1. Abra: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
+2. Faça login com: ana.novo@beunidemo.com / AnaPass123@2025
 3. Use a aplicação normalmente
 ```
 
@@ -101,10 +101,17 @@ curl -X POST https://beuni-desafio-production.up.railway.app/auth/login \
 ```
 📋 Para copiar e colar:
 
-Frontend: https://beuni-frontend-one.vercel.app
+Frontend: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
 API Docs: https://beuni-desafio-production.up.railway.app/api/docs
 GitHub:   https://github.com/zer0spin/beuni-desafio
 ```
+
+### **🔑 Credenciais de Teste:**
+```
+Email: ana.novo@beunidemo.com
+Senha: AnaPass123@2025
+```
+> ⚠️ **Nota:** Use estas credenciais para fazer login e testar a aplicação
 
 ---
 

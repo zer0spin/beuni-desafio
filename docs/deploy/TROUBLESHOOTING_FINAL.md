@@ -4,9 +4,10 @@
 
 ### **1. ✅ Erro de Deploy Vercel (Next.js não detectado)**
 - **Problema:** "No Next.js version detected" no último commit
-- **Causa:** Problema de configuração Root Directory  
-- **Solução:** `vercel --prod --force` resolveu o issue
-- **Status:** ✅ RESOLVIDO - Frontend funcionando em https://beuni-frontend-q6ee7y798-zer0spins-projects.vercel.app
+- **Causa:** Deploy sendo executado no diretório raiz em vez de `/frontend`
+- **Solução:** `cd frontend && vercel --prod` do diretório correto
+- **Status:** ✅ RESOLVIDO - Frontend funcionando em https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
+- **Update:** Deploy mais recente (3 out 2025) com status Ready ✅
 
 ### **2. ✅ Problemas de Autenticação**
 - **Problema:** Credenciais inválidas para developer.marcos.oliveira@gmail.com
@@ -76,7 +77,7 @@
 - ✅ Documentação: ATUALIZADA
 
 ### **🔗 Links de Acesso:**
-- **Usuário Final:** https://beuni-frontend-one.vercel.app/
+- **Usuário Final:** https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app/
 - **API Docs:** https://beuni-desafio-production.up.railway.app/api/docs
 - **Health Check:** https://beuni-desafio-production.up.railway.app/health
 
