@@ -3,7 +3,9 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
-import cookieParser from 'cookie-parser';
+// Usar require para compatibilidade com CommonJS
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const cookieParser = require('cookie-parser');
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CsrfGuard } from './common/guards/csrf.guard';
 
@@ -83,8 +85,9 @@ async function bootstrap() {
   });
 
   const port = process.env.PORT || 3001;
-  // Register global CSRF guard
-  app.useGlobalGuards(new CsrfGuard());
+  // Register global CSRF guard with DI
+  const reflector = app.get(Reflector);
+  app.useGlobalGuards(new CsrfGuard(reflector));
   await app.listen(port);
 
   console.log('🚀 Beuni Backend API rodando em:', `http://localhost:${port}`);

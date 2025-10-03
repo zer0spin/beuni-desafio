@@ -6,11 +6,11 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma.service';
 import { EnvioStatus } from '../../../common/constants/envio-brindes.constants';
-import { Prisma, StatusEnvioBrinde } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 export interface EnvioBrindeWhereClause {
   anoAniversario?: number;
-  status?: StatusEnvioBrinde;
+  status?: EnvioStatus;
   colaboradorId?: string;
   colaborador?: {
     organizationId: string;
@@ -74,7 +74,7 @@ export class EnvioBrindesRepository {
   async create(data: {
     colaboradorId: string;
     anoAniversario: number;
-    status: StatusEnvioBrinde;
+  status: EnvioStatus;
     dataGatilhoEnvio?: Date;
   }) {
     return this.prisma.envioBrinde.create({ data });
