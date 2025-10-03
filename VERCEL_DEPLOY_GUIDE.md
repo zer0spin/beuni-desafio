@@ -34,11 +34,11 @@ Framework: Next.js (detectado automaticamente)
 
 ⚠️ IMPORTANTE: Root Directory
   Root Directory: frontend
-  (Isso é CRUCIAL - sem isso não funcionará!)
+  (Isso é CRUCIAL - Vercel executará comandos DENTRO da pasta frontend)
 
-Build Command: npm run build (automático)
-Output Directory: .next (automático)
-Install Command: npm install (automático)
+Build Command: npm run build:vercel (automático via vercel.json)
+Output Directory: .next (automático via vercel.json)
+Install Command: npm ci --omit=dev (automático via vercel.json)
 ```
 
 ### **4. Environment Variables**
@@ -186,14 +186,17 @@ Development: NEXT_PUBLIC_API_URL=http://localhost:3001
 
 ### **Frontend Build Errors**
 ```bash
+❌ "cd: frontend: No such file or directory"
+✅ Solution: Root Directory "frontend" já configurado ✅
+
 ❌ "Module not found"
-✅ Solution: npm install na pasta frontend/
+✅ Solution: npm ci --omit=dev instalará dependências
 
 ❌ "NEXT_PUBLIC_API_URL is undefined" 
 ✅ Solution: Add env var in Vercel dashboard
 
 ❌ "Build timeout"
-✅ Solution: Check vercel.json buildCommand
+✅ Solution: vercel.json otimizado para produção ✅
 ```
 
 ### **API Connection Errors**
