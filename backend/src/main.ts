@@ -45,7 +45,16 @@ async function bootstrap() {
 
   // CORS configuration with security enhancements
   app.enableCors({
-    origin: process.env.CORS_ORIGIN?.split(',') || ['http://localhost:3000'],
+    origin: [
+      'http://localhost:3000', // Local development
+      'https://localhost:3000', // Local development with HTTPS
+      'https://beuni-desafio.railway.app', // Railway frontend (if used)
+      'https://beuni-frontend.vercel.app', // Vercel production
+      'https://beuni-frontend-git-main.vercel.app', // Vercel preview
+      /^https:\/\/beuni-frontend.*\.vercel\.app$/, // Any Vercel deployment
+      /^https:\/\/.*\.beuni\.app$/, // Custom domain pattern
+      ...((process.env.CORS_ORIGIN?.split(',')) || []), // Additional domains from env
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token'],
