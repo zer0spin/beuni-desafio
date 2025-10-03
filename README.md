@@ -59,7 +59,7 @@ npm run dev
 |----------|-------------|--------|
 | [README.md](README.md) | Project overview and quick start | ✅ Current |
 | [CHANGELOG.md](CHANGELOG.md) | Version history and release notes | ✅ Updated |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture and design | ✅ Complete |
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Comprehensive system architecture | ✅ Complete |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Development guidelines | ✅ Complete |
 
 ### 🔧 Development Documentation
@@ -67,22 +67,38 @@ npm run dev
 |----------|-------------|----------|
 | [Development Log](docs/DEVELOPMENT_LOG.md) | Complete development history (PT) | `docs/` |
 | [Setup Guide](SETUP_GUIDE.md) | Detailed installation instructions | Root |
-| [API Documentation](docs/API_DOCUMENTATION.md) | REST API endpoints and schemas | `docs/` |
-| [Docker Analysis](docs/DOCKER_COMPOSE_ANALYSIS.md) | Container configuration guide | `docs/` |
-
-### 🧪 Quality Assurance
-| Document | Description | Location |
-|----------|-------------|----------|
-| [Testing Architecture](docs/testing/TESTING-ARCHITECTURE.md) | Test strategy and frameworks | `docs/testing/` |
-| [Coverage Report](docs/testing/COVERAGE-REPORT.md) | Code coverage metrics | `docs/testing/` |
-| [Security Assessment](docs/security/SECURITY_ASSESSMENT_REPORT.md) | Security audit results | `docs/security/` |
+| [Performance Strategy](docs/PERFORMANCE.md) | Performance optimization guide | `docs/` |
+| [Deployment Guide](docs/DEPLOYMENT.md) | Deployment configurations | `docs/` |
 
 ### 🔒 Security Documentation
 | Document | Description | Location |
 |----------|-------------|----------|
+| [Security Assessment](docs/SECURITY.md) | Comprehensive security strategy | `docs/` |
 | [Security Policy](SECURITY.md) | Vulnerability reporting | Root |
-| [Security Fixes](SECURITY_FIXES_APPLIED.md) | Applied security patches | Root |
-| [Threat Analysis](docs/security/threat-hunting-queries.md) | Security monitoring | `docs/security/` |
+| [Threat Model](docs/security/threat-hunting-queries.md) | Security monitoring | `docs/security/` |
+| [Vulnerability Fixes](SECURITY_FIXES_APPLIED.md) | Applied security patches | Root |
+
+### 🧪 Quality Assurance
+| Document | Description | Location |
+|----------|-------------|----------|
+| [Testing Strategy](docs/TESTING.md) | Comprehensive testing approach | `docs/` |
+| [Code Refactoring](docs/REFACTORING.md) | Code quality improvements | `docs/` |
+| [Test Coverage](docs/testing/COVERAGE-REPORT.md) | Detailed coverage metrics | `docs/testing/` |
+| [Accessibility Guide](docs/ACCESSIBILITY.md) | Accessibility compliance | `docs/` |
+
+### 🌐 Technical References
+| Document | Description | Location |
+|----------|-------------|----------|
+| [API Documentation](docs/API.md) | Detailed API specifications | `docs/` |
+| [Docker Compose](docs/DOCKER_COMPOSE_ANALYSIS.md) | Container configuration | `docs/` |
+| [Local Development](docs/DEVELOPMENT.md) | Local setup instructions | `docs/` |
+
+### 🤝 Contribution & Support
+| Document | Description | Location |
+|----------|-------------|----------|
+| [Contributing Guidelines](CONTRIBUTING.md) | How to contribute | Root |
+| [Code of Conduct](CODE_OF_CONDUCT.md) | Community standards | Root |
+| [Support](SUPPORT.md) | Getting help | Root |
 
 ## 🎯 Key Features
 

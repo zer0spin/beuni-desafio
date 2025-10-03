@@ -70,6 +70,8 @@ model Colaborador {
   @@map("colaboradores")
   @@index([organizationId])
   @@index([organizationId, dataNascimento])
+  @@index([organizationId, departamento]) // Performance: department filtering
+  @@index([departamento]) // Performance: global department stats
 }
 
 model Endereco {
@@ -124,6 +126,7 @@ model EnvioBrinde {
   @@index([anoAniversario])
   @@index([status])
   @@index([colaboradorId])
+  @@index([status, anoAniversario]) // Performance: filter by status and year together
   @@map("envios_brinde")
 }
 
