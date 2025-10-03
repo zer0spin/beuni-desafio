@@ -76,7 +76,7 @@ git push origin production
 
 ### **Passo 3: Configurar Serviços**
 
-Railway detectará automaticamente o projeto. Configure os serviços:
+Railway detectará automaticamente o projeto. Configure os serviços SEPARADAMENTE:
 
 #### **3.1 PostgreSQL**
 ```yaml
@@ -95,8 +95,9 @@ Plan: Hobby (Free)
 #### **3.3 Backend (NestJS)**
 ```yaml
 # Configurações do serviço backend
-Root Directory: /backend
-Build Command: npm install && npm run build
+Service Name: beuni-backend
+Root Directory: backend
+Build Command: npm ci && npx nest build
 Start Command: npm run start:prod
 Port: 3001
 ```
@@ -114,8 +115,9 @@ FRONTEND_URL=https://your-frontend-url.up.railway.app
 #### **3.4 Frontend (Next.js)**
 ```yaml
 # Configurações do serviço frontend
-Root Directory: /frontend  
-Build Command: npm install && npm run build
+Service Name: beuni-frontend
+Root Directory: frontend
+Build Command: npm ci && npm run build
 Start Command: npm start
 Port: 3000
 ```
@@ -125,6 +127,26 @@ Port: 3000
 NODE_ENV=production
 NEXT_PUBLIC_API_URL=https://your-backend-url.up.railway.app
 ```
+
+### **⚠️ IMPORTANTE: Deploy Separado**
+
+**NÃO faça deploy do repositório inteiro!** O Railway deve deployar cada serviço separadamente:
+
+1. **Primeiro Deploy - Backend:**
+   - New Project → Deploy from GitHub
+   - Repository: `beuni-desafio`
+   - **Root Directory: `backend`** ← CRUCIAL
+   - Service Name: `beuni-backend`
+
+2. **Segundo Deploy - Frontend:**
+   - Add Service → Deploy from GitHub
+   - Same Repository: `beuni-desafio`
+   - **Root Directory: `frontend`** ← CRUCIAL
+   - Service Name: `beuni-frontend`
+
+3. **Adicionar Database Services:**
+   - Add Service → PostgreSQL
+   - Add Service → Redis
 
 ### **Passo 4: Deploy Automático**
 
@@ -416,12 +438,43 @@ npm install sharp --save
 
 #### **2. Build Failed - Backend**
 ```bash
+# Erro comum: NestJS CLI não encontrado
+Error: sh: 1: nest: not found
+
+# Solução 1: Usar npx nos scripts do package.json
+"build": "npx nest build"
+"start": "npx nest start"
+
+# Solução 2: Instalar @nestjs/cli globalmente
+npm install -g @nestjs/cli
+
+# Solução 3: Verificar Root Directory no Railway
+# Deve ser "backend" não "/backend" ou raiz
+```
+
+#### **3. Prisma Connection Error**
+```bash
 # Erro comum: Prisma não pode conectar
 Error: Can't reach database server
 
 # Solução: Verificar DATABASE_URL
 echo $DATABASE_URL
 # Deve mostrar: postgresql://user:pass@host:5432/db
+
+# Railway: Usar variáveis de referência
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+```
+
+#### **4. Monorepo Build Issues**
+```bash
+# Erro: Railway tentando buildar projeto inteiro
+Error: Multiple package.json found
+
+# Solução: SEMPRE usar Root Directory
+Backend Service: Root Directory = "backend"
+Frontend Service: Root Directory = "frontend"
+
+# NUNCA deployar o repositório inteiro!
 ```
 
 #### **3. 500 Error no Login**
@@ -638,14 +691,30 @@ Para uma demonstração/teste durante processo seletivo:
 
 ### **Opção 1: Deploy Instantâneo (Railway)**
 ```bash
+# ⚠️ MÉTODO CORRETO - Deploy Separado
+
 # 1. Clonar repositório
 git clone https://github.com/zer0spin/beuni-desafio.git
 
-# 2. Acessar Railway.app e conectar GitHub
+# 2. Railway.app → New Project
 
-# 3. Deploy automático em ~10 minutos
+# 3. Deploy Backend:
+#    - Deploy from GitHub repo
+#    - Root Directory: "backend" (SEM /)
+#    - Wait for build completion
 
-# 4. URLs finais:
+# 4. Deploy Frontend:
+#    - Add Service → Deploy from GitHub  
+#    - Same repo, Root Directory: "frontend"
+#    - Wait for build completion
+
+# 5. Add Services:
+#    - Add Service → PostgreSQL
+#    - Add Service → Redis
+
+# 6. Configure environment variables
+
+# 7. URLs finais em ~15 minutos:
 # Frontend: https://beuni-frontend.up.railway.app
 # Backend: https://beuni-backend.up.railway.app
 ```
