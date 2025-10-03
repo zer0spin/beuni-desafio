@@ -1,21 +1,23 @@
 # Railway-optimized Dockerfile for NestJS Backend
 # Build from repository root
-FROM node:18-alpine AS deps
-RUN apk add --no-cache openssl
+# Using Debian Slim instead of Alpine for better Prisma compatibility
+FROM node:18-slim AS deps
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY backend/package*.json ./
 COPY backend/prisma ./prisma/
 # Install ALL deps (incl. dev) for build & prisma generate
 RUN npm ci && npm cache clean --force
 
-FROM node:18-alpine AS builder
-RUN apk add --no-cache openssl
+FROM node:18-slim AS builder
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY backend/ .
 RUN npx prisma generate && npm run build
 
-FROM node:18-alpine AS runner
+FROM node:18-slim AS runner
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/node_modules ./node_modules
