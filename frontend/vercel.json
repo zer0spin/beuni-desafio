@@ -1,7 +1,4 @@
 {
-  "buildCommand": "npm ci --omit=dev && npm run build:vercel",
-  "outputDirectory": ".next",
-  "installCommand": "npm ci --omit=dev",
   "framework": "nextjs",
   "cleanUrls": true,
   "functions": {
