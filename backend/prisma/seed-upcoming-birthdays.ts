@@ -67,10 +67,19 @@ function generateBirthdayInRange(startDate: Date, endDate: Date): Date {
 async function main() {
   console.log('🎂 Adicionando colaboradores com aniversários nos próximos 5 dias...');
 
-  // Buscar a organização existente
-  const organizacao = await prisma.organizacao.findFirst({
-    where: { nome: 'Beuni Demo Company' }
-  });
+  // Buscar a organização existente (robusto: por ID fixo do seed principal ou por nome aproximado)
+  let organizacao = await prisma.organizacao.findUnique({ where: { id: 'demo-org-id' } });
+  if (!organizacao) {
+    organizacao = await prisma.organizacao.findFirst({
+      where: {
+        OR: [
+          { nome: 'Beuni Demo Company' },
+          { nome: { contains: 'Beuni', mode: 'insensitive' } },
+        ],
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
 
   if (!organizacao) {
     console.error('❌ Organização não encontrada. Execute o seed principal primeiro.');
@@ -142,9 +151,10 @@ async function main() {
       let dataGatilhoEnvio = null;
       
       if (diasParaAniversario <= 7) {
-  status = 'PRONTO_PARA_ENVIO';
-        dataGatilhoEnvio = new Date();
-        dataGatilhoEnvio.setDate(aniversarioEsteAno.getDate() - 7);
+        status = 'PRONTO_PARA_ENVIO';
+        // Corrige cálculo: usar a data do aniversário deste ano e subtrair 7 dias (não o dia do mês no 'hoje')
+        dataGatilhoEnvio = new Date(aniversarioEsteAno);
+        dataGatilhoEnvio.setDate(dataGatilhoEnvio.getDate() - 7);
       }
       
       await prisma.envioBrinde.create({

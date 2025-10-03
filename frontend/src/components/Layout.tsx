@@ -206,61 +206,71 @@ export default function Layout({ children }: LayoutProps) {
             })}
           </nav>
 
-          {/* User Section */}
+          {/* Quick Shortcuts Section (replaces 'Online') */}
           <div className="flex-shrink-0 border-t border-beuni-orange-100 p-4">
             {sidebarOpen ? (
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 overflow-hidden">
-                  <img
-                    src={getProfileImageUrl(user.imagemPerfil)}
-                    alt={user.nome}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // Se falhar ao carregar, mostrar inicial
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.textContent = user?.nome?.charAt(0) || 'U';
-                    }}
-                  />
-                </div>
-                <div className="ml-3 flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <p className="text-xs font-semibold text-green-600 uppercase tracking-wide">
-                      Online
-                    </p>
-                  </div>
-                  <p className="text-sm font-bold text-beuni-text truncate">
-                    {user?.organizacao?.nome || 'Organização'}
-                  </p>
-                  <p className="text-xs text-beuni-text/50 truncate">
-                    {new Date().toLocaleDateString('pt-BR', { 
-                      weekday: 'short', 
-                      month: 'short', 
-                      day: 'numeric' 
-                    })}
-                  </p>
+              <div>
+                <p className="text-xs font-semibold text-beuni-text/60 uppercase tracking-wide mb-2">
+                  Atalhos rápidos
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => router.push('/colaboradores/novo')}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-beuni-cream hover:bg-beuni-orange-50 rounded-lg text-sm font-semibold text-beuni-text transition-colors"
+                    title="Novo colaborador"
+                  >
+                    <Users className="h-4 w-4" />
+                    Novo
+                  </button>
+                  <button
+                    onClick={() => router.push('/relatorios')}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-beuni-cream hover:bg-beuni-orange-50 rounded-lg text-sm font-semibold text-beuni-text transition-colors"
+                    title="Relatórios"
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    Relatórios
+                  </button>
+                  <button
+                    onClick={() => router.push('/envios?status=PRONTO_PARA_ENVIO')}
+                    className="flex items-center justify-center gap-2 px-3 py-2 bg-beuni-cream hover:bg-beuni-orange-50 rounded-lg text-sm font-semibold text-beuni-text transition-colors col-span-2"
+                    title="Envios prontos"
+                  >
+                    <Package className="h-4 w-4" />
+                    Envios prontos
+                  </button>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="ml-2 p-2 text-beuni-text/60 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  className="mt-3 w-full p-2 text-beuni-text/60 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors flex items-center justify-center gap-2"
                   title="Sair"
                 >
                   <LogOut className="h-4 w-4" />
+                  Sair
                 </button>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <div className="w-10 h-10 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 rounded-full flex items-center justify-center text-white font-bold overflow-hidden">
-                  <img
-                    src={getProfileImageUrl(user.imagemPerfil)}
-                    alt={user.nome}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.textContent = user?.nome?.charAt(0) || 'U';
-                    }}
-                  />
-                </div>
+                <button
+                  onClick={() => router.push('/colaboradores/novo')}
+                  className="p-2 text-beuni-text/60 hover:text-beuni-orange-600 hover:bg-beuni-orange-50 rounded-lg transition-colors"
+                  title="Novo colaborador"
+                >
+                  <Users className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => router.push('/relatorios')}
+                  className="p-2 text-beuni-text/60 hover:text-beuni-orange-600 hover:bg-beuni-orange-50 rounded-lg transition-colors"
+                  title="Relatórios"
+                >
+                  <BarChart3 className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => router.push('/envios?status=PRONTO_PARA_ENVIO')}
+                  className="p-2 text-beuni-text/60 hover:text-beuni-orange-600 hover:bg-beuni-orange-50 rounded-lg transition-colors"
+                  title="Envios prontos"
+                >
+                  <Package className="h-4 w-4" />
+                </button>
                 <button
                   onClick={handleLogout}
                   className="p-2 text-beuni-text/60 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"

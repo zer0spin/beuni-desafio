@@ -497,29 +497,38 @@ export default function EnviosPage() {
                               }`} />
                             )}
                             <div className="min-w-0 flex-1">
-                              <p className={`text-xs font-semibold uppercase ${textTone.small}`}>
-                                {passouAniversario
-                                  ? 'ATRASADO'
-                                  : passouIdeal
-                                  ? 'APÓS PRAZO IDEAL'
-                                  : businessDaysUntilIdeal === 0
-                                  ? 'ÚLTIMO DIA PARA ENVIAR'
-                                  : 'PRAZO IDEAL'}
-                              </p>
-                              <p className={`text-sm font-bold truncate ${textTone.big}`}>
-                                {passouAniversario
-                                  ? '—'
-                                  : passouIdeal
-                                  ? 'Envie o quanto antes'
-                                  : businessDaysUntilIdeal === 0
-                                  ? 'Hoje é o último dia'
-                                  : `${businessDaysUntilIdeal} dias para enviar brinde`}
-                              </p>
-                              {idealDate && (
-                                <p className="text-[12px] mt-0.5">
-                                  <span className="inline-block px-2 py-0.5 rounded-md bg-beuni-orange-100 text-beuni-orange-700 font-semibold mr-2">Prazo ideal</span>
-                                  <span className="text-beuni-text font-medium">até {formatDate(idealDate)}</span>
-                                </p>
+                              {passouAniversario ? (
+                                <>
+                                  <p className={`text-xs font-semibold uppercase ${textTone.small}`}>ATRASADO</p>
+                                  {idealDate && (
+                                    <p className={`text-sm font-bold truncate ${textTone.big}`}>
+                                      O prazo ideal era {formatDate(idealDate)}
+                                    </p>
+                                  )}
+                                </>
+                              ) : (
+                                <>
+                                  <p className={`text-xs font-semibold uppercase ${textTone.small}`}>
+                                    {passouIdeal
+                                      ? 'APÓS PRAZO IDEAL'
+                                      : businessDaysUntilIdeal === 0
+                                      ? 'ÚLTIMO DIA PARA ENVIAR'
+                                      : 'PRAZO IDEAL'}
+                                  </p>
+                                  <p className={`text-sm font-bold truncate ${textTone.big}`}>
+                                    {passouIdeal
+                                      ? 'Envie o quanto antes'
+                                      : businessDaysUntilIdeal === 0
+                                      ? 'Hoje é o último dia'
+                                      : `${businessDaysUntilIdeal} dias para enviar brinde`}
+                                  </p>
+                                  {idealDate && (
+                                    <p className="text-[12px] mt-0.5">
+                                      <span className="inline-block px-2 py-0.5 rounded-md bg-beuni-orange-100 text-beuni-orange-700 font-semibold mr-2">Prazo ideal</span>
+                                      <span className="text-beuni-text font-medium">até {formatDate(idealDate)}</span>
+                                    </p>
+                                  )}
+                                </>
                               )}
                             </div>
                           </div>
