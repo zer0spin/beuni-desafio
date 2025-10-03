@@ -141,3 +141,4 @@ test-results/
 # Debug scripts
 debug-*.js
 debug-*.ts
+.vercel
