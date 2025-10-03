@@ -1,5 +1,8 @@
 # Security Testing Guide
 
+> DEPRECATED: This guide has been consolidated. For the up-to-date, unified security documentation, see docs/security/SECURITY_CONSOLIDATED.md.
+# Security Testing Guide
+
 ## Post-Remediation Validation
 
 This guide helps validate that all security fixes are working correctly.

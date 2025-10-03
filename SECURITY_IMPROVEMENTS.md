@@ -1,5 +1,7 @@
 # 🔒 RELATÓRIO DE MELHORIAS DE SEGURANÇA
 
+> Note: For the unified, English-first security documentation covering policies, assessments, fixes, and monitoring, refer to docs/security/SECURITY_CONSOLIDATED.md.
+
 ## Data: 02/10/2025
 ## Status: ✅ IMPLEMENTADO
 

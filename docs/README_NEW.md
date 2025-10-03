@@ -1,5 +1,7 @@
 # 📚 Documentation Master Index
 
+> Note: This file is superseded by docs/README.md and kept for historical comparison. Please use docs/README.md as the official index.
+
 > **Navigation Guide**: This index provides a structured overview of all project documentation, organized by category and purpose.
 
 ## 🏗️ Documentation Architecture

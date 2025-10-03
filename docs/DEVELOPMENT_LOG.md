@@ -1,5 +1,7 @@
 # 📋 Development Log - Beuni AI Challenge
 
+> Executive Summary (EN): This log provides a comprehensive account of the end-to-end development of the Beuni platform, including containerized setup, backend APIs with JWT auth, frontend modernization with Tailwind/Next.js, security hardening (httpOnly cookies + CSRF), database seeding and migrations, analytics/reporting improvements, and a complete documentation overhaul. It includes detailed troubleshooting, architecture notes, and validation steps with builds/tests. While the narrative is in Portuguese for historical accuracy, this summary clarifies scope and outcomes for English readers. Key highlights: 7-business-day scheduling logic (UI), robust seeds (including upcoming birthdays), stabilized auth via cookies, CSRF guard, Prisma indexes, UI redesigns (Home, Notifications, Settings, Catalog, Envios), animations, and consolidated English-first documentation.
+
 **Date:** 09/28-29/2025
 **Objective:** Develop SaaS platform for corporate birthday management
 **Stack:** Docker + NestJS + Next.js + PostgreSQL + Redis + Prisma

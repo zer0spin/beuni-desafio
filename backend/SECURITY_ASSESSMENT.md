@@ -1,3 +1,7 @@
+# DEPRECATED: Refer to Consolidated Security Docs
+
+> This file is retained for historical context. For the latest and unified security documentation, see: docs/security/SECURITY_CONSOLIDATED.md
+
 # Security Vulnerability Assessment Report
 
 **Project:** Beuni Desafio Backend

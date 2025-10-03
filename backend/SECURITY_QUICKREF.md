@@ -1,3 +1,7 @@
+# DEPRECATED: Refer to Consolidated Security Docs
+
+> This quick reference is retained for historical context. For the latest unified security guidelines, see: docs/security/SECURITY_CONSOLIDATED.md
+
 # Security Quick Reference Card
 
 ## Critical Security Fixes Applied

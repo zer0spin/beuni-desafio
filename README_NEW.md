@@ -1,5 +1,7 @@
 # 🎂 Beuni Birthday Management Platform
 
+> Note: This file has been superseded by the root README.md and is kept only for historical context. Please refer to README.md for the official documentation.
+
 [![Tests](https://img.shields.io/badge/tests-92%25_coverage-brightgreen)](docs/testing/COVERAGE-REPORT.md)
 [![Security](https://img.shields.io/badge/security-A+-brightgreen)](docs/security/SECURITY_ASSESSMENT_REPORT.md)
 [![Build](https://img.shields.io/badge/build-passing-success)](docs/DEVELOPMENT_LOG.md)
