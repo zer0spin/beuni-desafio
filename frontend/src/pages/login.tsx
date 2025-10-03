@@ -269,11 +269,11 @@ export default function LoginPage() {
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <span className="text-beuni-text/60 font-medium">E-mail:</span>
-                  <p className="text-beuni-text font-mono text-xs">ana.rh@beunidemo.com</p>
+                  <p className="text-beuni-text font-mono text-xs">ana.novo@beunidemo.com</p>
                 </div>
                 <div>
                   <span className="text-beuni-text/60 font-medium">Senha:</span>
-                  <p className="text-beuni-text font-mono text-xs">123456</p>
+                  <p className="text-beuni-text font-mono text-xs">AnaPass123@2025</p>
                 </div>
               </div>
             </div>
