@@ -26,7 +26,7 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "DOCKERFILE",
-    "dockerfilePath": "backend/Dockerfile"
+    "dockerfilePath": "Dockerfile"
   },
   "deploy": {
     "numReplicas": 1,
@@ -35,6 +35,8 @@
   }
 }
 ```
+
+**⚠️ IMPORTANTE:** O Dockerfile está no **root do repositório** (não em `backend/`), pois o Railway executa o build do diretório raiz. Os paths dentro do Dockerfile foram ajustados para `backend/`.
 
 #### 2. `backend/package.json` - Script de build
 ```json
@@ -45,7 +47,58 @@
 }
 ```
 
-#### 3. `nixpacks.toml` (Alternativa ao Dockerfile)
+#### 3. `Dockerfile` (Root do projeto)
+```dockerfile
+# Railway-optimized Dockerfile for NestJS Backend
+# Build from repository root
+FROM node:18-alpine AS deps
+RUN apk add --no-cache openssl
+WORKDIR /app
+COPY backend/package*.json ./
+COPY backend/prisma ./prisma/
+RUN npm ci && npm cache clean --force
+
+FROM node:18-alpine AS builder
+RUN apk add --no-cache openssl
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY backend/ .
+RUN npx prisma generate && npm run build
+
+FROM node:18-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY backend/package*.json ./
+EXPOSE $PORT
+CMD ["node", "dist/main.js"]
+```
+
+#### 4. `.dockerignore` (Root do projeto)
+```
+# Node modules
+**/node_modules
+**/npm-debug.log
+
+# Build outputs
+**/dist
+**/.next
+
+# Development & test files
+**/.git
+**/.env
+**/test
+**/coverage
+**/*.spec.ts
+**/*.test.ts
+
+# Frontend (backend build only)
+frontend/
+```
+
+#### 5. `nixpacks.toml` (Alternativa ao Dockerfile)
 ```toml
 [phases.setup]
 nixPkgs = ["nodejs_18"]
@@ -210,9 +263,26 @@ Se preferir usar Railpack/Nixpacks:
 ### Erro: `tsc: not found`
 ✅ **Resolvido** - TypeScript agora está em `dependencies` e o build usa Dockerfile
 
+**Solução aplicada:**
+- Mudança de `npx tsc` para `tsc` no build script
+- TypeScript em `dependencies` (não devDependencies)
+- Build via Dockerfile multi-stage
+
+### Erro: `/prisma: not found` no Docker
+✅ **Resolvido** - Dockerfile movido para root do repositório
+
+**Causa:**
+- Railway executa o build do diretório raiz
+- Dockerfile em `backend/` não conseguia acessar arquivos corretamente
+
+**Solução aplicada:**
+- Dockerfile movido para root do repositório
+- Paths ajustados para `backend/package.json`, `backend/prisma/`, etc.
+- `.dockerignore` criado para otimizar build
+
 ### Erro: `Prisma Client not generated`
 ```bash
-# Adicione ao Pre-Deploy Command:
+# Adicione ao Pre-Deploy Command no Railway:
 npx prisma generate && npx prisma migrate deploy
 ```
 
@@ -223,11 +293,15 @@ npx prisma generate && npx prisma migrate deploy
 ```bash
 # Verifique se DATABASE_URL está correta:
 railway variables
+
+# Teste a conexão:
+railway run npx prisma db push
 ```
 
 ### Build muito lento
-- Use cache do Docker (já configurado no Dockerfile)
-- Considere usar o Railway's build cache
+- ✅ Cache do Docker já configurado (multi-stage build)
+- ✅ `.dockerignore` criado para excluir arquivos desnecessários
+- Layer caching otimizado: dependencies → build → runtime
 
 ---
 
