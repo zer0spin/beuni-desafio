@@ -1,8 +1,7 @@
 {
   "framework": "nextjs",
-  "rootDirectory": "frontend",
-  "buildCommand": "npm ci && npm run build",
-  "installCommand": "npm ci",
+  "buildCommand": "cd frontend && npm ci && npm run build",
+  "installCommand": "cd frontend && npm ci",
   "outputDirectory": "frontend/.next",
   "headers": [
     {
