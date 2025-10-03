@@ -97,15 +97,14 @@ Plan: Hobby (Free)
 # Configurações do serviço backend
 Service Name: beuni-backend
 Root Directory: backend
-Build Command: npm ci && npx nest build
-Start Command: npm run start:prod
-Port: 3001
+Build Command: npm install && npx prisma generate && npx nest build
+Start Command: node dist/main.js
+Port: $PORT (Railway detecta automaticamente)
 ```
 
 **Variáveis de Ambiente (Backend):**
 ```env
 NODE_ENV=production
-PORT=3001
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 REDIS_URL=${{Redis.REDIS_URL}}
 JWT_SECRET=seu_jwt_secret_super_secreto_de_64_caracteres_aqui_123456
@@ -117,9 +116,9 @@ FRONTEND_URL=https://your-frontend-url.up.railway.app
 # Configurações do serviço frontend
 Service Name: beuni-frontend
 Root Directory: frontend
-Build Command: npm ci && npm run build
-Start Command: npm start
-Port: 3000
+Build Command: npm install && npm run build
+Start Command: npm run start
+Port: $PORT (Railway detecta automaticamente)
 ```
 
 **Variáveis de Ambiente (Frontend):**
@@ -475,6 +474,25 @@ Backend Service: Root Directory = "backend"
 Frontend Service: Root Directory = "frontend"
 
 # NUNCA deployar o repositório inteiro!
+```
+
+#### **5. Nixpacks Start Command Error**
+```bash
+# Erro: No start command could be found
+Error: No start command could be found
+
+# Solução 1: Configurar manualmente no Railway
+# Settings → Deploy → Start Command:
+# Backend: "node dist/main.js"
+# Frontend: "npm run start"
+
+# Solução 2: Verificar package.json scripts
+# Backend deve ter: "start:prod": "node dist/main"
+# Frontend deve ter: "start": "next start"
+
+# Solução 3: Build Command completo
+# Backend: "npm install && npx prisma generate && npx nest build"
+# Frontend: "npm install && npm run build"
 ```
 
 #### **3. 500 Error no Login**
