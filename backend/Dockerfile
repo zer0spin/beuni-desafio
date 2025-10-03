@@ -1,30 +1,25 @@
 # Railway-optimized Dockerfile for NestJS Backend
-FROM node:18-alpine
-
-# Add necessary packages for Prisma
+FROM node:18-alpine AS deps
 RUN apk add --no-cache openssl
-
-# Create and change to the app directory
 WORKDIR /app
-
-# Copy package files first for better layer caching
 COPY package*.json ./
 COPY prisma ./prisma/
+# Install ALL deps (incl. dev) for build & prisma generate
+RUN npm ci && npm cache clean --force
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+FROM node:18-alpine AS builder
+RUN apk add --no-cache openssl
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npx prisma generate && npm run build
 
-# Copy application code
-COPY . ./
-
-# Generate Prisma client
-RUN npx prisma generate
-
-# Build the application
-RUN npm run build
-
-# Expose the port Railway expects
+FROM node:18-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/prisma ./prisma
+COPY package*.json ./
 EXPOSE $PORT
-
-# Start the application
 CMD ["node", "dist/main.js"]
