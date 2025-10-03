@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
 import { Eye, EyeOff } from 'lucide-react';
@@ -173,6 +173,7 @@ export default function LoginPage() {
                       message: 'E-mail inválido',
                     },
                   })}
+                  id="email"
                   type="email"
                   placeholder="john@example.com"
                   className="block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 transition-colors"
@@ -200,6 +201,7 @@ export default function LoginPage() {
                     {...register('password', {
                       required: 'Senha é obrigatória',
                     })}
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••"
                     className="block w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 transition-colors"

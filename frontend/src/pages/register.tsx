@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
@@ -149,6 +149,7 @@ export default function RegisterPage() {
                       message: 'Nome deve ter pelo menos 2 caracteres',
                     },
                   })}
+                  id="nome"
                   type="text"
                   placeholder="Seu nome"
                   className="block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 transition-colors"
@@ -171,6 +172,7 @@ export default function RegisterPage() {
                       message: 'E-mail inválido',
                     },
                   })}
+                  id="email"
                   type="email"
                   placeholder="seuemail@empresa.com"
                   className="block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 transition-colors"
@@ -194,12 +196,14 @@ export default function RegisterPage() {
                         message: 'Senha deve ter pelo menos 6 caracteres',
                       },
                     })}
+                    id="password"
                     type={showPassword ? 'text' : 'password'}
                     placeholder="••••••"
                     className="block w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 transition-colors"
                   />
                   <button
                     type="button"
+                    aria-label="toggle password visibility"
                     className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-beuni-orange-500 transition-colors"
                     onClick={() => setShowPassword(!showPassword)}
                   >
@@ -227,12 +231,14 @@ export default function RegisterPage() {
                       validate: (value) =>
                         value === password || 'Senhas não conferem',
                     })}
+                    id="confirmPassword"
                     type={showConfirmPassword ? 'text' : 'password'}
                     placeholder="••••••"
                     className="block w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500 transition-colors"
                   />
                   <button
                     type="button"
+                    aria-label="toggle password visibility"
                     className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-beuni-orange-500 transition-colors"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >

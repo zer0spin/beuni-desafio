@@ -1,61 +1,49 @@
 import React from 'react';
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { vi, describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { UserProvider, useUser } from '@/contexts/UserContext';
+import { getUser, setAuthToken } from '@/lib/api';
 
-// Mock da API
-const mockApi = {
-  get: vi.fn(),
-  post: vi.fn(),
-};
-
+// Mock das funções da API sem variáveis externas
 vi.mock('@/lib/api', () => ({
-  default: mockApi,
-  endpoints: {
-    auth: '/api/auth',
-    authCheck: '/api/auth/check',
-  },
-  removeAuthToken: vi.fn(),
+  getUser: vi.fn().mockReturnValue(null),
   setAuthToken: vi.fn(),
 }));
 
-// Mock do router Next.js
-const mockPush = vi.fn();
-vi.mock('next/router', () => ({
-  useRouter: () => ({
-    push: mockPush,
-    pathname: '/',
-    asPath: '/',
-    query: {},
-    isReady: true,
-  }),
-}));
-
-// Mock do react-hot-toast
-vi.mock('react-hot-toast', () => ({
-  toast: {
-    success: vi.fn(),
-    error: vi.fn(),
-  },
-}));
+const mockGetUser = vi.mocked(getUser);
+const mockSetAuthToken = vi.mocked(setAuthToken);
 
 // Componente de teste para usar o hook
 function TestComponent() {
-  const { user, isLoading, login, logout } = useUser();
+  const { user, isLoading, setUser, updateUser, refreshUser } = useUser();
 
   return (
     <div>
       <div data-testid="loading">{isLoading.toString()}</div>
       <div data-testid="user">{user ? JSON.stringify(user) : 'null'}</div>
       <button
-        data-testid="login-btn"
-        onClick={() => login('test@example.com', 'password123')}
+        data-testid="set-user-btn"
+        onClick={() => setUser({ 
+          id: 1, 
+          nome_completo: 'Test User', 
+          email: 'test@example.com',
+          imagemPerfil: 'profile.jpg' 
+        })}
       >
-        Login
+        Set User
       </button>
-      <button data-testid="logout-btn" onClick={logout}>
-        Logout
+      <button
+        data-testid="update-user-btn"
+        onClick={() => updateUser({ nome_completo: 'Updated User' })}
+      >
+        Update User
+      </button>
+      <button data-testid="refresh-btn" onClick={refreshUser}>
+        Refresh
+      </button>
+      <button data-testid="clear-btn" onClick={() => setUser(null)}>
+        Clear
       </button>
     </div>
   );
@@ -64,23 +52,13 @@ function TestComponent() {
 describe('UserContext', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockPush.mockClear();
+    mockGetUser.mockReturnValue(null);
     
-    // Mock localStorage
-    const localStorageMock = {
-      getItem: vi.fn(),
-      setItem: vi.fn(),
-      removeItem: vi.fn(),
-      clear: vi.fn(),
-    };
-    Object.defineProperty(window, 'localStorage', {
-      value: localStorageMock,
+    // Mock document.cookie
+    Object.defineProperty(document, 'cookie', {
       writable: true,
+      value: '',
     });
-  });
-
-  afterEach(() => {
-    vi.clearAllTimers();
   });
 
   describe('Estado Inicial', () => {
@@ -91,19 +69,19 @@ describe('UserContext', () => {
         </UserProvider>
       );
 
-      expect(screen.getByTestId('loading')).toHaveTextContent('true');
+      expect(screen.getByTestId('loading')).toHaveTextContent('false');
       expect(screen.getByTestId('user')).toHaveTextContent('null');
     });
 
-    it('deve verificar autenticação no mount', async () => {
+    it('deve carregar usuário do cookie no mount', () => {
       const mockUser = {
         id: 1,
         nome_completo: 'Test User',
         email: 'test@example.com',
-        imagem_perfil: 'profile.jpg',
+        imagemPerfil: 'profile.jpg',
       };
 
-      mockApi.get.mockResolvedValueOnce({ data: mockUser });
+      mockGetUser.mockReturnValue(mockUser);
 
       render(
         <UserProvider>
@@ -111,188 +89,48 @@ describe('UserContext', () => {
         </UserProvider>
       );
 
-      await waitFor(() => {
-        expect(mockApi.get).toHaveBeenCalledWith('/api/auth/check');
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-      });
-    });
-
-    it('deve lidar com usuário não autenticado no check inicial', async () => {
-      mockApi.get.mockRejectedValueOnce(new Error('Unauthorized'));
-
-      render(
-        <UserProvider>
-          <TestComponent />
-        </UserProvider>
-      );
-
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-        expect(screen.getByTestId('user')).toHaveTextContent('null');
-      });
+      expect(mockGetUser).toHaveBeenCalled();
+      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
+      expect(screen.getByTestId('loading')).toHaveTextContent('false');
     });
   });
 
-  describe('Funcionalidade de Login', () => {
-    it('deve fazer login com credenciais válidas', async () => {
+  describe('Funcionalidade de setUser', () => {
+    it('deve permitir definir um usuário', async () => {
       const user = userEvent.setup();
-      const mockUser = {
-        id: 1,
-        nome_completo: 'Test User',
-        email: 'test@example.com',
-        imagem_perfil: 'profile.jpg',
-      };
-
-      mockApi.post.mockResolvedValueOnce({
-        data: {
-          user: mockUser,
-          token: 'fake-jwt-token',
-        },
-      });
 
       render(
         <UserProvider>
           <TestComponent />
         </UserProvider>
       );
-
-      // Aguardar carregamento inicial
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-      });
-
-      const loginButton = screen.getByTestId('login-btn');
-      await user.click(loginButton);
-
-      await waitFor(() => {
-        expect(mockApi.post).toHaveBeenCalledWith('/api/auth', {
-          email: 'test@example.com',
-          password: 'password123',
-        });
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
-      });
-    });
-
-    it('deve tratar erro de login com credenciais inválidas', async () => {
-      const user = userEvent.setup();
-      const toast = await import('react-hot-toast');
-
-      mockApi.post.mockRejectedValueOnce({
-        response: {
-          data: { message: 'Credenciais inválidas' },
-        },
-      });
-
-      render(
-        <UserProvider>
-          <TestComponent />
-        </UserProvider>
-      );
-
-      // Aguardar carregamento inicial
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-      });
-
-      const loginButton = screen.getByTestId('login-btn');
-      await user.click(loginButton);
-
-      await waitFor(() => {
-        expect(toast.toast.error).toHaveBeenCalledWith('Credenciais inválidas');
-      });
 
       expect(screen.getByTestId('user')).toHaveTextContent('null');
-    });
 
-    it('deve tratar erro de rede durante login', async () => {
-      const user = userEvent.setup();
-      const toast = await import('react-hot-toast');
-
-      mockApi.post.mockRejectedValueOnce(new Error('Network Error'));
-
-      render(
-        <UserProvider>
-          <TestComponent />
-        </UserProvider>
-      );
-
-      // Aguardar carregamento inicial
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-      });
-
-      const loginButton = screen.getByTestId('login-btn');
-      await user.click(loginButton);
+      const setUserButton = screen.getByTestId('set-user-btn');
+      await user.click(setUserButton);
 
       await waitFor(() => {
-        expect(toast.toast.error).toHaveBeenCalledWith(
-          'Erro ao fazer login. Tente novamente.'
+        expect(screen.getByTestId('user')).toHaveTextContent(
+          JSON.stringify({
+            id: 1,
+            nome_completo: 'Test User',
+            email: 'test@example.com',
+            imagemPerfil: 'profile.jpg',
+          })
         );
       });
     });
 
-    it('deve mostrar loading durante processo de login', async () => {
+    it('deve permitir limpar o usuário', async () => {
       const user = userEvent.setup();
-      let resolveLogin: (value: any) => void;
-      const loginPromise = new Promise((resolve) => {
-        resolveLogin = resolve;
-      });
-
-      mockApi.post.mockReturnValueOnce(loginPromise);
-
-      render(
-        <UserProvider>
-          <TestComponent />
-        </UserProvider>
-      );
-
-      // Aguardar carregamento inicial
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-      });
-
-      const loginButton = screen.getByTestId('login-btn');
-      await user.click(loginButton);
-
-      // Durante o login, loading deve ser true
-      expect(screen.getByTestId('loading')).toHaveTextContent('true');
-
-      // Resolver o login
-      act(() => {
-        resolveLogin!({
-          data: {
-            user: { id: 1, nome_completo: 'Test User', email: 'test@example.com' },
-            token: 'fake-token',
-          },
-        });
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-      });
-    });
-  });
-
-  describe('Funcionalidade de Logout', () => {
-    it('deve fazer logout com sucesso', async () => {
-      const user = userEvent.setup();
-      const { removeAuthToken } = await import('@/lib/api');
-      const toast = await import('react-hot-toast');
-
-      // Setup inicial com usuário logado
       const mockUser = {
         id: 1,
         nome_completo: 'Test User',
         email: 'test@example.com',
       };
 
-      mockApi.get.mockResolvedValueOnce({ data: mockUser });
+      mockGetUser.mockReturnValue(mockUser);
 
       render(
         <UserProvider>
@@ -300,61 +138,28 @@ describe('UserContext', () => {
         </UserProvider>
       );
 
-      // Aguardar usuário ser carregado
-      await waitFor(() => {
-        expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
-      });
+      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
 
-      const logoutButton = screen.getByTestId('logout-btn');
-      await user.click(logoutButton);
+      const clearButton = screen.getByTestId('clear-btn');
+      await user.click(clearButton);
 
       await waitFor(() => {
-        expect(removeAuthToken).toHaveBeenCalled();
-        expect(toast.toast.success).toHaveBeenCalledWith('Logout realizado com sucesso!');
         expect(screen.getByTestId('user')).toHaveTextContent('null');
-      });
-
-      expect(mockPush).toHaveBeenCalledWith('/login');
-    });
-
-    it('deve limpar localStorage no logout', async () => {
-      const user = userEvent.setup();
-
-      // Setup inicial com usuário logado
-      mockApi.get.mockResolvedValueOnce({
-        data: { id: 1, nome_completo: 'Test User', email: 'test@example.com' },
-      });
-
-      render(
-        <UserProvider>
-          <TestComponent />
-        </UserProvider>
-      );
-
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-      });
-
-      const logoutButton = screen.getByTestId('logout-btn');
-      await user.click(logoutButton);
-
-      await waitFor(() => {
-        expect(window.localStorage.removeItem).toHaveBeenCalledWith('auth_token');
       });
     });
   });
 
-  describe('Persistência de Sessão', () => {
-    it('deve restaurar usuário do token salvo', async () => {
-      window.localStorage.getItem = vi.fn().mockReturnValue('fake-saved-token');
-      
+  describe('Funcionalidade de updateUser', () => {
+    it('deve atualizar dados do usuário existente', async () => {
+      const user = userEvent.setup();
       const mockUser = {
         id: 1,
-        nome_completo: 'Saved User',
-        email: 'saved@example.com',
+        nome_completo: 'Test User',
+        email: 'test@example.com',
+        imagemPerfil: 'profile.jpg',
       };
 
-      mockApi.get.mockResolvedValueOnce({ data: mockUser });
+      mockGetUser.mockReturnValue(mockUser);
 
       render(
         <UserProvider>
@@ -362,16 +167,19 @@ describe('UserContext', () => {
         </UserProvider>
       );
 
+      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
+
+      const updateButton = screen.getByTestId('update-user-btn');
+      await user.click(updateButton);
+
       await waitFor(() => {
-        expect(mockApi.get).toHaveBeenCalledWith('/api/auth/check');
-        expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(mockUser));
+        const expectedUser = { ...mockUser, nome_completo: 'Updated User' };
+        expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(expectedUser));
       });
     });
 
-    it('deve lidar com token inválido salvo', async () => {
-      window.localStorage.getItem = vi.fn().mockReturnValue('invalid-token');
-      
-      mockApi.get.mockRejectedValueOnce(new Error('Token invalid'));
+    it('não deve atualizar se não houver usuário', async () => {
+      const user = userEvent.setup();
 
       render(
         <UserProvider>
@@ -379,43 +187,97 @@ describe('UserContext', () => {
         </UserProvider>
       );
 
+      expect(screen.getByTestId('user')).toHaveTextContent('null');
+
+      const updateButton = screen.getByTestId('update-user-btn');
+      await user.click(updateButton);
+
+      // O usuário deve permanecer null
+      expect(screen.getByTestId('user')).toHaveTextContent('null');
+    });
+  });
+
+  describe('Funcionalidade de refreshUser', () => {
+    it('deve recarregar usuário do cookie', async () => {
+      const user = userEvent.setup();
+      const initialUser = {
+        id: 1,
+        nome_completo: 'Initial User',
+        email: 'initial@example.com',
+      };
+
+      const refreshedUser = {
+        id: 1,
+        nome_completo: 'Refreshed User',
+        email: 'refreshed@example.com',
+      };
+
+      mockGetUser.mockReturnValueOnce(initialUser);
+
+      render(
+        <UserProvider>
+          <TestComponent />
+        </UserProvider>
+      );
+
+      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(initialUser));
+
+      // Simular mudança no cookie
+      mockGetUser.mockReturnValue(refreshedUser);
+
+      const refreshButton = screen.getByTestId('refresh-btn');
+      await user.click(refreshButton);
+
       await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
+        expect(mockGetUser).toHaveBeenCalledTimes(2);
+        expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(refreshedUser));
+      });
+    });
+
+    it('deve lidar com cookie inexistente no refresh', async () => {
+      const user = userEvent.setup();
+      const initialUser = {
+        id: 1,
+        nome_completo: 'Test User',
+        email: 'test@example.com',
+      };
+
+      mockGetUser.mockReturnValueOnce(initialUser);
+
+      render(
+        <UserProvider>
+          <TestComponent />
+        </UserProvider>
+      );
+
+      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(initialUser));
+
+      // Simular remoção do cookie
+      mockGetUser.mockReturnValue(null);
+
+      const refreshButton = screen.getByTestId('refresh-btn');
+      await user.click(refreshButton);
+
+      await waitFor(() => {
         expect(screen.getByTestId('user')).toHaveTextContent('null');
       });
     });
   });
 
   describe('Estados de Loading', () => {
-    it('deve gerenciar estado de loading corretamente', async () => {
-      let resolveCheck: (value: any) => void;
-      const checkPromise = new Promise((resolve) => {
-        resolveCheck = resolve;
-      });
-
-      mockApi.get.mockReturnValueOnce(checkPromise);
-
+    it('deve iniciar com loading false', () => {
       render(
         <UserProvider>
           <TestComponent />
         </UserProvider>
       );
 
-      // Inicialmente loading deve ser true
-      expect(screen.getByTestId('loading')).toHaveTextContent('true');
-
-      // Resolver o check
-      act(() => {
-        resolveCheck!({ data: null });
-      });
-
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-      });
+      // Após o useEffect, loading deve ser false
+      expect(screen.getByTestId('loading')).toHaveTextContent('false');
     });
 
-    it('deve manter loading false após operações assíncronas', async () => {
-      mockApi.get.mockResolvedValueOnce({ data: null });
+    it('deve manter loading false após operações', async () => {
+      const user = userEvent.setup();
 
       render(
         <UserProvider>
@@ -423,42 +285,61 @@ describe('UserContext', () => {
         </UserProvider>
       );
 
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-      });
+      expect(screen.getByTestId('loading')).toHaveTextContent('false');
 
-      // Fazer múltiplas verificações para garantir que loading permanece false
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Executar algumas operações
+      const setUserButton = screen.getByTestId('set-user-btn');
+      await user.click(setUserButton);
+
+      const refreshButton = screen.getByTestId('refresh-btn');
+      await user.click(refreshButton);
+
+      // Loading deve permanecer false
       expect(screen.getByTestId('loading')).toHaveTextContent('false');
     });
   });
 
   describe('Tratamento de Erros', () => {
-    it('deve tratar erro 401 removendo token', async () => {
-      const { removeAuthToken } = await import('@/lib/api');
+    it('deve lançar erro quando hook é usado fora do provider', () => {
+      const TestComponentOutsideProvider = () => {
+        try {
+          useUser();
+          return <div>Should not render</div>;
+        } catch (error: any) {
+          return <div data-testid="error">{error.message}</div>;
+        }
+      };
+
+      render(<TestComponentOutsideProvider />);
       
-      mockApi.get.mockRejectedValueOnce({
-        response: { status: 401 },
-      });
-
-      render(
-        <UserProvider>
-          <TestComponent />
-        </UserProvider>
+      expect(screen.getByTestId('error')).toHaveTextContent(
+        'useUser must be used within a UserProvider'
       );
-
-      await waitFor(() => {
-        expect(removeAuthToken).toHaveBeenCalled();
-        expect(screen.getByTestId('user')).toHaveTextContent('null');
-      });
     });
+  });
 
-    it('deve tratar erro 403 removendo token', async () => {
-      const { removeAuthToken } = await import('@/lib/api');
+  describe('Integração com Cookies', () => {
+    it('deve funcionar corretamente com diferentes estados de cookie', () => {
+      // Teste 1: Cookie vazio
+      mockGetUser.mockReturnValue(null);
       
-      mockApi.get.mockRejectedValueOnce({
-        response: { status: 403 },
-      });
+      const { unmount } = render(
+        <UserProvider>
+          <TestComponent />
+        </UserProvider>
+      );
+
+      expect(screen.getByTestId('user')).toHaveTextContent('null');
+      unmount();
+
+      // Teste 2: Cookie com usuário válido
+      const validUser = {
+        id: 2,
+        nome_completo: 'Valid User',
+        email: 'valid@example.com',
+      };
+
+      mockGetUser.mockReturnValue(validUser);
 
       render(
         <UserProvider>
@@ -466,30 +347,7 @@ describe('UserContext', () => {
         </UserProvider>
       );
 
-      await waitFor(() => {
-        expect(removeAuthToken).toHaveBeenCalled();
-        expect(screen.getByTestId('user')).toHaveTextContent('null');
-      });
-    });
-
-    it('deve tratar erros de rede graciosamente', async () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      
-      mockApi.get.mockRejectedValueOnce(new Error('Network Error'));
-
-      render(
-        <UserProvider>
-          <TestComponent />
-        </UserProvider>
-      );
-
-      await waitFor(() => {
-        expect(screen.getByTestId('loading')).toHaveTextContent('false');
-        expect(screen.getByTestId('user')).toHaveTextContent('null');
-      });
-
-      expect(consoleSpy).toHaveBeenCalledWith('Erro ao verificar autenticação:', expect.any(Error));
-      consoleSpy.mockRestore();
+      expect(screen.getByTestId('user')).toHaveTextContent(JSON.stringify(validUser));
     });
   });
 });

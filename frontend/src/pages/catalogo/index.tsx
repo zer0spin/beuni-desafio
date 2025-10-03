@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import {
@@ -191,6 +191,7 @@ export default function CatalogoPage() {
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setViewMode('grid')}
+                  aria-label="Grid view"
                   className={`p-3 rounded-xl transition-all ${
                     viewMode === 'grid'
                       ? 'bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white shadow-md'
@@ -201,6 +202,7 @@ export default function CatalogoPage() {
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
+                  aria-label="List view"
                   className={`p-3 rounded-xl transition-all ${
                     viewMode === 'list'
                       ? 'bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white shadow-md'

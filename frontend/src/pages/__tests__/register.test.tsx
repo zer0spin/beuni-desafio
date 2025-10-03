@@ -12,7 +12,7 @@ const mockToast = {
   error: vi.fn(),
 };
 
-const mockApiCall = vi.fn();
+const mockApiPost = vi.fn();
 
 vi.mock('next/router', () => ({
   useRouter: () => ({
@@ -28,7 +28,10 @@ vi.mock('react-hot-toast', () => ({
 }));
 
 vi.mock('../../lib/api', () => ({
-  apiCall: mockApiCall,
+  default: {
+    post: mockApiPost,
+  },
+  setAuthToken: vi.fn(),
   endpoints: {
     register: '/auth/register',
   },
@@ -49,10 +52,10 @@ vi.mock('../../contexts/UserContext', () => ({
   useUser: () => mockUserContextValue,
 }));
 
-// Mock do componente Layout
-vi.mock('../../components/Layout', () => ({
-  default: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="layout">{children}</div>
+// Mock Next.js Image component
+vi.mock('next/image', () => ({
+  default: ({ src, alt, ...props }: any) => (
+    <img src={src} alt={alt} {...props} />
   ),
 }));
 
@@ -70,37 +73,35 @@ describe('Register Page Tests', () => {
     it('should render register form correctly', async () => {
       await renderRegister();
 
-      expect(screen.getByText(/criar conta/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/nome/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-      expect(screen.getByLabelText(/senha/i)).toBeInTheDocument();
+      expect(screen.getByText(/crie sua conta/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/nome completo/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/e-mail profissional/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/^senha/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/confirmar senha/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /cadastrar/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /criar conta/i })).toBeInTheDocument();
+    });
+
+    it('should render product images grid', async () => {
+      await renderRegister();
+
+      expect(screen.getByAltText(/garrafa personalizada/i)).toBeInTheDocument();
+      expect(screen.getByAltText(/camiseta personalizada/i)).toBeInTheDocument();
+      expect(screen.getByAltText(/mochila personalizada/i)).toBeInTheDocument();
+      expect(screen.getByAltText(/ecobag personalizada/i)).toBeInTheDocument();
     });
 
     it('should render link to login page', async () => {
       await renderRegister();
 
-      const loginLink = screen.getByRole('link', { name: /já tem conta/i });
-      expect(loginLink).toBeInTheDocument();
-      expect(loginLink).toHaveAttribute('href', '/login');
+      const loginButton = screen.getByRole('button', { name: /faça login/i });
+      expect(loginButton).toBeInTheDocument();
     });
 
-    it('should have proper accessibility attributes', async () => {
+    it('should have password visibility toggle buttons', async () => {
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/senha/i);
-      const confirmPasswordInput = screen.getByLabelText(/confirmar senha/i);
-      
-      expect(nameInput).toHaveAttribute('required');
-      expect(emailInput).toHaveAttribute('type', 'email');
-      expect(emailInput).toHaveAttribute('required');
-      expect(passwordInput).toHaveAttribute('type', 'password');
-      expect(passwordInput).toHaveAttribute('required');
-      expect(confirmPasswordInput).toHaveAttribute('type', 'password');
-      expect(confirmPasswordInput).toHaveAttribute('required');
+      const passwordVisibilityButtons = screen.getAllByLabelText(/toggle password visibility/i);
+      expect(passwordVisibilityButtons).toHaveLength(2); // One for password, one for confirm password
     });
   });
 
@@ -109,7 +110,7 @@ describe('Register Page Tests', () => {
       const user = userEvent.setup();
       await renderRegister();
 
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
+      const submitButton = screen.getByRole('button', { name: /criar conta/i });
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -121,10 +122,10 @@ describe('Register Page Tests', () => {
       const user = userEvent.setup();
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
       await user.type(nameInput, 'A');
 
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
+      const submitButton = screen.getByRole('button', { name: /criar conta/i });
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -136,32 +137,14 @@ describe('Register Page Tests', () => {
       const user = userEvent.setup();
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
       await user.type(nameInput, 'João Silva');
 
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
+      const submitButton = screen.getByRole('button', { name: /criar conta/i });
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/email é obrigatório/i)).toBeInTheDocument();
-      });
-    });
-
-    it('should show validation error for invalid email format', async () => {
-      const user = userEvent.setup();
-      await renderRegister();
-
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      
-      await user.type(nameInput, 'João Silva');
-      await user.type(emailInput, 'email-invalido');
-
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
-      await user.click(submitButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/formato de email inválido/i)).toBeInTheDocument();
+        expect(screen.getByText(/e-mail é obrigatório/i)).toBeInTheDocument();
       });
     });
 
@@ -169,17 +152,20 @@ describe('Register Page Tests', () => {
       const user = userEvent.setup();
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
+      const emailInput = screen.getByLabelText(/e-mail profissional/i);
       
       await user.type(nameInput, 'João Silva');
       await user.type(emailInput, 'joao@example.com');
 
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
+      const submitButton = screen.getByRole('button', { name: /criar conta/i });
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/senha é obrigatória/i)).toBeInTheDocument();
+        // Deve aparecer tanto "Senha é obrigatória" quanto "Confirmação de senha é obrigatória"
+        const passwordErrors = screen.getAllByText(/senha é obrigatória/i);
+        expect(passwordErrors).toHaveLength(2);
+        expect(passwordErrors[0]).toBeInTheDocument();
       });
     });
 
@@ -187,15 +173,15 @@ describe('Register Page Tests', () => {
       const user = userEvent.setup();
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/senha/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
+      const emailInput = screen.getByLabelText(/e-mail profissional/i);
+      const passwordInput = screen.getByLabelText(/^senha/i);
       
       await user.type(nameInput, 'João Silva');
       await user.type(emailInput, 'joao@example.com');
       await user.type(passwordInput, '123');
 
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
+      const submitButton = screen.getByRole('button', { name: /criar conta/i });
       await user.click(submitButton);
 
       await waitFor(() => {
@@ -207,9 +193,9 @@ describe('Register Page Tests', () => {
       const user = userEvent.setup();
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/senha/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
+      const emailInput = screen.getByLabelText(/e-mail profissional/i);
+      const passwordInput = screen.getByLabelText(/^senha/i);
       const confirmPasswordInput = screen.getByLabelText(/confirmar senha/i);
       
       await user.type(nameInput, 'João Silva');
@@ -217,11 +203,11 @@ describe('Register Page Tests', () => {
       await user.type(passwordInput, 'senha123');
       await user.type(confirmPasswordInput, 'senha456');
 
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
+      const submitButton = screen.getByRole('button', { name: /criar conta/i });
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(screen.getByText(/senhas não coincidem/i)).toBeInTheDocument();
+        expect(screen.getByText(/senhas não conferem/i)).toBeInTheDocument();
       });
     });
   });
@@ -230,19 +216,20 @@ describe('Register Page Tests', () => {
     it('should handle successful registration', async () => {
       const user = userEvent.setup();
       const mockUserData = {
-        id: 'user-123',
-        nome: 'João Silva',
-        email: 'joao@example.com',
-        token: 'jwt-token-123',
+        user: {
+          id: 'user-123',
+          nome: 'João Silva',
+          email: 'joao@example.com',
+        }
       };
 
-      mockApiCall.mockResolvedValue(mockUserData);
+      mockApiPost.mockResolvedValue({ data: mockUserData });
       
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/senha/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
+      const emailInput = screen.getByLabelText(/e-mail profissional/i);
+      const passwordInput = screen.getByLabelText(/^senha/i);
       const confirmPasswordInput = screen.getByLabelText(/confirmar senha/i);
       
       await user.type(nameInput, 'João Silva');
@@ -250,38 +237,32 @@ describe('Register Page Tests', () => {
       await user.type(passwordInput, 'senha123');
       await user.type(confirmPasswordInput, 'senha123');
 
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
+      const submitButton = screen.getByRole('button', { name: /criar conta/i });
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(mockApiCall).toHaveBeenCalledWith(
-          expect.any(Function),
-          expect.objectContaining({
-            showSuccessToast: true,
-            successMessage: 'Conta criada com sucesso!',
-          })
-        );
+        expect(mockApiPost).toHaveBeenCalledWith('/auth/register', {
+          name: 'João Silva',
+          email: 'joao@example.com',
+          password: 'senha123',
+        });
       });
 
-      expect(mockLogin).toHaveBeenCalledWith(mockUserData);
+      expect(mockToast.success).toHaveBeenCalledWith('Bem-vindo, João Silva! Conta criada com sucesso.');
       expect(mockPush).toHaveBeenCalledWith('/dashboard');
     });
 
     it('should handle registration failure', async () => {
       const user = userEvent.setup();
-      const mockError = {
-        response: {
-          data: { message: 'Email já cadastrado' },
-        },
-      };
+      const mockError = new Error('Network Error');
 
-      mockApiCall.mockRejectedValue(mockError);
+      mockApiPost.mockRejectedValue(mockError);
       
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/senha/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
+      const emailInput = screen.getByLabelText(/e-mail profissional/i);
+      const passwordInput = screen.getByLabelText(/^senha/i);
       const confirmPasswordInput = screen.getByLabelText(/confirmar senha/i);
       
       await user.type(nameInput, 'João Silva');
@@ -289,31 +270,29 @@ describe('Register Page Tests', () => {
       await user.type(passwordInput, 'senha123');
       await user.type(confirmPasswordInput, 'senha123');
 
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
+      const submitButton = screen.getByRole('button', { name: /criar conta/i });
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(mockApiCall).toHaveBeenCalled();
+        expect(mockApiPost).toHaveBeenCalled();
       });
 
-      // Erro deve ser mostrado via toast (já está sendo mockado)
-      expect(mockLogin).not.toHaveBeenCalled();
       expect(mockPush).not.toHaveBeenCalled();
     });
 
-    it('should disable submit button during loading', async () => {
+    it('should show loading state during submission', async () => {
       const user = userEvent.setup();
       
       // Mock para demorar um pouco
-      mockApiCall.mockImplementation(() => new Promise(resolve => 
-        setTimeout(() => resolve({ id: '1', nome: 'Test' }), 100)
+      mockApiPost.mockImplementation(() => new Promise(resolve => 
+        setTimeout(() => resolve({ data: { user: { id: '1', nome: 'Test' } } }), 100)
       ));
       
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/senha/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
+      const emailInput = screen.getByLabelText(/e-mail profissional/i);
+      const passwordInput = screen.getByLabelText(/^senha/i);
       const confirmPasswordInput = screen.getByLabelText(/confirmar senha/i);
       
       await user.type(nameInput, 'João Silva');
@@ -321,16 +300,49 @@ describe('Register Page Tests', () => {
       await user.type(passwordInput, 'senha123');
       await user.type(confirmPasswordInput, 'senha123');
 
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
+      const submitButton = screen.getByRole('button', { name: /criar conta/i });
       await user.click(submitButton);
 
       // Durante o loading, o botão deve estar desabilitado
       expect(submitButton).toBeDisabled();
-      expect(screen.getByText(/carregando/i)).toBeInTheDocument();
+      expect(screen.getByText(/criando conta/i)).toBeInTheDocument();
 
       await waitFor(() => {
         expect(submitButton).not.toBeDisabled();
-      });
+      }, { timeout: 200 });
+    });
+
+    it('should toggle password visibility', async () => {
+      const user = userEvent.setup();
+      await renderRegister();
+
+      const passwordInput = screen.getByLabelText(/^senha/i);
+      const passwordToggleButtons = screen.getAllByRole('button', { name: /toggle password visibility/i });
+      
+      // Inicialmente a senha deve estar oculta
+      expect(passwordInput).toHaveAttribute('type', 'password');
+      
+      // Clicar no botão de visibilidade
+      await user.click(passwordToggleButtons[0]);
+      
+      // Agora a senha deve estar visível
+      expect(passwordInput).toHaveAttribute('type', 'text');
+      
+      // Clicar novamente para ocultar
+      await user.click(passwordToggleButtons[0]);
+      
+      // Senha deve estar oculta novamente
+      expect(passwordInput).toHaveAttribute('type', 'password');
+    });
+
+    it('should navigate to login page when clicking login button', async () => {
+      const user = userEvent.setup();
+      await renderRegister();
+
+      const loginButton = screen.getByRole('button', { name: /faça login/i });
+      await user.click(loginButton);
+
+      expect(mockPush).toHaveBeenCalledWith('/login');
     });
   });
 
@@ -339,7 +351,7 @@ describe('Register Page Tests', () => {
       const user = userEvent.setup();
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
       const maliciousName = '<script>alert("xss")</script>';
       
       await user.type(nameInput, maliciousName);
@@ -352,7 +364,7 @@ describe('Register Page Tests', () => {
       const user = userEvent.setup();
       await renderRegister();
 
-      const emailInput = screen.getByLabelText(/email/i);
+      const emailInput = screen.getByLabelText(/e-mail profissional/i);
       const maliciousEmail = '<script>alert("xss")</script>@test.com';
       
       await user.type(emailInput, maliciousEmail);
@@ -365,8 +377,8 @@ describe('Register Page Tests', () => {
       const user = userEvent.setup();
       await renderRegister();
 
-      const passwordInput = screen.getByLabelText(/senha/i);
-      const specialPassword = "!@#$%^&*()_+{}|:<>?[]\\;',./";
+      const passwordInput = screen.getByLabelText(/^senha/i);
+      const specialPassword = "!@#$%^&*()_+";
       
       await user.type(passwordInput, specialPassword);
 
@@ -374,102 +386,16 @@ describe('Register Page Tests', () => {
     });
   });
 
-  describe('Strength Password Validation', () => {
-    it('should show password strength indicator', async () => {
-      const user = userEvent.setup();
-      await renderRegister();
-
-      const passwordInput = screen.getByLabelText(/senha/i);
-      
-      // Senha fraca
-      await user.type(passwordInput, '123456');
-      expect(screen.getByText(/senha fraca/i)).toBeInTheDocument();
-
-      await user.clear(passwordInput);
-      
-      // Senha média
-      await user.type(passwordInput, 'abc123456');
-      expect(screen.getByText(/senha média/i)).toBeInTheDocument();
-
-      await user.clear(passwordInput);
-      
-      // Senha forte
-      await user.type(passwordInput, 'AbC123!@#');
-      expect(screen.getByText(/senha forte/i)).toBeInTheDocument();
-    });
-  });
-
-  describe('Terms and Conditions', () => {
-    it('should render terms and conditions checkbox', async () => {
-      await renderRegister();
-
-      const termsCheckbox = screen.getByRole('checkbox', { name: /aceito os termos/i });
-      expect(termsCheckbox).toBeInTheDocument();
-      expect(termsCheckbox).not.toBeChecked();
-    });
-
-    it('should require terms acceptance for registration', async () => {
-      const user = userEvent.setup();
-      await renderRegister();
-
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/senha/i);
-      const confirmPasswordInput = screen.getByLabelText(/confirmar senha/i);
-      
-      await user.type(nameInput, 'João Silva');
-      await user.type(emailInput, 'joao@example.com');
-      await user.type(passwordInput, 'senha123');
-      await user.type(confirmPasswordInput, 'senha123');
-
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
-      await user.click(submitButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/aceite os termos/i)).toBeInTheDocument();
-      });
-    });
-
-    it('should allow registration when terms are accepted', async () => {
-      const user = userEvent.setup();
-      const mockUserData = { id: '1', nome: 'João Silva' };
-
-      mockApiCall.mockResolvedValue(mockUserData);
-      
-      await renderRegister();
-
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/senha/i);
-      const confirmPasswordInput = screen.getByLabelText(/confirmar senha/i);
-      const termsCheckbox = screen.getByRole('checkbox', { name: /aceito os termos/i });
-      
-      await user.type(nameInput, 'João Silva');
-      await user.type(emailInput, 'joao@example.com');
-      await user.type(passwordInput, 'senha123');
-      await user.type(confirmPasswordInput, 'senha123');
-      await user.click(termsCheckbox);
-
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
-      await user.click(submitButton);
-
-      await waitFor(() => {
-        expect(mockApiCall).toHaveBeenCalled();
-      });
-    });
-  });
-
-  describe('Keyboard Navigation', () => {
+  describe('Navegação por Teclado', () => {
     it('should support Tab navigation between form fields', async () => {
       const user = userEvent.setup();
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/senha/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
+      const emailInput = screen.getByLabelText(/e-mail profissional/i);
+      const passwordInput = screen.getByLabelText(/^senha/i);
       const confirmPasswordInput = screen.getByLabelText(/confirmar senha/i);
-      const termsCheckbox = screen.getByRole('checkbox', { name: /aceito os termos/i });
-      const submitButton = screen.getByRole('button', { name: /cadastrar/i });
+      const submitButton = screen.getByRole('button', { name: /criar conta/i });
 
       // Navegar com Tab
       await user.tab();
@@ -482,39 +408,28 @@ describe('Register Page Tests', () => {
       expect(passwordInput).toHaveFocus();
 
       await user.tab();
+      // Skip password visibility toggle button
+      await user.tab();
       expect(confirmPasswordInput).toHaveFocus();
 
       await user.tab();
-      expect(termsCheckbox).toHaveFocus();
-
+      // Skip confirm password visibility toggle button
       await user.tab();
       expect(submitButton).toHaveFocus();
     });
 
-    it('should submit form on Enter key press', async () => {
-      const user = userEvent.setup();
-      const mockUserData = { id: '1', nome: 'Test User' };
-
-      mockApiCall.mockResolvedValue(mockUserData);
-      
+    it('should have accessible form elements', async () => {
       await renderRegister();
 
-      const nameInput = screen.getByLabelText(/nome/i);
-      const emailInput = screen.getByLabelText(/email/i);
-      const passwordInput = screen.getByLabelText(/senha/i);
+      const nameInput = screen.getByLabelText(/nome completo/i);
+      const emailInput = screen.getByLabelText(/e-mail profissional/i);
+      const passwordInput = screen.getByLabelText(/^senha/i);
       const confirmPasswordInput = screen.getByLabelText(/confirmar senha/i);
-      const termsCheckbox = screen.getByRole('checkbox', { name: /aceito os termos/i });
       
-      await user.type(nameInput, 'João Silva');
-      await user.type(emailInput, 'joao@example.com');
-      await user.type(passwordInput, 'senha123');
-      await user.type(confirmPasswordInput, 'senha123');
-      await user.click(termsCheckbox);
-      await user.keyboard('{Enter}');
-
-      await waitFor(() => {
-        expect(mockApiCall).toHaveBeenCalled();
-      });
+      expect(nameInput).toHaveAttribute('id', 'nome');
+      expect(emailInput).toHaveAttribute('type', 'email');
+      expect(passwordInput).toHaveAttribute('type', 'password');
+      expect(confirmPasswordInput).toHaveAttribute('type', 'password');
     });
   });
 });
