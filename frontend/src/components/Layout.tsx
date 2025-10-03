@@ -38,10 +38,11 @@ export default function Layout({ children }: LayoutProps) {
   // Função para gerar URL da imagem com timestamp para evitar cache
   const getProfileImageUrl = (imagemPerfil?: string) => {
     const timestamp = user?.imageTimestamp || Date.now();
-    // Se não houver imagem de perfil, use a imagem padrão
     const filename = imagemPerfil || 'default-profile.png';
-    console.log('Layout.getProfileImageUrl:', filename, 'timestamp:', timestamp);
-    return `${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${filename}?t=${timestamp}`;
+    const base = process.env.NODE_ENV === 'production'
+      ? '/api'
+      : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001');
+    return `${base}/auth/profile-image/${filename}?t=${timestamp}`;
   };
 
   useEffect(() => {

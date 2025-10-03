@@ -71,6 +71,13 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex bg-beuni-cream">
+      {/* Demo credentials */}
+      <div className="absolute top-2 right-2 bg-white/80 backdrop-blur px-4 py-2 rounded shadow text-xs text-gray-700 border border-orange-200">
+        <p className="font-semibold text-orange-700">Acesso Demo</p>
+        <p>Email: <code className="font-mono">ana.novo@beunidemo.com</code></p>
+        <p>Senha: <code className="font-mono">AnaPass123@2025</code></p>
+      </div>
+
       {/* Left Side - Product Grid */}
       <div className="hidden lg:flex lg:w-1/2 p-12 items-center justify-center">
         <div className="max-w-2xl w-full">

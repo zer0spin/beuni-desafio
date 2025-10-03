@@ -38,7 +38,10 @@ export default function Configuracoes() {
   const getProfileImageUrl = (imagemPerfil?: string) => {
     const timestamp = Date.now();
     const filename = imagemPerfil || 'default-profile.png';
-    return `${process.env.NEXT_PUBLIC_API_URL}/auth/profile-image/${filename}?t=${timestamp}`;
+    const base = process.env.NODE_ENV === 'production'
+      ? '/api'
+      : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001');
+    return `${base}/auth/profile-image/${filename}?t=${timestamp}`;
   };
 
   const { data: profile, refetch } = useQuery<UserProfile>(

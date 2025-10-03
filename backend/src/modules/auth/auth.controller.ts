@@ -270,13 +270,22 @@ export class AuthController {
         // Retornar imagem padrão
         const defaultImagePath = join(process.cwd(), 'public', 'default-profile.png');
 
-        if (!existsSync(defaultImagePath)) {
-          throw new NotFoundException('Imagem padrão não encontrada');
+        if (existsSync(defaultImagePath)) {
+          res.setHeader('Content-Type', 'image/png');
+          res.setHeader('Cache-Control', 'public, max-age=86400');
+          return res.sendFile(defaultImagePath);
         }
 
-        res.setHeader('Content-Type', 'image/png');
+        // Fallback SVG inline caso nenhuma imagem exista
+        const fallbackSvg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" rx="24" fill="#FFA559"/>
+  <circle cx="128" cy="108" r="52" fill="white" fill-opacity="0.85"/>
+  <path d="M40 228c0-48 40-80 88-80s88 32 88 80" stroke="white" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+</svg>`;
+        res.setHeader('Content-Type', 'image/svg+xml');
         res.setHeader('Cache-Control', 'public, max-age=86400');
-        return res.sendFile(defaultImagePath);
+        return res.send(fallbackSvg);
       }
 
       // Determinar o tipo de conteúdo baseado na extensão
@@ -300,6 +309,8 @@ export class AuthController {
 
       return res.sendFile(imagePath);
     } catch (error) {
+      // Log simples para rastrear falhas em produção sem vazar detalhes ao cliente
+      console.warn('[AuthController] Falha ao servir imagem de perfil:', filename, error?.message);
       throw new NotFoundException('Imagem não encontrada');
     }
   }
