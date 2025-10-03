@@ -5,11 +5,11 @@
 ## 📋 Security Documentation Index
 
 ### Current Security Files (To Be Consolidated)
-- `SECURITY.md` - Main security policy
-- `SECURITY_FIXES_APPLIED.md` - Applied security patches
-- `SECURITY_IMPROVEMENTS.md` - Security enhancements (Portuguese)
-- `backend/SECURITY_*.md` - Backend-specific security docs
-- `docs/security/SECURITY_ASSESSMENT_REPORT.md` - Assessment report
+- [`SECURITY.md`](../../SECURITY.md) - Main security policy (high-level)
+- [`SECURITY_FIXES_APPLIED.md`](../../SECURITY_FIXES_APPLIED.md) - Applied security patches
+- [`SECURITY_IMPROVEMENTS.md`](../../SECURITY_IMPROVEMENTS.md) - Security enhancements (Portuguese, legacy; see this consolidated doc for canonical content)
+- [`backend/SECURITY_*.md`](../../backend) - Backend-specific security docs (deprecated; consolidated here)
+- [`SECURITY_ASSESSMENT_REPORT.md`](./SECURITY_ASSESSMENT_REPORT.md) - Assessment report
 
 ### Consolidation Strategy
 1. **Keep**: `SECURITY.md` as main policy document

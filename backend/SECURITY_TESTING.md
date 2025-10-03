@@ -1,3 +1,7 @@
+> Deprecated: This document is preserved for historical context. For the canonical, up-to-date security documentation, see docs/security/SECURITY_CONSOLIDATED.md.
+# Security Testing Guide
+
+> DEPRECATED: This guide has been consolidated. For the up-to-date, unified security documentation, see docs/security/SECURITY_CONSOLIDATED.md.
 # Security Testing Guide
 
 > DEPRECATED: This guide has been consolidated. For the up-to-date, unified security documentation, see docs/security/SECURITY_CONSOLIDATED.md.

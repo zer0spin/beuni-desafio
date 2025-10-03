@@ -1,5 +1,7 @@
 # Security Policy for Beuni Project
 
+> For the full, consolidated security documentation (policies, implementation, testing, incident response), see docs/security/SECURITY_CONSOLIDATED.md. This file is the high-level policy; technical details live in the consolidated doc.
+
 ## 🛡 Supported Versions
 
 | Version | Supported          |
