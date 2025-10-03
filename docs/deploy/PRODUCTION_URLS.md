@@ -4,8 +4,8 @@
 
 ### **🎨 FRONTEND (Para Usuários)**
 ```
-🌟 PRINCIPAL: https://beuni-frontend.vercel.app
-📱 Preview:   https://beuni-frontend-1cbhuyp4o-zer0spins-projects.vercel.app
+🌟 PRINCIPAL: https://beuni-frontend-one.vercel.app
+📱 Preview:   https://beuni-frontend-q6ee7y798-zer0spins-projects.vercel.app
 🔧 Dashboard: https://vercel.com/zer0spins-projects/beuni-frontend
 ```
 
@@ -22,10 +22,10 @@
 ## 🧭 **NAVEGAÇÃO RÁPIDA**
 
 ### **👥 Para Usuários Finais:**
-- **Aplicação**: https://beuni-frontend.vercel.app
-- **Login**: https://beuni-frontend.vercel.app/login  
-- **Registro**: https://beuni-frontend.vercel.app/register
-- **Dashboard**: https://beuni-frontend.vercel.app/dashboard
+- **Aplicação**: https://beuni-frontend-one.vercel.app
+- **Login**: https://beuni-frontend-one.vercel.app/login  
+- **Registro**: https://beuni-frontend-one.vercel.app/register
+- **Dashboard**: https://beuni-frontend-one.vercel.app/dashboard
 
 ### **👨‍💻 Para Desenvolvedores:**
 - **API Docs**: https://beuni-desafio-production.up.railway.app/api/docs
@@ -33,7 +33,7 @@
 - **GitHub Repo**: https://github.com/zer0spin/beuni-desafio
 
 ### **🎯 Para Recrutadores:**
-- **Demo Live**: https://beuni-desafio.vercel.app
+- **Demo Live**: https://beuni-frontend-one.vercel.app
 - **Documentação**: Swagger + README no GitHub
 - **Performance**: 95+ Lighthouse Score
 
@@ -78,7 +78,7 @@ GET  /       - Info básica da API
 
 ### **1. Acesso Direto (Usuários)**
 ```
-1. Abra: https://beuni-desafio.vercel.app
+1. Abra: https://beuni-frontend-one.vercel.app
 2. Registre-se ou faça login
 3. Use a aplicação normalmente
 ```
@@ -101,7 +101,7 @@ curl -X POST https://beuni-desafio-production.up.railway.app/auth/login \
 ```
 📋 Para copiar e colar:
 
-Frontend: https://beuni-desafio.vercel.app
+Frontend: https://beuni-frontend-one.vercel.app
 API Docs: https://beuni-desafio-production.up.railway.app/api/docs
 GitHub:   https://github.com/zer0spin/beuni-desafio
 ```
