@@ -84,7 +84,7 @@ async function bootstrap() {
     },
   });
 
-  const port = process.env.PORT || 3001;
+  const port = parseInt(process.env.PORT || '3001', 10);
   // Register global CSRF guard with DI
   const reflector = app.get(Reflector);
   app.useGlobalGuards(new CsrfGuard(reflector));
