@@ -38,7 +38,6 @@ export default function ColaboradoresPage() {
         totalPages: response.data.totalPages
       });
     } catch (error) {
-      console.error('Erro ao carregar colaboradores:', error);
       toast.error('Erro ao carregar colaboradores');
     } finally {
       setLoading(false);

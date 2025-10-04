@@ -71,7 +71,7 @@ export default function Configuracoes() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) {
-      toast.error('Dados do usuário não carregados');
+      toast.error('User data not loaded');
       return;
     }
 
@@ -100,11 +100,10 @@ export default function Configuracoes() {
       await queryClient.invalidateQueries('userProfile');
       await refetch();
 
-      toast.success('Dados atualizados com sucesso!');
+      toast.success('Data updated successfully!');
       setIsEditing(false);
     } catch (error) {
-      console.error('Erro ao atualizar:', error);
-      toast.error('Erro ao atualizar dados');
+      toast.error('Error updating data');
     } finally {
       setIsSaving(false);
     }
@@ -153,10 +152,9 @@ export default function Configuracoes() {
       await queryClient.invalidateQueries('userProfile');
       await refetch();
 
-      toast.success('Foto de perfil atualizada com sucesso!');
+      toast.success('Profile photo updated successfully!');
       setImagePreview(null);
     } catch (error) {
-      console.error('Erro ao fazer upload da imagem:', error);
       setImagePreview(null);
       toast.error('Erro ao fazer upload da imagem');
     } finally {
@@ -187,9 +185,8 @@ export default function Configuracoes() {
       await queryClient.invalidateQueries('userProfile');
       await refetch();
 
-      toast.success('Foto de perfil removida com sucesso!');
+      toast.success('Profile photo removed successfully!');
     } catch (error) {
-      console.error('Erro ao remover imagem:', error);
       toast.error('Erro ao remover foto de perfil');
     } finally {
       setIsUploadingImage(false);

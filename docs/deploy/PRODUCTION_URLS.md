@@ -1,15 +1,15 @@
-# 🌐 URLs DE ACESSO - APLICAÇÃO BEUNI
+# 🌐 ACCESS URLS - BEUNI APPLICATION
 
-## 📍 **URLS PRINCIPAIS** 
+## 📍 **MAIN URLS** 
 
-### **🎨 FRONTEND (Para Usuários)**
+### **🎨 FRONTEND (For Users)**
 ```
-🌟 PRINCIPAL: https://beuni-frontend-one.vercel.app
-📱 Atual:     https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
+🌟 MAIN:      https://beuni-frontend-one.vercel.app
+📱 Current:   https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
 🔧 Dashboard: https://vercel.com/zer0spins-projects/beuni-frontend
 ```
 
-### **🚂 BACKEND (Para APIs)**  
+### **🚂 BACKEND (For APIs)**  
 ```
 🔗 API Base:  https://beuni-desafio-production.up.railway.app
 📚 Swagger:   https://beuni-desafio-production.up.railway.app/api/docs
@@ -19,71 +19,71 @@
 
 ---
 
-## 🧭 **NAVEGAÇÃO RÁPIDA**
+## 🧭 **QUICK NAVIGATION**
 
-### **👥 Para Usuários Finais:**
-- **Aplicação**: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
+### **👥 For End Users:**
+- **Application**: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
 - **Login**: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app/login  
-- **Registro**: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app/register
+- **Register**: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app/register
 - **Dashboard**: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app/dashboard
 
-### **👨‍💻 Para Desenvolvedores:**
+### **👨‍💻 For Developers:**
 - **API Docs**: https://beuni-desafio-production.up.railway.app/api/docs
 - **Health Check**: https://beuni-desafio-production.up.railway.app/health
 - **GitHub Repo**: https://github.com/zer0spin/beuni-desafio
 
-### **🎯 Para Recrutadores:**
-- **Demo Live**: https://beuni-frontend-one.vercel.app
-- **Documentação**: Swagger + README no GitHub
+### **🎯 For Recruiters:**
+- **Live Demo**: https://beuni-frontend-one.vercel.app
+- **Documentation**: Swagger + README on GitHub
 - **Performance**: 95+ Lighthouse Score
 
 ---
 
-## 🔗 **ENDPOINTS PRINCIPAIS**
+## 🔗 **MAIN ENDPOINTS**
 
 ### **Authentication**
 ```
-POST /auth/login     - Login de usuário
-POST /auth/register  - Registro de usuário  
-POST /auth/logout    - Logout + invalidar sessão
-GET  /auth/profile   - Dados do usuário logado
+POST /auth/login     - User login
+POST /auth/register  - User registration
+POST /auth/logout    - Logout + invalidate session
+GET  /auth/profile   - Logged user data
 ```
 
 ### **Employees/Birthdays**
 ```
-GET    /employees           - Listar funcionários
-POST   /employees           - Criar funcionário
-GET    /employees/:id       - Buscar por ID
-PUT    /employees/:id       - Atualizar funcionário
-DELETE /employees/:id       - Deletar funcionário
-GET    /employees/birthdays - Aniversariantes do mês
+GET    /employees           - List employees
+POST   /employees           - Create employee
+GET    /employees/:id       - Find by ID
+PUT    /employees/:id       - Update employee
+DELETE /employees/:id       - Delete employee
+GET    /employees/birthdays - Birthday celebrants of the month
 ```
 
 ### **Organizations**
 ```
-GET  /organizations     - Listar organizações
-POST /organizations     - Criar organização
-GET  /organizations/:id - Buscar organização
+GET  /organizations     - List organizations
+POST /organizations     - Create organization
+GET  /organizations/:id - Find organization
 ```
 
 ### **System**
 ```
-GET  /health - Status da aplicação
-GET  /       - Info básica da API
+GET  /health - Application status
+GET  /       - Basic API info
 ```
 
 ---
 
-## 🛠️ **COMO USAR**
+## 🛠️ **HOW TO USE**
 
-### **1. Acesso Direto (Usuários)**
+### **1. Direct Access (Users)**
 ```
-1. Abra: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
-2. Faça login com: ana.novo@beunidemo.com / AnaPass123@2025
-3. Use a aplicação normalmente
+1. Open: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
+2. Login with: ana.novo@beunidemo.com / AnaPass123@2025
+3. Use the application normally
 ```
 
-### **2. Teste API (Desenvolvedores)**
+### **2. API Testing (Developers)**
 ```bash
 # Health Check
 curl https://beuni-desafio-production.up.railway.app/health
@@ -97,27 +97,27 @@ curl -X POST https://beuni-desafio-production.up.railway.app/auth/login \
   -d '{"email":"teste@exemplo.com","password":"123456"}'
 ```
 
-### **3. Compartilhamento**
+### **3. Sharing**
 ```
-📋 Para copiar e colar:
+📋 To copy and paste:
 
 Frontend: https://beuni-frontend-13q7cdv5c-zer0spins-projects.vercel.app
 API Docs: https://beuni-desafio-production.up.railway.app/api/docs
 GitHub:   https://github.com/zer0spin/beuni-desafio
 ```
 
-### **🔑 Credenciais de Teste:**
+### **🔑 Test Credentials:**
 ```
 Email: ana.novo@beunidemo.com
-Senha: AnaPass123@2025
+Password: AnaPass123@2025
 ```
-> ⚠️ **Nota:** Use estas credenciais para fazer login e testar a aplicação
+> ⚠️ **Note:** Use these credentials to login and test the application
 
 ---
 
-## 📱 **COMPATIBILIDADE**
+## 📱 **COMPATIBILITY**
 
-### **Browsers Suportados:**
+### **Supported Browsers:**
 - ✅ Chrome 90+
 - ✅ Firefox 88+  
 - ✅ Safari 14+
@@ -132,9 +132,9 @@ Senha: AnaPass123@2025
 
 ---
 
-## 🚀 **STATUS DOS SERVIÇOS**
+## 🚀 **SERVICES STATUS**
 
-### **✅ Todos Online:**
+### **✅ All Online:**
 - 🌐 Frontend (Vercel): ✅ ONLINE
 - 🚂 Backend (Railway): ✅ ONLINE  
 - 🐘 PostgreSQL: ✅ ONLINE
@@ -148,10 +148,10 @@ Senha: AnaPass123@2025
 
 ---
 
-## 🎯 **PRÓXIMOS PASSOS**
+## 🎯 **NEXT STEPS**
 
-1. **✅ Deploy Completo**: Backend + Frontend funcionando
-2. **🔄 Agora**: Siga o `VERCEL_DEPLOY_GUIDE.md` 
-3. **🎊 Resultado**: Aplicação acessível globalmente
+1. **✅ Complete Deploy**: Backend + Frontend working
+2. **🔄 Now**: Follow the `VERCEL_DEPLOY_GUIDE.md` 
+3. **🎊 Result**: Application globally accessible
 
-**🏆 APLICAÇÃO PRONTA PARA PRODUÇÃO!**
+**🏆 APPLICATION READY FOR PRODUCTION!**

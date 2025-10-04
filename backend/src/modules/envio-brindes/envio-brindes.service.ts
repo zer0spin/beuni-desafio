@@ -216,7 +216,7 @@ export class EnvioBrindesService {
     });
 
     if (!envio) {
-      throw new Error('Envio não encontrado');
+      throw new Error('Shipment not found');
     }
 
     // Preparar dados para atualização

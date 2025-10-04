@@ -19,7 +19,6 @@ export default function LoginPage() {
   // Redirecionar se já estiver logado
   useEffect(() => {
     if (user && !isLoading) {
-      console.log('Login: Usuário já logado, redirecionando');
       router.replace('/dashboard');
     }
   }, [user, isLoading, router]);
@@ -27,7 +26,6 @@ export default function LoginPage() {
   // Após login bem-sucedido, aguardar UserContext atualizar
   useEffect(() => {
     if (loginSuccess && user) {
-      console.log('Login: UserContext atualizado após login, redirecionando');
       router.replace('/dashboard');
       setLoginSuccess(false);
     }
@@ -42,27 +40,22 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginCredentials) => {
     setIsLoading(true);
     try {
-      console.log('Login: Enviando dados', data);
       // SECURITY: Backend now sets httpOnly cookie automatically
       const response = await api.post<{ user: any }>(endpoints.login, data);
       const { user } = response.data;
 
-      console.log('Login: Resposta recebida', { user });
       // SECURITY: Only store user data (token is httpOnly from backend)
       setAuthToken(user);
-      console.log('Login: Cookie de usuário definido, atualizando UserContext...');
 
       // Atualizar UserContext
       refreshUser();
 
-      toast.success(`Bem-vindo, ${user.nome}!`);
+      toast.success(`Welcome, ${user.nome}!`);
 
       // Marcar login como bem-sucedido para triggerar o useEffect
       setLoginSuccess(true);
 
-      console.log('Login: Processo concluído');
     } catch (error) {
-      console.error('Login: Erro no login', error);
       // Error is handled by axios interceptor
     } finally {
       setIsLoading(false);

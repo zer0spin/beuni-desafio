@@ -55,7 +55,7 @@ export class UploadService {
       // Retornar apenas o nome do arquivo para salvar no banco
       return fileName;
     } catch (error) {
-      throw new BadRequestException('Erro ao processar a imagem');
+      throw new BadRequestException('Error processing image');
     }
   }
 
@@ -80,7 +80,7 @@ export class UploadService {
 
   private validateFile(file: any): void {
     if (!file) {
-      throw new BadRequestException('Nenhum arquivo foi enviado');
+      throw new BadRequestException('No file was sent');
     }
 
     if (file.size > this.maxFileSize) {

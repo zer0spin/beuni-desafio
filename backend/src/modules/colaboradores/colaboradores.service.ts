@@ -25,7 +25,7 @@ export class ColaboradoresService {
     // Validar e buscar dados do CEP
     const dadosCep = await this.cepService.consultarCep(endereco.cep);
     if (!dadosCep) {
-      throw new BadRequestException('CEP não encontrado');
+      throw new BadRequestException('ZIP code not found');
     }
 
     // Converter string de data para Date object

@@ -169,25 +169,11 @@ export default function RelatoriosPage() {
         params.append('mes', mesSelecionado.toString());
       }
       
-      console.log('🔍 Carregando relatórios:', { 
-        ano: anoSelecionado, 
-        mes: mesSelecionado,
-        url: `${endpoints.relatorios}?${params}` 
-      });
-      
       const response = await api.get(`${endpoints.relatorios}?${params}`);
-      
-      console.log('📊 Dados recebidos:', {
-        totalColaboradores: response.data.totalColaboradores,
-        aniversariantesEsteAno: response.data.aniversariantesEsteAno,
-        enviosPorMes: response.data.enviosPorMes,
-        totalItensEnviosPorMes: response.data.enviosPorMes?.length
-      });
       
       setStats(response.data);
     } catch (error) {
-      console.error('Erro ao carregar relatórios:', error);
-      toast.error('Erro ao carregar relatórios');
+      // Error is handled by axios interceptor
     } finally {
       setLoading(false);
     }
@@ -263,9 +249,8 @@ export default function RelatoriosPage() {
       document.body.removeChild(link);
 
       toast.dismiss();
-      toast.success('Relatório exportado com sucesso!');
+      toast.success('Report exported successfully!');
     } catch (error) {
-      console.error('Erro ao exportar relatório:', error);
       toast.dismiss();
       toast.error('Erro ao exportar relatório');
     }

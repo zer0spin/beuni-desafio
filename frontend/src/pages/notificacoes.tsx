@@ -64,7 +64,6 @@ export default function NotificacoesPage() {
       const response = await api.get(endpoints.notificacoes);
       setNotifications(response.data);
     } catch (error) {
-      console.error('Erro ao carregar notificações:', error);
       setNotifications([]);
     } finally {
       setIsLoading(false);
@@ -104,7 +103,7 @@ export default function NotificacoesPage() {
         prev.map(n => n.id === notificationId ? { ...n, lida: true } : n)
       );
     } catch (error) {
-      console.error('Erro ao marcar notificação como lida:', error);
+      // Error handled by interceptor
     }
   };
 
@@ -115,7 +114,7 @@ export default function NotificacoesPage() {
         prev.map(n => ({ ...n, lida: true }))
       );
     } catch (error) {
-      console.error('Erro ao marcar todas as notificações como lidas:', error);
+      // Error handled by interceptor
     }
   };
 

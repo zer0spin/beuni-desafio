@@ -171,8 +171,7 @@ export default function EnviosPage() {
         totalPages: data.totalPages || 1
       });
     } catch (error) {
-      console.error('Erro ao carregar envios:', error);
-      toast.error('Erro ao carregar envios');
+      toast.error('Error loading shipments');
       setEnvios([]);
       setStats({ total: 0, page: 1, totalPages: 1 });
     } finally {
@@ -184,11 +183,10 @@ export default function EnviosPage() {
     setProcessingId(envioId);
     try {
       await api.patch(`/envio-brindes/${envioId}/marcar-enviado`);
-      toast.success('Envio marcado como enviado!');
+      toast.success('Shipping marked as sent!');
       loadEnvios();
     } catch (error: any) {
-      console.error('Erro ao marcar envio:', error);
-      toast.error(error.response?.data?.message || 'Erro ao marcar envio');
+      toast.error(error.response?.data?.message || 'Error marking shipment');
     } finally {
       setProcessingId(null);
     }

@@ -79,7 +79,7 @@ export default function DashboardPage() {
 
       setRecentBirthdays(upcomingBirthdays.slice(0, 5));
     } catch (error) {
-      console.error('Erro ao carregar dados do dashboard:', error);
+      // Error handled by interceptor
     } finally {
       setIsLoading(false);
     }

@@ -150,7 +150,7 @@ export default function HomePage() {
                     />
                   </div>
 
-                  {/* Menu de navegação centralizado */}
+                  {/* Centered navigation menu */}
                   <nav className="hidden md:flex space-x-10">
                     <a href="#top" className="text-beuni-text hover:text-beuni-orange-500 font-semibold text-lg transition-colors">
                       Início
