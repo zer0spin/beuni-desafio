@@ -17,7 +17,7 @@ COPY backend/ .
 RUN npx prisma generate && npm run build
 
 FROM node:18-slim AS runner
-RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y openssl ca-certificates curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=builder /app/node_modules ./node_modules
@@ -25,4 +25,6 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
 COPY backend/package*.json ./
 EXPOSE $PORT
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD curl -f http://localhost:${PORT:-3001}/health || exit 1
 CMD ["node", "dist/main.js"]

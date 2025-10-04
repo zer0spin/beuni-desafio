@@ -43,16 +43,29 @@ async function bootstrap() {
     }),
   );
 
-  // CORS configuration with security enhancements
+  // CORS configuration with security enhancements and fallbacks
+  const allowedOrigins = [
+    'http://localhost:3000', // Local development
+    'https://localhost:3000', // Local development with HTTPS
+    'https://beuni-frontend-one.vercel.app', // Vercel production domain
+    /^https:\/\/beuni-frontend.*\.vercel\.app$/, // Any Vercel deployment (preview, staging, etc)
+    /^https:\/\/.*\.beuni\.app$/, // Custom domain pattern
+    /^https:\/\/.*\.railway\.app$/, // Railway domain pattern for API
+  ];
+
+  // Add CORS_ORIGIN from environment if exists
+  if (process.env.CORS_ORIGIN) {
+    const envOrigins = process.env.CORS_ORIGIN.split(',').map(o => o.trim()).filter(Boolean);
+    allowedOrigins.push(...envOrigins);
+  }
+
+  // Add FRONTEND_URL from environment if exists (fallback)
+  if (process.env.FRONTEND_URL && !allowedOrigins.includes(process.env.FRONTEND_URL)) {
+    allowedOrigins.push(process.env.FRONTEND_URL);
+  }
+
   app.enableCors({
-    origin: [
-      'http://localhost:3000', // Local development
-      'https://localhost:3000', // Local development with HTTPS
-      'https://beuni-frontend-one.vercel.app', // Vercel production domain
-      /^https:\/\/beuni-frontend.*\.vercel\.app$/, // Any Vercel deployment (preview, staging, etc)
-      /^https:\/\/.*\.beuni\.app$/, // Custom domain pattern
-      ...((process.env.CORS_ORIGIN?.split(',')) || []), // Additional domains from env
-    ],
+    origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-CSRF-Token'],
