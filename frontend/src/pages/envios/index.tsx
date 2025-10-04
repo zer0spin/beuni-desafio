@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Package, MapPin, Calendar, Truck, CheckCircle, Clock, AlertCircle, Search } from 'lucide-react';
+import { Package, MapPin, Calendar, Truck, CheckCircle, Clock, AlertCircle, Search, Plus, Settings, MoreVertical } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import Layout from '@/components/Layout';
+import ShipmentStatusModal from '@/components/ShipmentStatusModal';
+import BulkShipmentModal from '@/components/BulkShipmentModal';
 import api, { getUser } from '@/lib/api';
 
 // Business days utilities (frontend-only) mirroring backend logic
@@ -139,6 +141,11 @@ export default function EnviosPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Modal states
+  const [statusModalOpen, setStatusModalOpen] = useState(false);
+  const [bulkModalOpen, setBulkModalOpen] = useState(false);
+  const [selectedEnvio, setSelectedEnvio] = useState<EnvioBrinde | null>(null);
+
   useEffect(() => {
     const user = getUser();
     if (!user) {
@@ -190,6 +197,24 @@ export default function EnviosPage() {
     } finally {
       setProcessingId(null);
     }
+  };
+
+  const handleOpenStatusModal = (envio: EnvioBrinde) => {
+    setSelectedEnvio(envio);
+    setStatusModalOpen(true);
+  };
+
+  const handleCloseStatusModal = () => {
+    setStatusModalOpen(false);
+    setSelectedEnvio(null);
+  };
+
+  const handleStatusUpdate = () => {
+    loadEnvios();
+  };
+
+  const handleBulkSuccess = () => {
+    loadEnvios();
   };
 
   // Returns deadline info for UI ONLY (no backend mutation)
@@ -263,6 +288,13 @@ export default function EnviosPage() {
                 <span className="font-bold text-2xl">{stats.total}</span>
                 <span className="text-sm opacity-90">envios</span>
               </div>
+              <button
+                onClick={() => setBulkModalOpen(true)}
+                className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2.5 rounded-xl shadow-md border border-white/30 hover:bg-white/25 transition-all"
+              >
+                <Plus className="h-5 w-5" />
+                <span className="font-semibold">Criar Envios</span>
+              </button>
             </div>
           </div>
 
@@ -377,25 +409,37 @@ export default function EnviosPage() {
                         <StatusIcon className="h-3.5 w-3.5 mr-1.5" />
                         {statusConfig.label}
                       </span>
-                      {envio.status === 'PRONTO_PARA_ENVIO' && (
+                      
+                      {/* Quick Actions */}
+                      <div className="flex items-center space-x-1">
+                        {envio.status === 'PRONTO_PARA_ENVIO' && (
+                          <button
+                            onClick={() => handleMarcarEnviado(envio.id)}
+                            disabled={processingId === envio.id}
+                            className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-sm hover:shadow-md disabled:opacity-50 text-xs"
+                          >
+                            {processingId === envio.id ? (
+                              <>
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-1"></div>
+                                Processando...
+                              </>
+                            ) : (
+                              <>
+                                <Truck className="h-3 w-3 mr-1" />
+                                Marcar Enviado
+                              </>
+                            )}
+                          </button>
+                        )}
+                        
                         <button
-                          onClick={() => handleMarcarEnviado(envio.id)}
-                          disabled={processingId === envio.id}
-                          className="inline-flex items-center px-4 py-1.5 bg-gradient-to-r from-green-500 to-green-600 text-white font-bold rounded-lg hover:from-green-600 hover:to-green-700 transition-all shadow-sm hover:shadow-md disabled:opacity-50 text-sm"
+                          onClick={() => handleOpenStatusModal(envio)}
+                          className="p-2 text-beuni-text/60 hover:text-beuni-text hover:bg-beuni-cream rounded-lg transition-all"
+                          title="Gerenciar Status"
                         >
-                          {processingId === envio.id ? (
-                            <>
-                              <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white mr-1.5"></div>
-                              Processando...
-                            </>
-                          ) : (
-                            <>
-                              <Truck className="h-3.5 w-3.5 mr-1.5" />
-                              Marcar Enviado
-                            </>
-                          )}
+                          <Settings className="h-4 w-4" />
                         </button>
-                      )}
+                      </div>
                     </div>
                   </div>
 
@@ -619,6 +663,22 @@ export default function EnviosPage() {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      {selectedEnvio && (
+        <ShipmentStatusModal
+          envio={selectedEnvio}
+          isOpen={statusModalOpen}
+          onClose={handleCloseStatusModal}
+          onUpdate={handleStatusUpdate}
+        />
+      )}
+      
+      <BulkShipmentModal
+        isOpen={bulkModalOpen}
+        onClose={() => setBulkModalOpen(false)}
+        onSuccess={handleBulkSuccess}
+      />
     </Layout>
   );
 }

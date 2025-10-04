@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Users, Plus, Search, Edit, Calendar, MapPin, Briefcase } from 'lucide-react';
+import { Users, Plus, Search, Edit, Calendar, MapPin, Briefcase, Package } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import Layout from '@/components/Layout';
 import api, { endpoints } from '@/lib/api';
 import type { ColaboradoresResponse, Colaborador } from '@/types';
+
+interface EnvioBrinde {
+  id: string;
+  colaborador_id: string;
+  status: 'PENDENTE' | 'PRONTO_PARA_ENVIO' | 'ENVIADO' | 'ENTREGUE' | 'CANCELADO';
+  created_at: string;
+  updated_at: string;
+}
 
 export default function ColaboradoresPage() {
   const parseBrDate = (dateStr?: string) => {
@@ -22,6 +30,7 @@ export default function ColaboradoresPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [stats, setStats] = useState({ total: 0, page: 1, totalPages: 0 });
   const [currentPage, setCurrentPage] = useState(1);
+  const [enviosBrindes, setEnviosBrindes] = useState<EnvioBrinde[]>([]);
 
   useEffect(() => {
     loadColaboradores(currentPage);
@@ -30,17 +39,61 @@ export default function ColaboradoresPage() {
   const loadColaboradores = async (page: number = 1) => {
     try {
       setLoading(true);
-      const response = await api.get<ColaboradoresResponse>(`${endpoints.colaboradores}?page=${page}&limit=10`);
-      setColaboradores(response.data.colaboradores);
+      const [colaboradoresResponse, enviosResponse] = await Promise.all([
+        api.get<ColaboradoresResponse>(`${endpoints.colaboradores}?page=${page}&limit=10`),
+        api.get<EnvioBrinde[]>('/api/envio-brindes')
+      ]);
+      
+      setColaboradores(colaboradoresResponse.data.colaboradores);
+      setEnviosBrindes(enviosResponse.data || []);
       setStats({
-        total: response.data.total,
-        page: response.data.page,
-        totalPages: response.data.totalPages
+        total: colaboradoresResponse.data.total,
+        page: colaboradoresResponse.data.page,
+        totalPages: colaboradoresResponse.data.totalPages
       });
     } catch (error) {
       toast.error('Erro ao carregar colaboradores');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getStatusEnvio = (colaboradorId: string) => {
+    const envio = enviosBrindes.find(e => e.colaborador_id === colaboradorId);
+    return envio?.status || null;
+  };
+
+  const getStatusBadgeColor = (status: string | null) => {
+    switch (status) {
+      case 'PENDENTE':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'PRONTO_PARA_ENVIO':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'ENVIADO':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'ENTREGUE':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'CANCELADO':
+        return 'bg-red-100 text-red-800 border-red-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const getStatusLabel = (status: string | null) => {
+    switch (status) {
+      case 'PENDENTE':
+        return 'Pendente';
+      case 'PRONTO_PARA_ENVIO':
+        return 'Pronto';
+      case 'ENVIADO':
+        return 'Enviado';
+      case 'ENTREGUE':
+        return 'Entregue';
+      case 'CANCELADO':
+        return 'Cancelado';
+      default:
+        return 'Sem envio';
     }
   };
 
@@ -177,6 +230,9 @@ export default function ColaboradoresPage() {
                     <th className="px-6 py-4 text-left text-xs font-semibold text-beuni-text/70 uppercase tracking-wider">
                       Localização
                     </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-beuni-text/70 uppercase tracking-wider">
+                      Status Envio
+                    </th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-beuni-text/70 uppercase tracking-wider">
                       Ações
                     </th>
@@ -218,6 +274,19 @@ export default function ColaboradoresPage() {
                             {colaborador.endereco?.cidade}, {colaborador.endereco?.uf}
                           </span>
                         </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {(() => {
+                          const status = getStatusEnvio(colaborador.id);
+                          return (
+                            <div className="flex items-center">
+                              <Package className="h-4 w-4 text-beuni-text/40 mr-2" />
+                              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusBadgeColor(status)}`}>
+                                {getStatusLabel(status)}
+                              </span>
+                            </div>
+                          );
+                        })()}
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end space-x-2">
