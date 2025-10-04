@@ -1,23 +1,23 @@
-# 🚂 Deploy Backend no Railway - Guia Completo
+# 🚂 Railway Backend Deployment - Complete Guide
 
-## 📋 **VISÃO GERAL**
+## 📋 **OVERVIEW**
 
-Este guia documenta o processo completo para fazer deploy do backend NestJS no Railway, incluindo configuração de banco de dados PostgreSQL e Redis.
+This guide documents the complete process for deploying the NestJS backend on Railway, including PostgreSQL database and Redis configuration.
 
-### **Stack Técnica:**
+### **Technical Stack:**
 - **Backend**: NestJS + TypeScript + Prisma ORM
-- **Database**: PostgreSQL (gerenciado)
-- **Cache**: Redis (gerenciado)
-- **Deploy**: Railway com CI/CD automático
+- **Database**: PostgreSQL (managed)
+- **Cache**: Redis (managed)
+- **Deploy**: Railway with automatic CI/CD
 - **URL**: https://beuni-desafio-production.up.railway.app
 
 ---
 
-## 🚀 **PASSO A PASSO - DEPLOY INICIAL**
+## 🚀 **STEP-BY-STEP - INITIAL DEPLOYMENT**
 
-### **1. Preparação do Repositório**
+### **1. Repository Preparation**
 ```bash
-# Estrutura necessária:
+# Required structure:
 /beuni-desafio/
 ├── backend/
 │   ├── package.json
@@ -28,33 +28,33 @@ Este guia documenta o processo completo para fazer deploy do backend NestJS no R
 └── frontend/
 ```
 
-### **2. Criar Projeto no Railway**
-1. **Acesse**: https://railway.app
+### **2. Create Railway Project**
+1. **Access**: https://railway.app
 2. **Login**: "Login with GitHub"
-3. **Novo Projeto**: "New Project" → "Deploy from GitHub repo"
-4. **Selecionar**: "zer0spin/beuni-desafio"
+3. **New Project**: "New Project" → "Deploy from GitHub repo"
+4. **Select**: "zer0spin/beuni-desafio"
 
-### **3. Configurar Serviços**
+### **3. Configure Services**
 
 #### **3.1 PostgreSQL Database**
 ```bash
-# No Railway Dashboard:
+# In Railway Dashboard:
 1. "Add Service" → "Database" → "PostgreSQL"
-2. Aguardar provisionamento (~2min)
-3. ✅ URL gerada automaticamente: ${{Postgres.DATABASE_URL}}
+2. Wait for provisioning (~2min)
+3. ✅ URL automatically generated: ${{Postgres.DATABASE_URL}}
 ```
 
 #### **3.2 Redis Cache**  
 ```bash
-# No Railway Dashboard:
+# In Railway Dashboard:
 1. "Add Service" → "Database" → "Redis"
-2. Aguardar provisionamento (~1min)
-3. ✅ URL gerada automaticamente: ${{Redis.REDIS_URL}}
+2. Wait for provisioning (~1min)
+3. ✅ URL automatically generated: ${{Redis.REDIS_URL}}
 ```
 
 #### **3.3 Backend Service**
 ```bash
-# No Railway Dashboard:
+# In Railway Dashboard:
 1. "Add Service" → "GitHub Repo"
 2. Root Directory: /backend
 3. Start Command: npm start
@@ -63,13 +63,13 @@ Este guia documenta o processo completo para fazer deploy do backend NestJS no R
 
 ---
 
-## ⚙️ **CONFIGURAÇÕES TÉCNICAS**
+## ⚙️ **TECHNICAL CONFIGURATIONS**
 
-### **Dockerfile Otimizado**
+### **Optimized Dockerfile**
 ```dockerfile
-# Multi-stage build para produção
-FROM node:18-alpine AS base
-RUN apk add --no-cache openssl
+# Multi-stage build for production
+FROM node:18-slim AS base
+RUN apt-get update && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
 
 FROM base AS dependencies
 WORKDIR /app
@@ -86,8 +86,8 @@ RUN npm run build
 
 FROM base AS runtime
 WORKDIR /app
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nestjs -u 1001
+RUN addgroup --gid 1001 nodejs
+RUN adduser --uid 1001 --gid 1001 --disabled-password nestjs
 
 COPY --from=dependencies /app/node_modules ./node_modules
 COPY --from=build /app/dist ./dist
@@ -100,7 +100,7 @@ EXPOSE 3001
 CMD ["npm", "start"]
 ```
 
-### **package.json Produção**
+### **Production package.json**
 ```json
 {
   "scripts": {
@@ -116,284 +116,276 @@ CMD ["npm", "start"]
 }
 ```
 
-### **prisma/schema.prisma**
-```prisma
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-```
-
----
-
-## 🔧 **VARIÁVEIS DE AMBIENTE**
-
-### **Configuração no Railway**
-```bash
-# Service → Variables:
+### **Environment Variables**
+```env
+# Railway Variables (Raw Editor)
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 REDIS_URL=${{Redis.REDIS_URL}}
+JWT_SECRET=your-secure-jwt-secret
+JWT_EXPIRES_IN=7d
+CORS_ORIGIN=https://beuni-frontend-one.vercel.app
 NODE_ENV=production
-PORT=3001
-JWT_SECRET=seu-jwt-secret-aqui
-CORS_ORIGIN=https://beuni-frontend.vercel.app
-```
-
-### **Arquivo .env.example**
-```env
-# Database
-DATABASE_URL="postgresql://user:pass@host:5432/db"
-REDIS_URL="redis://host:6379"
-
-# App
-NODE_ENV="production"
-PORT=3001
-JWT_SECRET="your-super-secret-jwt-key"
-
-# CORS
-CORS_ORIGIN="https://beuni-frontend.vercel.app"
+PORT=${{PORT}}
+RATE_LIMIT_LOGIN=5
+RATE_LIMIT_CEP=30
+VIACEP_API_URL=https://viacep.com.br/ws
 ```
 
 ---
 
-## 🔄 **CI/CD AUTOMÁTICO**
+## 🔄 **DEPLOYMENT PROCESS**
 
-### **Configuração GitHub Integration**
+### **Automatic Deployment**
 ```bash
-# Automático após conectar repositório:
-Git Push → GitHub → Railway Webhook → Build → Deploy
+# After configuration, Railway automatically:
+1. Detects changes in GitHub
+2. Builds Docker image
+3. Runs database migrations
+4. Deploys to production
+5. Configures health checks
 ```
 
-### **Build Process**
+### **Manual Deployment**
 ```bash
-1. npm ci                    # Install dependencies
-2. npx prisma generate      # Generate Prisma client
-3. npm run build            # Compile TypeScript
-4. npx prisma db push       # Apply schema changes
-5. npm start                # Start application
-```
-
-### **Monitoring Build**
-```bash
-# Railway CLI
-railway logs --follow
-
-# Dashboard
-https://railway.app/project/[project-id]
+# Using Railway CLI
+railway login
+railway link
+railway up
 ```
 
 ---
 
-## 🚨 **RESOLUÇÃO DE PROBLEMAS**
+## 🔧 **DATABASE MANAGEMENT**
 
-### **❌ Erro: "DATABASE_URL resolved to an empty string"**
-**Causa**: Variável não referenciando serviço corretamente
-**Solução**:
+### **Run Migrations**
 ```bash
-# Railway CLI:
-railway variables --set 'DATABASE_URL=${{Postgres.DATABASE_URL}}'
+# Connect via SSH and run migrations
+railway ssh "npx prisma migrate deploy"
 
-# Ou via Dashboard:
-Variables → DATABASE_URL → ${{Postgres.DATABASE_URL}}
+# Generate Prisma client
+railway ssh "npx prisma generate"
+
+# Seed database (if needed)
+railway ssh "npx prisma db seed"
 ```
 
-### **❌ Erro: "Module not found: typescript"**
-**Causa**: TypeScript em devDependencies
-**Solução**:
+### **Database Studio Access**
+```bash
+# Open Prisma Studio in production
+railway ssh "npx prisma studio"
+```
+
+---
+
+## 🏥 **HEALTH CHECKS**
+
+### **Built-in Health Endpoint**
+```
+GET https://beuni-desafio-production.up.railway.app/health
+```
+
+### **Expected Response**
 ```json
 {
-  "dependencies": {
-    "typescript": "^5.1.3",
-    "@types/node": "^20.0.0"
+  "status": "ok",
+  "info": {
+    "database": { "status": "up" },
+    "redis": { "status": "up" }
+  },
+  "error": {},
+  "details": {
+    "database": { "status": "up" },
+    "redis": { "status": "up" }
   }
 }
 ```
 
-### **❌ Erro: "Prisma Client not found"**
-**Causa**: Cliente não gerado
-**Solução**:
-```dockerfile
-# Adicionar no Dockerfile:
-RUN npx prisma generate
-```
+---
 
-### **❌ Erro: "CORS policy blocked"**
-**Causa**: CORS não configurado para Vercel
-**Solução**:
+## 📊 **MONITORING**
+
+### **Railway Metrics**
+- CPU usage
+- Memory consumption
+- Request rate
+- Response time
+- Error rate
+
+### **Custom Logging**
 ```typescript
-// main.ts
-app.enableCors({
-  origin: [
-    'https://beuni-frontend.vercel.app',
-    /https:\/\/beuni-frontend-.*\.vercel\.app$/
-  ],
-  credentials: true
+// Winston logger configuration
+import { createLogger, format, transports } from 'winston';
+
+export const logger = createLogger({
+  level: 'info',
+  format: format.combine(
+    format.timestamp(),
+    format.errors({ stack: true }),
+    format.json()
+  ),
+  transports: [
+    new transports.Console()
+  ]
 });
 ```
 
 ---
 
-## ✅ **VALIDAÇÃO DO DEPLOY**
+## 🔒 **SECURITY CONSIDERATIONS**
 
-### **1. Health Check**
-```bash
-# Test Backend
-curl https://beuni-desafio-production.up.railway.app/health
+### **Environment Variables Security**
+- ✅ Never commit .env files
+- ✅ Use Railway's variable management
+- ✅ Rotate JWT secrets regularly
+- ✅ Use strong database passwords
 
-# Expected: {"message":"🎉 Beuni API está funcionando!"}
-```
-
-### **2. Database Connection**
-```bash
-# Test Database
-curl https://beuni-desafio-production.up.railway.app/users
-
-# Expected: JSON array or 401 unauthorized
-```
-
-### **3. API Documentation**
-```bash
-# Swagger UI
-https://beuni-desafio-production.up.railway.app/api/docs
-
-# OpenAPI JSON
-https://beuni-desafio-production.up.railway.app/api/docs-json
-```
-
-### **4. Performance Check**
-- **Response Time**: <100ms
-- **Memory Usage**: <512MB
-- **CPU Usage**: <50%
-
----
-
-## 📊 **MONITORAMENTO**
-
-### **Railway Metrics**
-```bash
-# CPU & Memory
-Railway Dashboard → Metrics
-
-# Application Logs
-Railway Dashboard → Deployments → Logs
-
-# Database Stats
-PostgreSQL Service → Metrics
-```
-
-### **Custom Monitoring**
+### **Network Security**
 ```typescript
-// health.controller.ts
-@Get('health')
-async health() {
-  return {
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    database: await this.checkDatabase(),
-    redis: await this.checkRedis()
-  };
-}
-```
-
----
-
-## 🔐 **SEGURANÇA**
-
-### **Environment Variables**
-```bash
-# Nunca commitar:
-- JWT_SECRET
-- DATABASE_URL
-- REDIS_URL
-- API Keys
-
-# Usar Railway Variables
-```
-
-### **CORS Configuration**
-```typescript
+// CORS configuration
 app.enableCors({
-  origin: process.env.CORS_ORIGIN.split(','),
+  origin: process.env.CORS_ORIGIN,
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+  allowedHeaders: ['Content-Type', 'Authorization']
 });
 ```
 
 ### **Rate Limiting**
 ```typescript
-import { ThrottlerModule } from '@nestjs/throttler';
-
-@Module({
-  imports: [
-    ThrottlerModule.forRoot({
-      ttl: 60,
-      limit: 100
-    })
-  ]
-})
+// Rate limiting configuration
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP'
+  })
+);
 ```
 
 ---
 
-## 🌍 **URLS FINAIS**
+## 🐛 **TROUBLESHOOTING**
 
-### **Produção:**
-- **API Base**: https://beuni-desafio-production.up.railway.app
-- **Swagger**: https://beuni-desafio-production.up.railway.app/api/docs
-- **Health**: https://beuni-desafio-production.up.railway.app/health
-- **Dashboard**: https://railway.app/dashboard
+### **Common Issues**
 
----
-
-## 📝 **COMANDOS ÚTEIS**
-
+#### **Database Connection Errors**
 ```bash
-# Railway CLI
-npm install -g @railway/cli
-railway login
-railway link [project-id]
+# Check database connection
+railway ssh "npx prisma db pull"
 
-# Deploy manual
-railway up
-
-# Logs em tempo real
-railway logs --follow
-
-# Variables
+# Verify environment variables
 railway variables
-railway variables --set KEY=value
+```
 
-# Database shell
-railway connect postgres
+#### **Redis Connection Issues**
+```bash
+# Test Redis connection
+railway ssh "redis-cli -u $REDIS_URL ping"
+```
 
-# Redis shell  
-railway connect redis
+#### **Port Configuration**
+```env
+# Correct port configuration (no quotes)
+PORT=${{PORT}}
+
+# Incorrect (causes string parsing)
+PORT="${{PORT}}"
+```
+
+#### **Prisma Generation Issues**
+```bash
+# Regenerate Prisma client
+railway ssh "npx prisma generate"
+
+# Reset database (CAUTION: Development only)
+railway ssh "npx prisma migrate reset"
 ```
 
 ---
 
-## 🎯 **RESULTADO FINAL**
+## 📝 **BEST PRACTICES**
 
-**✅ Backend Deployado com Sucesso:**
-- 🚂 **URL**: https://beuni-desafio-production.up.railway.app
-- 🗄️ **Database**: PostgreSQL conectado e funcionando
-- ⚡ **Cache**: Redis ativo e responsivo
-- 🔄 **CI/CD**: Deploy automático via GitHub
-- 📚 **API Docs**: Swagger UI disponível
-- 🔒 **Security**: CORS, Rate Limiting, JWT
-- 📊 **Monitoring**: Logs e métricas integradas
+### **Deployment Checklist**
+- [ ] Environment variables configured
+- [ ] Database migrations applied
+- [ ] Health checks responding
+- [ ] Logs are structured and informative
+- [ ] Error handling implemented
+- [ ] Security headers configured
+- [ ] Rate limiting enabled
+- [ ] CORS properly configured
 
-**PRONTO PARA PRODUÇÃO! 🚀**
+### **Performance Optimization**
+```typescript
+// Connection pooling
+{
+  datasources: {
+    db: {
+      provider: "postgresql",
+      url: env("DATABASE_URL"),
+      connectionLimit: 20,
+      poolTimeout: 60,
+    }
+  }
+}
+```
+
+### **Error Handling**
+```typescript
+// Global exception filter
+@Catch()
+export class AllExceptionsFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse();
+    const request = ctx.getRequest();
+
+    logger.error('Unhandled exception', {
+      exception,
+      url: request.url,
+      method: request.method
+    });
+
+    response.status(500).json({
+      statusCode: 500,
+      timestamp: new Date().toISOString(),
+      path: request.url,
+      message: 'Internal server error'
+    });
+  }
+}
+```
+
+---
+
+## 🔄 **BACKUP & RECOVERY**
+
+### **Database Backup**
+```bash
+# Create database backup
+railway ssh "pg_dump $DATABASE_URL > backup.sql"
+
+# Restore from backup
+railway ssh "psql $DATABASE_URL < backup.sql"
+```
+
+### **Redis Backup**
+```bash
+# Redis persistence is handled automatically by Railway
+# Data is persisted to disk and backed up regularly
+```
+
+---
+
+## 📚 **ADDITIONAL RESOURCES**
+
+- [Railway Documentation](https://docs.railway.app/)
+- [NestJS Deployment Guide](https://docs.nestjs.com/deployment)
+- [Prisma Production Guide](https://www.prisma.io/docs/guides/deployment)
+- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
+
+---
+
+**Last Updated**: October 4, 2025  
+**Maintained By**: Development Team  
+**Status**: Production Ready

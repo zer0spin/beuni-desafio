@@ -1,46 +1,46 @@
 # 🔧 Troubleshooting - Beuni Platform
 
-Guia completo de solução de problemas para o projeto Beuni.
+Complete troubleshooting guide for the Beuni project.
 
 ---
 
-## 📋 Índice
+## 📋 Index
 
-1. [Erros de Login](#erros-de-login)
-2. [Erros de Conexão com API](#erros-de-conexão-com-api)
-3. [Erros de Database](#erros-de-database)
-4. [Erros de Deploy](#erros-de-deploy)
-5. [Comandos Úteis](#comandos-úteis)
+1. [Login Errors](#login-errors)
+2. [API Connection Errors](#api-connection-errors)
+3. [Database Errors](#database-errors)
+4. [Deployment Errors](#deployment-errors)
+5. [Useful Commands](#useful-commands)
 
 ---
 
-## 🔐 Erros de Login
+## 🔐 Login Errors
 
-### Erro: "Request failed with status code 500"
+### Error: "Request failed with status code 500"
 
-**Causa**: Banco de dados sem migrations ou tabelas não criadas.
+**Cause**: Database without migrations or tables not created.
 
-**Solução**:
+**Solution**:
 ```bash
-# 1. Conectar via SSH ao Railway e rodar migrations
+# 1. Connect via SSH to Railway and run migrations
 cd backend
 railway ssh "npx prisma migrate deploy"
 
-# 2. Verificar se as tabelas foram criadas
+# 2. Verify tables were created
 railway ssh "cd /app && npx prisma studio"
 ```
 
 ---
 
-### Erro: "Bad Request (400)" no login
+### Error: "Bad Request (400)" on login
 
-**Causa**: Frontend enviando campos incorretos no body da requisição.
+**Cause**: Frontend sending incorrect fields in request body.
 
-**Verificar**:
-- O DTO do backend espera `email` e `password`
-- O frontend está enviando esses campos corretamente
+**Check**:
+- Backend DTO expects `email` and `password`
+- Frontend is sending these fields correctly
 
-**Exemplo correto**:
+**Correct example**:
 ```json
 {
   "email": "admin@beuni.com",
@@ -50,11 +50,11 @@ railway ssh "cd /app && npx prisma studio"
 
 ---
 
-### Erro: "Credenciais inválidas (401)"
+### Error: "Invalid credentials (401)"
 
-**Causa**: Usuário não existe no banco ou senha incorreta.
+**Cause**: User doesn't exist in database or incorrect password.
 
-**Solução - Criar usuário de teste**:
+**Solution - Create test user**:
 ```bash
 cd backend
 railway ssh "cd /app && cat > create-user.js << 'EOFSCRIPT'
@@ -95,350 +95,313 @@ EOFSCRIPT
 node create-user.js && rm create-user.js"
 ```
 
-**Credenciais criadas**:
+**Created credentials**:
 - Email: `admin@beuni.com`
-- Senha: `Admin@123`
+- Password: `Admin@123`
 
 ---
 
-## 🔌 Erros de Conexão com API
+## 🌐 API Connection Errors
 
-### Erro: "Cannot connect to backend"
+### Error: "Network Error" or "ERR_NETWORK"
 
-**Verificar URLs**:
+**Cause**: Frontend trying to connect to incorrect backend URL.
 
-1. **Frontend `.env.production`**:
+**Check frontend configuration**:
+```env
+# .env.local (frontend)
+NEXT_PUBLIC_API_URL=https://beuni-desafio-production.up.railway.app
+```
+
+**Verify CORS configuration**:
 ```bash
-NEXT_PUBLIC_API_URL=https://beuni-desafio-production-41c7.up.railway.app
+# Check backend CORS settings
+railway logs --tail
 ```
 
-2. **Vercel `vercel.json`**:
-```json
-{
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://beuni-desafio-production-41c7.up.railway.app/:path*"
-    }
-  ]
-}
-```
-
-3. **Next.js `next.config.js`**:
-```javascript
-const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
-  (process.env.NODE_ENV === 'production'
-    ? 'https://beuni-desafio-production-41c7.up.railway.app'
-    : 'http://localhost:3001');
-```
-
-**Comando para verificar Railway URL**:
-```bash
-cd backend
-railway status
-```
-
----
-
-### Erro: "CORS policy blocked"
-
-**Verificar configuração CORS no backend**:
-
-Arquivo: `backend/src/main.ts`
-
+**Check CORS configuration in backend**:
 ```typescript
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://beuni-frontend-one.vercel.app',
-  /^https:\/\/beuni-frontend.*\.vercel\.app$/,
-];
-
-if (process.env.CORS_ORIGIN) {
-  const envOrigins = process.env.CORS_ORIGIN.split(',');
-  allowedOrigins.push(...envOrigins);
-}
+// main.ts
+app.enableCors({
+  origin: 'https://beuni-frontend-one.vercel.app',
+  credentials: true
+});
 ```
 
-**Verificar variáveis no Railway**:
+---
+
+### Error: "CORS Error"
+
+**Cause**: Backend not configured to accept requests from frontend domain.
+
+**Solution**:
 ```bash
-railway variables
-```
-
-Deve conter:
-```
+# Update CORS_ORIGIN variable in Railway
 CORS_ORIGIN=https://beuni-frontend-one.vercel.app
-FRONTEND_URL=https://beuni-frontend-one.vercel.app
 ```
 
 ---
 
-## 💾 Erros de Database
+## 🗄️ Database Errors
 
-### Erro: "Can't reach database server at `postgres.railway.internal:5432`"
+### Error: "PrismaClientInitializationError"
 
-**Causa**: Tentando conectar à Railway database de fora do Railway.
+**Cause**: Migrations not executed in production database.
 
-**Solução**:
+**Solution**:
 ```bash
-# ERRADO: railway run usa .env local
-railway run npx prisma migrate deploy
+# Apply migrations in production
+railway ssh "npx prisma migrate deploy"
 
-# CORRETO: railway ssh executa DENTRO do Railway
+# Verify database schema
+railway ssh "npx prisma db pull"
+```
+
+---
+
+### Error: "Table doesn't exist"
+
+**Cause**: Database schema not up to date.
+
+**Solution**:
+```bash
+# Reset and recreate database (DEVELOPMENT ONLY)
+railway ssh "npx prisma migrate reset"
+
+# In production, use:
 railway ssh "npx prisma migrate deploy"
 ```
 
 ---
 
-### Erro: "The table `public.usuarios` does not exist"
+## 🚀 Deployment Errors
 
-**Causa**: Migrations não foram executadas no banco de produção.
+### Error: "Application failed to respond"
 
-**Solução**:
-```bash
-cd backend
+**Cause**: PORT variable incorrectly configured.
 
-# 1. Verificar conexão com banco
-railway variables | grep DATABASE_URL
+**Solution**:
+```env
+# Correct configuration (no quotes)
+PORT=${{PORT}}
 
-# 2. Executar migrations via SSH
-railway ssh "npx prisma migrate deploy"
-
-# 3. Verificar se tabelas foram criadas
-railway ssh "cd /app && npx prisma db pull"
+# Incorrect configuration
+PORT="${{PORT}}"
 ```
 
----
+**Complete fix steps:**
+1. Access Railway Dashboard
+2. Go to Backend service → Variables
+3. Find the PORT line
+4. Remove quotes: change `PORT="${{PORT}}"` to `PORT=${{PORT}}`
+5. Save changes (press Enter or click outside)
+6. Wait 3-5 minutes for automatic redeploy
 
-### Erro: "Argument `organizacao` is missing"
+### Error: "Variables not being substituted"
 
-**Causa**: Schema do Prisma exige relacionamento definido.
+**Cause**: Railway variable references not working correctly.
 
-**Solução - Usar `organizationId` em vez de `organizacao`**:
-```javascript
-// ❌ ERRADO
-prisma.usuario.create({
-  data: { organizacaoId: org.id }
-});
+**Manual URL Copy Solution (100% guaranteed)**:
 
-// ✅ CORRETO
-prisma.usuario.create({
-  data: { organizationId: org.id }
-});
+#### Step 1: Copy PostgreSQL URL
+1. Railway Dashboard → Your Project
+2. Click **Postgres** service
+3. Click **Variables** tab
+4. Find `DATABASE_URL`
+5. Click the eye icon 👁️ to reveal password
+6. Copy the complete URL
+
+Example:
+```
+postgresql://postgres:AbCd1234EfGh5678@containers-us-west-123.railway.app:5432/railway
 ```
 
----
+#### Step 2: Copy Redis URL
+1. Click **Redis** service
+2. Click **Variables** tab
+3. Find `REDIS_URL`
+4. Click eye icon 👁️ to reveal password
+5. Copy the complete URL
 
-## 🚀 Erros de Deploy
-
-### Erro: "Build failed on Vercel"
-
-**Verificar**:
-
-1. **Variáveis de ambiente na Vercel**:
-```bash
-NEXT_PUBLIC_API_URL=https://beuni-desafio-production-41c7.up.railway.app
-NODE_ENV=production
+Example:
+```
+redis://default:XyZ9876WqRsTuV5432@containers-us-west-456.railway.app:6379
 ```
 
-2. **Build command correto**:
+#### Step 3: Configure Backend with Real URLs
+1. Go back to **Backend** service
+2. Click **Variables** tab
+3. Click settings ⚙️ → **Raw Editor**
+4. Delete everything and paste this JSON (replace URLs):
+
 ```json
 {
-  "buildCommand": "cd frontend && npm ci && npm run build",
-  "installCommand": "cd frontend && npm ci",
-  "outputDirectory": "frontend/.next"
+  "CORS_ORIGIN": "https://beuni-frontend-one.vercel.app",
+  "DATABASE_URL": "PASTE_YOUR_POSTGRES_URL_HERE",
+  "JWT_EXPIRES_IN": "7d",
+  "JWT_SECRET": "fa68e27a-4848-47e5-8535-af2f25b8866a",
+  "NODE_ENV": "production",
+  "PORT": "3001",
+  "RATE_LIMIT_CEP": "30",
+  "RATE_LIMIT_LOGIN": "5",
+  "REDIS_URL": "PASTE_YOUR_REDIS_URL_HERE",
+  "VIACEP_API_URL": "https://viacep.com.br/ws"
 }
 ```
 
+5. Click **Save Variables**
+6. Wait for automatic redeploy (~3-5 minutes)
+
 ---
 
-### Erro: "Railway deployment failed"
+## 🐛 Docker build failed
 
-**Logs do Railway**:
-```bash
-cd backend
-railway logs
+**Cause**: Docker image build issues.
+
+**Check**:
+- Dockerfile uses correct base image
+- All dependencies are included
+- Build context is correct
+
+**Solution**:
+```dockerfile
+# Use Debian instead of Alpine for Prisma
+FROM node:18-slim AS base
+RUN apt-get update && apt-get install -y openssl ca-certificates
 ```
 
-**Verificar**:
-1. `DATABASE_URL` está configurada?
-2. Migrations foram executadas?
-3. PORT está configurada (3001)?
-
 ---
 
-## 🔍 Comandos Úteis
+## 🛠️ Useful Commands
 
-### Railway
-
+### Railway CLI Commands
 ```bash
-# Ver status do serviço
-railway status
+# Login to Railway
+railway login
 
-# Ver variáveis de ambiente
+# Link project
+railway link
+
+# View logs
+railway logs --tail
+
+# Access shell
+railway ssh
+
+# View environment variables
 railway variables
 
-# Ver logs em tempo real
-railway logs
-
-# Executar comando no Railway
-railway ssh "comando aqui"
-
-# Redeployar
+# Deploy
 railway up
-
-# Conectar ao Redis
-railway ssh "redis-cli -u $REDIS_URL"
-
-# Conectar ao PostgreSQL
-railway ssh "psql $DATABASE_URL"
 ```
 
-### Prisma
-
+### Prisma Commands
 ```bash
-# Gerar client
+# Generate client
 npx prisma generate
 
-# Criar migration
-npx prisma migrate dev --name nome_da_migration
+# Apply migrations
+npx prisma migrate deploy
 
-# Aplicar migrations em produção
-railway ssh "npx prisma migrate deploy"
+# Reset database (DEVELOPMENT ONLY)
+npx prisma migrate reset
 
-# Abrir Prisma Studio
+# View database
 npx prisma studio
 
-# Ver schema do banco
+# Pull database schema
 npx prisma db pull
-
-# Reset database (CUIDADO!)
-npx prisma migrate reset --force
 ```
 
-### Git
-
+### Docker Commands
 ```bash
-# Ver status
-git status
+# Build image
+docker build -t beuni-backend .
 
-# Adicionar mudanças
-git add -A
+# Run container
+docker run -p 3001:3001 beuni-backend
 
-# Commit
-git commit -m "mensagem"
+# View logs
+docker logs <container-id>
 
-# Push
-git push origin main
-
-# Ver histórico
-git log --oneline -10
-
-# Ver mudanças não commitadas
-git diff
+# Access container
+docker exec -it <container-id> /bin/bash
 ```
 
 ---
 
-## 📊 Health Checks
+## 🔍 Diagnostic Commands
 
-### Backend Health
-
+### Check Application Health
 ```bash
-# Produção
-curl https://beuni-desafio-production-41c7.up.railway.app/health
+# Test health endpoint
+curl https://beuni-desafio-production.up.railway.app/health
 
-# Local
-curl http://localhost:3001/health
+# Test API documentation
+curl https://beuni-desafio-production.up.railway.app/api/docs
 ```
 
-**Resposta esperada**:
-```json
-{
-  "status": "ok",
-  "timestamp": "2025-10-04T05:00:00.000Z",
-  "database": "connected",
-  "redis": "connected"
-}
-```
-
----
-
-### Frontend Health
-
+### Database Connection Test
 ```bash
-# Produção
-curl https://beuni-frontend-one.vercel.app
+# Test database connection
+railway ssh "npx prisma db pull"
 
-# Local
-curl http://localhost:3000
+# Count records in tables
+railway ssh "npx prisma db seed --preview-feature"
 ```
 
----
-
-## 🐛 Debug Mode
-
-### Backend (NestJS)
-
+### Redis Connection Test
 ```bash
-# Development com debug
-npm run start:debug
-
-# Logs detalhados
-NODE_ENV=development npm run start:dev
-```
-
-### Frontend (Next.js)
-
-```bash
-# Development mode
-npm run dev
-
-# Build com análise
-ANALYZE=true npm run build
-
-# Verificar variáveis de ambiente
-npm run env
+# Test Redis connection
+railway ssh "redis-cli -u \$REDIS_URL ping"
 ```
 
 ---
 
-## 📝 Checklist de Deploy
+## 📋 Production Checklist
 
-- [ ] Railway database migrations executadas
-- [ ] Usuário de teste criado no banco
-- [ ] Variáveis de ambiente configuradas no Railway
-- [ ] Variáveis de ambiente configuradas na Vercel
-- [ ] CORS configurado corretamente
-- [ ] URLs de produção corretas em todos os arquivos
-- [ ] Build do frontend sem erros
-- [ ] Build do backend sem erros
-- [ ] Health checks respondendo OK
-- [ ] Login funcionando
-- [ ] Redis conectado
+### Before Deployment
+- [ ] Test user created in database
+- [ ] Environment variables configured
+- [ ] CORS origin correctly set
+- [ ] Migrations applied
+- [ ] Health endpoint responding
+- [ ] API documentation accessible
+- [ ] Redis connection working
+- [ ] Production URLs correct in all files
 
----
-
-## 🆘 Suporte
-
-Se após seguir este guia o problema persistir:
-
-1. **Verificar logs**:
-   - Railway: `railway logs`
-   - Vercel: Dashboard → Deployments → Logs
-
-2. **Verificar variáveis**:
-   - Railway: `railway variables`
-   - Vercel: Settings → Environment Variables
-
-3. **Testar endpoints manualmente**:
-   ```bash
-   # Login
-   curl -X POST https://beuni-desafio-production-41c7.up.railway.app/auth/login \
-     -H "Content-Type: application/json" \
-     -d '{"email":"admin@beuni.com","password":"Admin@123"}'
-   ```
+### After Deployment
+- [ ] Application responding on production URL
+- [ ] Login working with test credentials
+- [ ] Database queries executing correctly
+- [ ] Error handling working properly
+- [ ] Logs showing structured information
+- [ ] Monitoring alerts configured
 
 ---
 
-**Última atualização**: 2025-01-04
-**Versão**: 1.0.0
+## 🆘 Emergency Procedures
+
+### Application Down
+1. Check Railway deployment logs
+2. Verify database connection
+3. Check environment variables
+4. Restart services if needed
+
+### Database Issues
+1. Check connection string
+2. Verify migrations status
+3. Check disk space
+4. Review recent schema changes
+
+### Performance Issues
+1. Check resource usage (CPU/Memory)
+2. Analyze slow queries
+3. Review Redis cache hit rate
+4. Check for memory leaks
+
+---
+
+**Last Updated**: October 4, 2025  
+**Maintained By**: Development Team  
+**Status**: Production Ready
