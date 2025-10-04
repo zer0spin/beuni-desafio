@@ -14,11 +14,9 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<'select' | 'confirm' | 'processing'>('select');
 
-  const availableYears = [
-    new Date().getFullYear(),
-    new Date().getFullYear() + 1,
-    new Date().getFullYear() + 2
-  ];
+  // Últimos 5 anos incluindo o atual (ex: 2021, 2022, 2023, 2024, 2025)
+  const currentYear = new Date().getFullYear();
+  const availableYears = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i).reverse();
 
   const handleCreateRecords = async () => {
     setStep('processing');

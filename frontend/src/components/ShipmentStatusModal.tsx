@@ -80,11 +80,17 @@ const statusOptions = [
 export default function ShipmentStatusModal({ envio, isOpen, onClose, onUpdate }: ShipmentStatusModalProps) {
   const [selectedStatus, setSelectedStatus] = useState(envio.status);
   const [observacoes, setObservacoes] = useState(envio.observacoes || '');
+  const [dataEntrega, setDataEntrega] = useState(() => {
+    if (envio.dataEnvioRealizado) {
+      return new Date(envio.dataEnvioRealizado).toISOString().split('T')[0];
+    }
+    return new Date().toISOString().split('T')[0];
+  });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (selectedStatus === envio.status && observacoes === (envio.observacoes || '')) {
       toast.error('Nenhuma alteração foi feita');
       return;
@@ -92,10 +98,17 @@ export default function ShipmentStatusModal({ envio, isOpen, onClose, onUpdate }
 
     setLoading(true);
     try {
-      await api.patch(`/envio-brindes/${envio.id}/status`, {
+      const payload: any = {
         status: selectedStatus,
         observacoes: observacoes.trim() || undefined
-      });
+      };
+
+      // Adicionar data de entrega se status for ENVIADO ou ENTREGUE
+      if (['ENVIADO', 'ENTREGUE'].includes(selectedStatus)) {
+        payload.dataEntrega = dataEntrega;
+      }
+
+      await api.patch(`/envio-brindes/${envio.id}/status`, payload);
       
       toast.success('Status atualizado com sucesso!');
       onUpdate();
@@ -231,6 +244,27 @@ export default function ShipmentStatusModal({ envio, isOpen, onClose, onUpdate }
                 })}
               </div>
             </div>
+
+            {/* Data de Entrega/Envio - Mostrar apenas para ENVIADO ou ENTREGUE */}
+            {['ENVIADO', 'ENTREGUE'].includes(selectedStatus) && (
+              <div className="mb-6">
+                <label className="block text-sm font-bold text-beuni-text mb-2">
+                  Data de {selectedStatus === 'ENVIADO' ? 'Envio' : 'Entrega'}
+                </label>
+                <div className="relative">
+                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-beuni-orange-600" />
+                  <input
+                    type="date"
+                    value={dataEntrega}
+                    onChange={(e) => setDataEntrega(e.target.value)}
+                    className="w-full pl-11 pr-4 py-3 border border-beuni-orange-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-beuni-orange-500 focus:border-beuni-orange-500"
+                  />
+                </div>
+                <p className="text-xs text-beuni-text/60 mt-1">
+                  Data em que o brinde foi {selectedStatus === 'ENVIADO' ? 'enviado' : 'entregue'} (padrão: hoje)
+                </p>
+              </div>
+            )}
 
             {/* Observações */}
             <div className="mb-6">

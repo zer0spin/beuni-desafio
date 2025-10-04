@@ -154,6 +154,11 @@ export class EnvioBrindesController {
         observacoes: {
           type: 'string',
           description: 'Observações sobre a mudança (opcional)',
+        },
+        dataEntrega: {
+          type: 'string',
+          format: 'date',
+          description: 'Data de entrega/envio (opcional, padrão: hoje). Formato: YYYY-MM-DD',
         }
       },
       required: ['status']
@@ -169,14 +174,15 @@ export class EnvioBrindesController {
   })
   async atualizarStatusEnvio(
     @Param('id') id: string,
-    @Body() body: { status: string; observacoes?: string },
+    @Body() body: { status: string; observacoes?: string; dataEntrega?: string },
     @Request() req,
   ) {
     return this.envioBrindesService.atualizarStatusEnvio(
       id,
       body.status,
       req.user.organizationId,
-      body.observacoes
+      body.observacoes,
+      body.dataEntrega
     );
   }
 

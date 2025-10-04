@@ -200,7 +200,8 @@ export class EnvioBrindesService {
     envioBrindeId: string,
     novoStatus: string,
     organizationId: string,
-    observacoes?: string
+    observacoes?: string,
+    dataEntrega?: string
   ) {
     // Verificar se o envio existe e pertence à organização
     const envio = await this.prisma.envioBrinde.findFirst({
@@ -216,7 +217,7 @@ export class EnvioBrindesService {
     });
 
     if (!envio) {
-      throw new Error('Shipment not found');
+      throw new Error('Envio não encontrado');
     }
 
     // Preparar dados para atualização
@@ -225,9 +226,10 @@ export class EnvioBrindesService {
       observacoes,
     };
 
-    // Se o status for ENVIADO, adicionar data de envio
-    if (novoStatus === 'ENVIADO') {
-      updateData.dataEnvioRealizado = new Date();
+    // Se o status for ENVIADO ou ENTREGUE, adicionar data de envio
+    if (['ENVIADO', 'ENTREGUE'].includes(novoStatus)) {
+      // Usar data fornecida ou data atual
+      updateData.dataEnvioRealizado = dataEntrega ? new Date(dataEntrega) : new Date();
     }
 
     // Se o status for PRONTO_PARA_ENVIO, adicionar data do gatilho
@@ -596,10 +598,10 @@ export class EnvioBrindesService {
 
   /**
    * Criar registros de envio para um novo ano
+   * Todos os envios começam como PENDENTE para gestão manual
    */
   async criarRegistrosParaNovoAno(ano: number) {
     const colaboradores = await this.prisma.colaborador.findMany();
-
     const registrosCriados = [];
 
     for (const colaborador of colaboradores) {
