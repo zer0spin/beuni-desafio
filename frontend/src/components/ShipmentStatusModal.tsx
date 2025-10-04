@@ -3,11 +3,13 @@ import { X, Package, Clock, Truck, CheckCircle, AlertCircle, Calendar } from 'lu
 import { toast } from 'react-hot-toast';
 import api from '@/lib/api';
 
+type StatusType = 'PENDENTE' | 'PRONTO_PARA_ENVIO' | 'ENVIADO' | 'ENTREGUE' | 'CANCELADO';
+
 interface EnvioBrinde {
   id: string;
   colaboradorId: string;
   anoAniversario: number;
-  status: 'PENDENTE' | 'PRONTO_PARA_ENVIO' | 'ENVIADO' | 'ENTREGUE' | 'CANCELADO';
+  status: StatusType;
   dataGatilhoEnvio?: string;
   dataEnvioRealizado?: string;
   observacoes?: string;
@@ -203,7 +205,7 @@ export default function ShipmentStatusModal({ envio, isOpen, onClose, onUpdate }
                           name="status"
                           value={option.value}
                           checked={isSelected}
-                          onChange={(e) => setSelectedStatus(e.target.value)}
+                          onChange={(e) => setSelectedStatus(e.target.value as StatusType)}
                           className="sr-only"
                         />
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
