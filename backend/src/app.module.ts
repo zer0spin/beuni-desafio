@@ -19,6 +19,8 @@ import { NotificacoesModule } from './modules/notificacoes/notificacoes.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { RedisService } from './shared/redis.service';
+import { TestDataController } from './controllers/test-data.controller';
+import { TestDataService } from './shared/services/test-data.service';
 
 @Module({
   imports: [
