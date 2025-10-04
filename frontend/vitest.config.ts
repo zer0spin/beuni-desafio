@@ -20,6 +20,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
+      reportsDirectory: './coverage',
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
         'src/**/*.d.ts',
@@ -29,6 +30,9 @@ export default defineConfig({
         'src/pages/_document.tsx',
         'src/pages/**',
         '__tests__/**',
+        '**/*.config.{ts,js}',
+        '**/node_modules/**',
+        '**/.next/**',
       ],
       thresholds: {
         lines: 70,
@@ -36,6 +40,9 @@ export default defineConfig({
         branches: 65,
         statements: 70,
       },
+      all: true,
+      clean: true,
+      cleanOnRerun: true,
     },
   },
   resolve: {
