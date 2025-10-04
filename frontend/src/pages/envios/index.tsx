@@ -59,7 +59,7 @@ function isBusinessDay(date: Date): boolean {
 function addDaysLocal(date: Date, days: number): Date {
   const copy = new Date(date);
   copy.setDate(copy.getDate() + days);
-  copy.setHours(0, 0, 0, 0);
+  copy.setHours(12, 0, 0, 0); // Use noon to avoid DST issues
   return copy;
 }
 
@@ -82,7 +82,7 @@ function countBusinessDaysBetween(startDate: Date, endDate: Date): number {
   let count = 0;
   let cur = addDaysLocal(startDate, 1);
   const end = new Date(endDate);
-  end.setHours(0, 0, 0, 0);
+  end.setHours(12, 0, 0, 0); // Use noon for consistency
   while (cur <= end) {
     if (isBusinessDay(cur)) count++;
     cur = addDaysLocal(cur, 1);
@@ -223,25 +223,40 @@ export default function EnviosPage() {
   // - passouAniversario: birthday already passed
   // - dataGatilho: ideal deadline (7 business days before birthday) from backend if present
   const getPrazoInfo = (envio: EnvioBrinde) => {
+    // Work with dates at noon UTC to avoid timezone issues when comparing dates
     const hoje = new Date();
-    hoje.setHours(0, 0, 0, 0);
+    const hojeNormalized = new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate(), 12, 0, 0, 0);
 
-    // FIX: Use UTC methods to avoid timezone issues with birth dates
+    // Parse birth date and construct birthday in the target year
     const dataNascimento = new Date(envio.colaborador.dataNascimento);
-    const dataAniversario = new Date(Date.UTC(envio.anoAniversario, dataNascimento.getUTCMonth(), dataNascimento.getUTCDate()));
-    dataAniversario.setHours(0, 0, 0, 0);
+    // Use local date components from UTC to construct the anniversary date at noon local time
+    const dataAniversario = new Date(
+      envio.anoAniversario,
+      dataNascimento.getUTCMonth(),
+      dataNascimento.getUTCDate(),
+      12, 0, 0, 0
+    );
 
-    const passouAniversario = dataAniversario.getTime() < hoje.getTime();
+    const passouAniversario = dataAniversario.getTime() < hojeNormalized.getTime();
 
     // Only for visual guidance about the ideal deadline (7 business days before)
     const dataGatilho = envio.dataGatilhoEnvio ? new Date(envio.dataGatilhoEnvio) : null;
-    if (dataGatilho) dataGatilho.setHours(0, 0, 0, 0);
-    const idealDate = dataGatilho || calculateBusinessDaysBefore(dataAniversario, 7);
-    const passouIdeal = idealDate.getTime() < hoje.getTime();
-    const businessDaysUntilIdeal = passouIdeal ? 0 : countBusinessDaysBetween(hoje, idealDate);
-    const ehHoje = idealDate.getTime() === hoje.getTime();
+    let dataGatilhoNormalized = null;
+    if (dataGatilho) {
+      dataGatilhoNormalized = new Date(
+        dataGatilho.getFullYear(),
+        dataGatilho.getMonth(),
+        dataGatilho.getDate(),
+        12, 0, 0, 0
+      );
+    }
 
-    const passouGatilho = dataGatilho ? hoje.getTime() > dataGatilho.getTime() : false;
+    const idealDate = dataGatilhoNormalized || calculateBusinessDaysBefore(dataAniversario, 7);
+    const passouIdeal = idealDate.getTime() < hojeNormalized.getTime();
+    const businessDaysUntilIdeal = passouIdeal ? 0 : countBusinessDaysBetween(hojeNormalized, idealDate);
+    const ehHoje = idealDate.getTime() === hojeNormalized.getTime();
+
+    const passouGatilho = dataGatilhoNormalized ? hojeNormalized.getTime() > dataGatilhoNormalized.getTime() : false;
 
     return { businessDaysUntilIdeal, passouIdeal, passouAniversario, passouGatilho, idealDate, ehHoje } as const;
   };
