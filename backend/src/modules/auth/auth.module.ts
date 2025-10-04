@@ -15,14 +15,11 @@ import { UsuariosModule } from '../usuarios/usuarios.module';
 @Module({
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.registerAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET'),
-        signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '7d',
-        },
-      }),
+    JwtModule.register({
+      secret: process.env.JWT_SECRET || 'fallback-secret-for-dev',
+      signOptions: {
+        expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+      },
     }),
     UsuariosModule,
   ],

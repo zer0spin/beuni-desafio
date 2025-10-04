@@ -11,6 +11,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private authService: AuthService,
     private configService: ConfigService,
   ) {
+    // CRITICAL: Use process.env directly - ConfigService may not be ready at startup
+    const jwtSecret = process.env.JWT_SECRET;
+
+    if (!jwtSecret) {
+      console.error('❌ FATAL: JWT_SECRET not found in environment variables!');
+      throw new Error('JWT_SECRET environment variable is required');
+    }
+
     super({
       // Support both httpOnly cookie and Authorization header
       jwtFromRequest: (req: any) => {
@@ -23,7 +31,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         return ExtractJwt.fromAuthHeaderAsBearerToken()(req);
       },
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET'),
+      secretOrKey: jwtSecret,
     });
   }
 
