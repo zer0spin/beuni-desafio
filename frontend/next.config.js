@@ -13,39 +13,15 @@ const nextConfig = {
   
   // API routes configuration
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 
-      (process.env.NODE_ENV === 'production' 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL ||
+      (process.env.NODE_ENV === 'production'
         ? 'https://beuni-desafio-production-41c7.up.railway.app'
         : 'http://localhost:3001');
-    
+
     return [
       {
-        source: '/api/auth/:path*',
-        destination: `${apiUrl}/auth/:path*`,
-      },
-      {
-        source: '/api/colaboradores/:path*',
-        destination: `${apiUrl}/colaboradores/:path*`,
-      },
-      {
-        source: '/api/cep/:path*',
-        destination: `${apiUrl}/cep/:path*`,
-      },
-      {
-        source: '/api/envio-brindes/:path*',
-        destination: `${apiUrl}/envio-brindes/:path*`,
-      },
-      {
-        source: '/api/organizacoes/:path*',
-        destination: `${apiUrl}/organizacoes/:path*`,
-      },
-      {
-        source: '/api/notificacoes/:path*',
-        destination: `${apiUrl}/notificacoes/:path*`,
-      },
-      {
-        source: '/api/health',
-        destination: `${apiUrl}/health`,
+        source: '/api/:path*',
+        destination: `${apiUrl}/:path*`,
       },
     ];
   },
