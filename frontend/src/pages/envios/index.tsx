@@ -226,8 +226,9 @@ export default function EnviosPage() {
     const hoje = new Date();
     hoje.setHours(0, 0, 0, 0);
 
+    // FIX: Use UTC methods to avoid timezone issues with birth dates
     const dataNascimento = new Date(envio.colaborador.dataNascimento);
-    const dataAniversario = new Date(envio.anoAniversario, dataNascimento.getMonth(), dataNascimento.getDate());
+    const dataAniversario = new Date(Date.UTC(envio.anoAniversario, dataNascimento.getUTCMonth(), dataNascimento.getUTCDate()));
     dataAniversario.setHours(0, 0, 0, 0);
 
     const passouAniversario = dataAniversario.getTime() < hoje.getTime();
@@ -238,10 +239,11 @@ export default function EnviosPage() {
     const idealDate = dataGatilho || calculateBusinessDaysBefore(dataAniversario, 7);
     const passouIdeal = idealDate.getTime() < hoje.getTime();
     const businessDaysUntilIdeal = passouIdeal ? 0 : countBusinessDaysBetween(hoje, idealDate);
+    const ehHoje = idealDate.getTime() === hoje.getTime();
 
     const passouGatilho = dataGatilho ? hoje.getTime() > dataGatilho.getTime() : false;
 
-    return { businessDaysUntilIdeal, passouIdeal, passouAniversario, passouGatilho, idealDate } as const;
+    return { businessDaysUntilIdeal, passouIdeal, passouAniversario, passouGatilho, idealDate, ehHoje } as const;
   };
 
   const getStatusConfig = (status: string) => {
@@ -381,7 +383,7 @@ export default function EnviosPage() {
               .map((envio) => {
               const statusConfig = getStatusConfig(envio.status);
               const StatusIcon = statusConfig.icon;
-              const { businessDaysUntilIdeal, passouIdeal, passouAniversario, passouGatilho, idealDate } = getPrazoInfo(envio);
+              const { businessDaysUntilIdeal, passouIdeal, passouAniversario, passouGatilho, idealDate, ehHoje } = getPrazoInfo(envio);
 
               return (
                 <div
@@ -553,6 +555,8 @@ export default function EnviosPage() {
                                   <p className={`text-xs font-semibold uppercase ${textTone.small}`}>
                                     {passouIdeal
                                       ? 'APÓS PRAZO IDEAL'
+                                      : ehHoje
+                                      ? 'PRAZO IDEAL'
                                       : businessDaysUntilIdeal === 0
                                       ? 'ÚLTIMO DIA PARA ENVIAR'
                                       : 'PRAZO IDEAL'}
@@ -560,6 +564,8 @@ export default function EnviosPage() {
                                   <p className={`text-sm font-bold truncate ${textTone.big}`}>
                                     {passouIdeal
                                       ? 'Envie o quanto antes'
+                                      : ehHoje
+                                      ? 'O PRAZO IDEAL É HOJE!'
                                       : businessDaysUntilIdeal === 0
                                       ? 'Hoje é o último dia'
                                       : `${businessDaysUntilIdeal} dias para enviar brinde`}

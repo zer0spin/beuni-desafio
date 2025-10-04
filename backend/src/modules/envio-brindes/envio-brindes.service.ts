@@ -41,9 +41,9 @@ export class EnvioBrindesService {
       let marcadosParaEnvio = 0;
 
       for (const colaborador of colaboradores) {
-        // Calcular a data do aniversário no ano atual
+        // Calcular a data do aniversário no ano atual (usando UTC para evitar problemas de timezone)
         const dataAniversario = new Date(colaborador.dataNascimento);
-        const aniversarioAnoAtual = new Date(anoAtual, dataAniversario.getMonth(), dataAniversario.getDate());
+        const aniversarioAnoAtual = new Date(Date.UTC(anoAtual, dataAniversario.getUTCMonth(), dataAniversario.getUTCDate()));
 
         // Calcular 7 dias úteis antes do aniversário
         const dataGatilhoEnvio = this.businessDaysService.calculateBusinessDaysBefore(
@@ -556,10 +556,10 @@ export class EnvioBrindesService {
         }
 
         const dataNasc = new Date(colaborador.dataNascimento);
-        const dataGatilho = new Date(ano, dataNasc.getMonth(), dataNasc.getDate() - 30);
+        const dataGatilho = new Date(Date.UTC(ano, dataNasc.getUTCMonth(), dataNasc.getUTCDate() - 30));
         let dataEnvio = null;
         if (['ENVIADO', 'ENTREGUE'].includes(status)) {
-          dataEnvio = randomDate(dataGatilho, new Date(ano, dataNasc.getMonth(), dataNasc.getDate()));
+          dataEnvio = randomDate(dataGatilho, new Date(Date.UTC(ano, dataNasc.getUTCMonth(), dataNasc.getUTCDate())));
         }
 
         await this.prisma.envioBrinde.upsert({
