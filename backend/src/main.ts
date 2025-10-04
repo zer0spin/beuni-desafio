@@ -10,6 +10,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CsrfGuard } from './common/guards/csrf.guard';
 
 async function bootstrap() {
+  console.log('🚀 Beuni Backend v1.0.1 - FORÇA DEPLOY AdminModule');
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
 
