@@ -74,8 +74,8 @@ export default function LoginPage() {
       {/* Demo credentials */}
       <div className="absolute top-2 right-2 bg-white/80 backdrop-blur px-4 py-2 rounded shadow text-xs text-gray-700 border border-orange-200">
         <p className="font-semibold text-orange-700">Acesso Demo</p>
-        <p>Email: <code className="font-mono">ana.novo@beunidemo.com</code></p>
-        <p>Senha: <code className="font-mono">AnaPass123@2025</code></p>
+        <p>Email: <code className="font-mono">admin@beuni.com</code></p>
+        <p>Senha: <code className="font-mono">Admin@123</code></p>
       </div>
 
       {/* Left Side - Product Grid */}
@@ -269,11 +269,11 @@ export default function LoginPage() {
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <span className="text-beuni-text/60 font-medium">E-mail:</span>
-                  <p className="text-beuni-text font-mono text-xs">ana.novo@beunidemo.com</p>
+                  <p className="text-beuni-text font-mono text-xs">admin@beuni.com</p>
                 </div>
                 <div>
                   <span className="text-beuni-text/60 font-medium">Senha:</span>
-                  <p className="text-beuni-text font-mono text-xs">AnaPass123@2025</p>
+                  <p className="text-beuni-text font-mono text-xs">Admin@123</p>
                 </div>
               </div>
             </div>
