@@ -1,13 +1,16 @@
 import { Controller, Post, Headers, HttpException, HttpStatus } from '@nestjs/common';
 import { exec } from 'child_process';
+import { SkipCsrf } from '../../common/decorators/skip-csrf.decorator';
 
 @Controller('admin')
 export class AdminController {
   /**
    * Dispara o script de seed populacional dentro do container.
    * Protegido por header "x-admin-token" que deve coincidir com ADMIN_SEED_TOKEN nas variáveis.
+   * CSRF skip: endpoint administrativo com autenticação via header token.
    */
   @Post('run-seed')
+  @SkipCsrf()
   async runSeed(@Headers('x-admin-token') token?: string): Promise<{ status: string; output?: string }> {
     const expected = process.env.ADMIN_SEED_TOKEN;
     if (!expected) {
