@@ -25,7 +25,8 @@ const nextConfig = {
   images: {
     domains: [
       'localhost',
-      'beuni-desafio-production.up.railway.app', // Railway backend
+      'beuni-desafio-production-41c7.up.railway.app', // Railway backend
+      'beuni-frontend-one.vercel.app', // Vercel frontend (for rewrites)
     ],
     unoptimized: false, // Enable optimization for production
   },
