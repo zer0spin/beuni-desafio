@@ -16,7 +16,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://beuni-desafio-production.up.railway.app/:path*"
+      "destination": "https://beuni-desafio-production-41c7.up.railway.app/:path*"
     }
   ]
 }
