@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { Users, Plus, Search, Edit, Calendar, MapPin, Briefcase, Package } from 'lucide-react';
+import { Users, Plus, Search, Edit, Calendar, MapPin, Briefcase, Package, Trash2 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import Layout from '@/components/Layout';
@@ -31,12 +31,14 @@ export default function ColaboradoresPage() {
   const [stats, setStats] = useState({ total: 0, page: 1, totalPages: 0 });
   const [currentPage, setCurrentPage] = useState(1);
   const [enviosBrindes, setEnviosBrindes] = useState<EnvioBrinde[]>([]);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     loadColaboradores(currentPage);
   }, [currentPage]);
 
-  const loadColaboradores = async (page: number = 1) => {
+    const loadColaboradores = async (page: number = 1) => {
     try {
       setLoading(true);
       const [colaboradoresResponse, enviosResponse] = await Promise.all([
@@ -49,12 +51,28 @@ export default function ColaboradoresPage() {
       setStats({
         total: colaboradoresResponse.data.total,
         page: colaboradoresResponse.data.page,
-        totalPages: colaboradoresResponse.data.totalPages
+        totalPages: colaboradoresResponse.data.totalPages,
       });
     } catch (error) {
-      toast.error('Erro ao carregar colaboradores');
+      console.error('Error loading colaboradores:', error);
+      toast.error('Error loading colaboradores');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteAllColaboradores = async () => {
+    setDeleteLoading(true);
+    try {
+      await api.delete(endpoints.colaboradores);
+      toast.success('All colaboradores deleted successfully!');
+      setShowDeleteConfirm(false);
+      loadColaboradores(1);
+      setCurrentPage(1);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Error deleting colaboradores');
+    } finally {
+      setDeleteLoading(false);
     }
   };
 
@@ -123,13 +141,22 @@ export default function ColaboradoresPage() {
                 </h1>
                 <p className="text-white/80 mt-1">Gerencie todos os colaboradores da organização</p>
               </div>
-              <button
-                onClick={() => router.push('/colaboradores/novo')}
-                className="flex items-center px-6 py-3 bg-white text-beuni-orange-600 font-semibold rounded-xl hover:bg-beuni-orange-50 transition-all duration-200 shadow-md hover:shadow-lg"
-              >
-                <Plus className="h-5 w-5 mr-2" />
-                Novo Colaborador
-              </button>
+              <div className="flex items-center space-x-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="flex items-center px-4 py-3 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  <Trash2 className="h-5 w-5 mr-2" />
+                  Delete All
+                </button>
+                <button
+                  onClick={() => router.push('/colaboradores/novo')}
+                  className="flex items-center px-6 py-3 bg-white text-beuni-orange-600 font-semibold rounded-xl hover:bg-beuni-orange-50 transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  <Plus className="h-5 w-5 mr-2" />
+                  Novo Colaborador
+                </button>
+              </div>
             </div>
           </div>
 
@@ -347,6 +374,43 @@ export default function ColaboradoresPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="h-8 w-8 text-red-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                ⚠️ DELETE ALL COLABORADORES
+              </h3>
+              <p className="text-gray-600 mb-6">
+                This will permanently delete <strong>ALL colaboradores</strong> and <strong>ALL related shipment records</strong>. 
+                This action cannot be undone and will completely reset your database.
+              </p>
+              
+              <div className="flex items-center justify-center space-x-4">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deleteLoading}
+                  className="px-6 py-3 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-xl font-semibold transition-all disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAllColaboradores}
+                  disabled={deleteLoading}
+                  className="px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {deleteLoading ? 'Deleting...' : 'DELETE ALL'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

@@ -515,4 +515,27 @@ export class ColaboradoresService {
       status_envio_atual: colaborador.enviosBrinde?.[0]?.status || 'PENDENTE',
     };
   }
+
+  async removeAll(organizationId: string) {
+    // Primeiro deletar todos os envios relacionados
+    await this.prisma.envioBrinde.deleteMany({
+      where: {
+        colaborador: {
+          organizationId
+        }
+      }
+    });
+
+    // Depois deletar todos os colaboradores (isso também deleta os endereços devido ao cascade)
+    const deletedRecords = await this.prisma.colaborador.deleteMany({
+      where: {
+        organizationId
+      }
+    });
+
+    return {
+      message: 'All colaboradores and related records deleted successfully',
+      deletedCount: deletedRecords.count
+    };
+  }
 }

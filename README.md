@@ -6,7 +6,20 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](tsconfig.json)
 [![Deployment](https://img.shields.io/badge/deployment-Railway+Vercel-blueviolet)](docs/deploy/)
 
-A comprehensive corporate birthday management platform built with modern web technologies, featuring automated gift sending, employee management, and advanced analytics.
+A comprehensive corporate birthday management platform built with modern web technologies, featuring automated gift sending, employee management, advanced analytics, and enhanced shipment operations.
+
+## 🆕 Latest Updates (December 2024)
+
+### ✨ Enhanced Shipment Management
+- **Bulk Delete Operations**: Complete delete functionality for shipment records with organization-scoped security
+- **Fixed Date Calculations**: Corrected business day calculations (7 business days instead of 30 calendar days)
+- **Improved Date Handling**: Fixed timezone issues with component-based date comparisons
+- **Enhanced UI**: Action selection modals with confirmation flows for better user experience
+
+### 🔧 Technical Improvements
+- **API Enhancements**: New delete endpoints with proper validation and organization isolation
+- **Code Quality**: Translated Portuguese comments to English for better maintainability
+- **Business Logic**: Fixed critical date calculation errors affecting shipment deadlines
 
 ## 🚀 Quick Start
 

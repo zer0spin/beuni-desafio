@@ -229,4 +229,17 @@ export class ColaboradoresController {
   async remove(@Param('id') id: string, @Request() req) {
     return this.colaboradoresService.remove(id, req.user.organizationId);
   }
+
+  @Delete()
+  @ApiOperation({ 
+    summary: 'Delete ALL colaboradores for organization',
+    description: 'Removes ALL colaboradores for the organization. This is a destructive operation that cannot be undone and will also delete all related shipment records.'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'All colaboradores deleted successfully',
+  })
+  async removeAll(@Request() req) {
+    return this.colaboradoresService.removeAll(req.user.organizationId);
+  }
 }

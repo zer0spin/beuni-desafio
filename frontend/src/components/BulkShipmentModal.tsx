@@ -12,9 +12,10 @@ interface BulkShipmentModalProps {
 export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkShipmentModalProps) {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState<'select' | 'confirm' | 'processing'>('select');
+  const [step, setStep] = useState<'select' | 'confirm' | 'confirmDelete' | 'processing'>('select');
+  const [action, setAction] = useState<'create' | 'delete' | 'seed'>('create');
 
-  // Últimos 5 anos incluindo o atual (ex: 2021, 2022, 2023, 2024, 2025)
+  // Last 5 years including current (e.g., 2021, 2022, 2023, 2024, 2025)
   const currentYear = new Date().getFullYear();
   const availableYears = Array.from({ length: 5 }, (_, i) => currentYear - 4 + i).reverse();
 
@@ -25,12 +26,31 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
     try {
       const response = await api.post(`/envio-brindes/criar-registros-ano/${selectedYear}`);
       
-      toast.success(`Registros criados para o ano ${selectedYear}!`);
+      toast.success(`Records created for year ${selectedYear}!`);
       onSuccess();
       onClose();
       setStep('select');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao criar registros');
+      toast.error(error.response?.data?.message || 'Error creating records');
+      setStep('select');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteRecords = async () => {
+    setStep('processing');
+    setLoading(true);
+    
+    try {
+      const response = await api.delete('/envio-brindes/delete-all');
+      
+      toast.success('All shipment records deleted successfully!');
+      onSuccess();
+      onClose();
+      setStep('select');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Error deleting records');
       setStep('select');
     } finally {
       setLoading(false);
@@ -44,7 +64,7 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
     try {
       const response = await api.post('/envio-brindes/seed-test-data');
       
-      toast.success('Dados de teste criados com sucesso!');
+      toast.success('Test data created successfully!');
       onSuccess();
       onClose();
       setStep('select');
@@ -193,24 +213,39 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
               </div>
 
               {/* Actions */}
-              <div className="flex items-center justify-end space-x-3">
+              <div className="flex items-center justify-between">
                 <button
-                  onClick={handleClose}
-                  className="px-6 py-3 text-beuni-text bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl font-semibold transition-all"
+                  onClick={() => {
+                    setAction('delete');
+                    setStep('confirmDelete');
+                  }}
+                  className="px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg font-semibold transition-all border border-red-200"
                 >
-                  Cancelar
+                  Delete All {selectedYear}
                 </button>
-                <button
-                  onClick={() => setStep('confirm')}
-                  className="px-6 py-3 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white font-semibold rounded-xl hover:from-beuni-orange-600 hover:to-beuni-orange-700 transition-all shadow-md hover:shadow-lg"
-                >
-                  Continuar
-                </button>
+                
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={handleClose}
+                    className="px-6 py-3 text-beuni-text bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl font-semibold transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAction('create');
+                      setStep('confirm');
+                    }}
+                    className="px-6 py-3 bg-gradient-to-r from-beuni-orange-500 to-beuni-orange-600 text-white font-semibold rounded-xl hover:from-beuni-orange-600 hover:to-beuni-orange-700 transition-all shadow-md hover:shadow-lg"
+                  >
+                    Continue
+                  </button>
+                </div>
               </div>
             </>
           )}
 
-          {step === 'confirm' && (
+          {step === 'confirm' && action === 'create' && (
             <>
               {/* Confirmation */}
               <div className="bg-beuni-cream rounded-xl p-6 mb-6 text-center">
@@ -218,10 +253,10 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
                   <Package className="h-8 w-8 text-white" />
                 </div>
                 <h4 className="text-lg font-bold text-beuni-text mb-2">
-                  Confirmar Criação
+                  Confirm Creation
                 </h4>
                 <p className="text-beuni-text/70">
-                  Você está prestes a criar registros de envio para <strong>todos os colaboradores</strong> no ano <strong>{selectedYear}</strong>.
+                  You are about to create shipment records for <strong>all employees</strong> in year <strong>{selectedYear}</strong>.
                 </p>
               </div>
 
@@ -231,14 +266,51 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
                   onClick={() => setStep('select')}
                   className="px-6 py-3 text-beuni-text bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl font-semibold transition-all"
                 >
-                  Voltar
+                  Back
                 </button>
                 <button
                   onClick={handleCreateRecords}
                   disabled={loading}
                   className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Criando...' : 'Criar Registros'}
+                  {loading ? 'Creating...' : 'Create Records'}
+                </button>
+              </div>
+            </>
+          )}
+
+          {step === 'confirmDelete' && action === 'delete' && (
+            <>
+              {/* Delete Confirmation */}
+              <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-6 text-center">
+                <div className="w-16 h-16 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle className="h-8 w-8 text-white" />
+                </div>
+                <h4 className="text-lg font-bold text-red-800 mb-2">
+                  ⚠️ DANGER: Delete ALL Shipments
+                </h4>
+                <p className="text-red-700 mb-2">
+                  This action will <strong>permanently delete ALL shipment records</strong> for <strong>ALL YEARS</strong> and <strong>ALL EMPLOYEES</strong>.
+                </p>
+                <p className="text-red-600 text-sm font-semibold">
+                  This will completely reset your shipment database. This cannot be undone!
+                </p>
+              </div>
+
+              {/* Actions */}
+              <div className="flex items-center justify-end space-x-3">
+                <button
+                  onClick={() => setStep('select')}
+                  className="px-6 py-3 text-beuni-text bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl font-semibold transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteRecords}
+                  disabled={loading}
+                  className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl hover:from-red-600 hover:to-red-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Deleting All...' : 'DELETE ALL RECORDS'}
                 </button>
               </div>
             </>

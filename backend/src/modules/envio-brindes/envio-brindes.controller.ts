@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Param,
   Body,
   Query,
@@ -315,5 +316,18 @@ export class EnvioBrindesController {
   })
   async fixGatilhoDates(@Request() req) {
     return this.envioBrindesService.fixGatilhoDates(req.user.organizationId);
+  }
+
+  @Delete('delete-all')
+  @ApiOperation({
+    summary: 'Delete ALL shipments for organization',
+    description: 'Removes ALL shipment records for the organization across ALL years. This is a destructive operation that cannot be undone.'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'All shipments deleted successfully',
+  })
+  async deleteAllShipments(@Request() req) {
+    return this.envioBrindesService.deleteAllShipments(req.user.organizationId);
   }
 }

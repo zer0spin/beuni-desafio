@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import CatalogoPage from '../index';
 
-// Mock do Next.js
+// Next.js mock
 vi.mock('next/image', () => ({
   default: ({ src, alt, ...props }: { src: string; alt: string; [key: string]: any }) => (
     <img src={src} alt={alt} {...props} />
@@ -17,7 +17,7 @@ vi.mock('next/router', () => ({
   }),
 }));
 
-// Mock do Layout
+// Layout mock
 vi.mock('@/components/Layout', () => ({
   default: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="layout">{children}</div>
@@ -78,7 +78,7 @@ describe('CatalogoPage Tests', () => {
       const listViewButton = screen.getByRole('button', { name: 'List view' });
       fireEvent.click(listViewButton);
       
-      // Verifica se tem botão "Adicionar" na visualização de lista
+      // Check if there's an "Add" button in list view
       expect(screen.getAllByText('Adicionar').length).toBeGreaterThan(0);
     });
 

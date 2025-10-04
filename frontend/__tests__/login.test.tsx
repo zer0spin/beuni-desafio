@@ -137,7 +137,7 @@ describe('LoginPage Tests', () => {
       const submitButton = screen.getByRole('button', { name: /login/i });
       await user.click(submitButton);
 
-      // Verificar que a validação acontece (pode não aparecer a mensagem exata devido a react-hook-form)
+      // Check that validation occurs (exact message may not appear due to react-hook-form)
       expect(emailInput).toHaveValue('invalid-email');
     });
   });
@@ -266,16 +266,16 @@ describe('LoginPage Tests', () => {
       const emailInput = screen.getByLabelText(/email/i);
       const passwordInput = screen.getByLabelText(/senha/i);
 
-      // Testar que os elementos podem receber foco
+      // Test that elements can receive focus
       await user.click(emailInput);
       expect(emailInput).toHaveFocus();
 
       await user.click(passwordInput);
       expect(passwordInput).toHaveFocus();
 
-      // Verificar se é possível tabular entre os campos
+      // Check if tabbing between fields is possible
       await user.tab();
-      // Aceitar qualquer elemento focado após tab, pois há vários elementos interativos
+      // Accept any focused element after tab, as there are multiple interactive elements
       expect(document.activeElement).toBeTruthy();
     });
   });
@@ -303,7 +303,7 @@ describe('LoginPage Tests', () => {
       await user.type(emailInput, maliciousEmail);
 
       expect(emailInput).toHaveValue(maliciousEmail);
-      // O valor é armazenado mas não executado como script
+      // The value is stored but not executed as script
     });
   });
 });

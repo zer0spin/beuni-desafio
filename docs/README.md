@@ -1,8 +1,25 @@
 # 📚 Documentation Index - Beuni Platform
 
 > **Comprehensive documentation for the Beuni Birthday Management Platform**  
-> **Last Updated**: October 4, 2025  
-> **Status**: Production Ready
+> **Last Updated**: December 15, 2024  
+> **Status**: Production Ready with Enhanced Shipment Management
+
+---
+
+## 🆕 Latest Updates (December 2024)
+
+### 🎯 Major Enhancements
+- **✅ Enhanced Shipment Management**: Complete delete functionality for bulk shipment operations
+- **📅 Fixed Date Calculations**: Corrected business days calculation (7 business days instead of 30 calendar days)
+- **🔧 Improved Date Handling**: Fixed timezone issues with noon-based date comparisons
+- **🌐 Translation Improvements**: Removed Portuguese comments and improved English localization
+- **🎨 Enhanced UI**: Improved shipment modal with action selection and confirmation flows
+
+### 🔧 Technical Improvements
+- Fixed "today" date comparison logic for accurate deadline detection
+- Added comprehensive delete endpoints with organization-scoped queries  
+- Enhanced business day calculations mirroring backend HolidaysService
+- Improved error handling and user feedback in shipment operations
 
 ---
 
@@ -115,11 +132,14 @@ docs/
 |----------|--------|-------------|----------|
 | Architecture | ✅ Complete | 2025-10-04 | High |
 | Deployment Guide | ✅ Complete | 2025-10-04 | High |
-| API Documentation | ✅ Complete | 2025-10-03 | High |
+| API Documentation | ✅ Updated | 2024-12-15 | High |
 | Security Analysis | ✅ Complete | 2025-10-04 | High |
 | Development Log | ✅ Complete | 2025-10-04 | Medium |
 | Testing Strategy | ✅ Complete | 2025-10-03 | Medium |
 | Monitoring Setup | ✅ Complete | 2025-10-03 | Medium |
+| Recent Updates | ✅ Updated | 2024-12-15 | High |
+| Changelog | ✅ Updated | 2024-12-15 | High |
+| Main README | ✅ Updated | 2024-12-15 | High |
 
 ---
 
@@ -160,5 +180,5 @@ docs/
 ---
 
 **Maintained By**: Development Team  
-**Last Review**: October 4, 2025  
-**Next Review**: November 4, 2025
+**Last Review**: December 15, 2024  
+**Next Review**: January 15, 2025

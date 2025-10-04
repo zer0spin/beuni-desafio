@@ -2,7 +2,38 @@
 
 All notable changes to the Beuni Birthday Management Platform are documented in this file.
 
-## [2025-10-03] - Latest Release
+## [2024-12-15] - Shipment Management Enhancement
+
+### 🎯 Major Features
+- **Enhanced Shipment Management**: Complete overhaul of shipment operations with bulk delete functionality
+  - Added bulk delete operations with organization-scoped queries for data security
+  - Implemented action selection modal (create/delete) with proper confirmation flows
+  - Enhanced BulkShipmentModal with step management and destructive action warnings
+
+### 🔧 Critical Bug Fixes
+- **Date Calculation Corrections**: Fixed fundamental business day calculation errors
+  - Corrected from 30 calendar days to 7 business days for shipment deadlines
+  - Fixed "today" date comparison logic using component-based comparisons instead of timestamps
+  - Enhanced date handling with noon-based calculations to avoid DST issues
+
+### 🌐 Localization Improvements
+- **English Translation**: Comprehensive translation of Portuguese comments and documentation
+  - Translated holiday comments in date calculation utilities
+  - Updated test file comments from Portuguese to English
+  - Improved documentation consistency across the codebase
+
+### 📚 API Enhancements
+- **New Endpoints**: Added comprehensive shipment management endpoints
+  - `DELETE /envio-brindes/delete-all-year`: Bulk deletion with organization isolation
+  - `POST /envio-brindes/fix-gatilho-dates`: Fix existing trigger dates with correct calculations
+  - Enhanced error handling and validation for all shipment operations
+
+### 🔒 Security & Data Integrity
+- **Organization Isolation**: All delete operations properly scoped to user's organization
+- **Confirmation Flows**: Multi-step confirmation for destructive operations
+- **Data Validation**: Enhanced input validation for year parameters and bulk operations
+
+## [2025-10-03] - Previous Release
 
 ### 🎨 UI/UX Enhancements
 - **Home Page Redesign**: Complete overhaul of the marketing home page with modern animations and sections

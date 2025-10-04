@@ -664,7 +664,25 @@ export class EnvioBrindesService {
   }
 
   /**
-   * Corrigir datas de gatilho existentes usando 7 dias úteis corretos
+   * Delete all shipments for a specific year
+   */
+    async deleteAllShipments(organizationId: string) {
+    const deletedRecords = await this.prisma.envioBrinde.deleteMany({
+      where: {
+        colaborador: {
+          organizationId
+        }
+      }
+    });
+
+    return {
+      message: 'All shipments deleted successfully',
+      deletedCount: deletedRecords.count
+    };
+  }
+
+  /**
+   * Fix trigger dates for existing shipments using correct 7 business days calculation
    */
   async fixGatilhoDates(organizationId: string) {
     const envios = await this.prisma.envioBrinde.findMany({
@@ -705,7 +723,7 @@ export class EnvioBrindesService {
     }
     
     return { 
-      message: 'Datas de gatilho corrigidas com sucesso',
+      message: 'Trigger dates corrected successfully',
       enviosCorrigidos: corrigidos,
       totalEnvios: envios.length 
     };

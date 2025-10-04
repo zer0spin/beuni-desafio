@@ -164,6 +164,19 @@ Authorization: Bearer <jwt_token>
 - **Endpoint**: `DELETE /colaboradores/:id`
 - **Authentication**: Required
 
+### Delete ALL Collaborators (Global Reset)
+- **Endpoint**: `DELETE /colaboradores`
+- **Authentication**: Required (Admin only)
+- **Description**: **DANGER**: Delete ALL collaborators and ALL related shipment records for the organization. This completely resets the collaborator database.
+
+#### Response
+```json
+{
+    "message": "All colaboradores and related records deleted successfully",
+    "deletedCount": 108
+}
+```
+
 ### Upcoming Birthdays
 - **Endpoint**: `GET /colaboradores/aniversariantes-proximos`
 - **Authentication**: Required
@@ -269,6 +282,49 @@ Authorization: Bearer <jwt_token>
 - **Endpoint**: `GET /envio-brindes/prontos-para-envio`
 - **Authentication**: Required
 - **Description**: Get all gift deliveries ready to be shipped
+
+### Fix Trigger Dates
+- **Endpoint**: `POST /envio-brindes/fix-gatilho-dates`
+- **Authentication**: Required (Admin only)
+- **Description**: Fix trigger dates for existing shipments using correct business day calculations
+- **Body**: `{ "ano": 2025 }`
+
+#### Response
+```json
+{
+    "message": "Trigger dates fixed successfully",
+    "updatedRecords": 42,
+    "year": 2025
+}
+```
+
+### Delete All Shipments for Year
+- **Endpoint**: `DELETE /envio-brindes/delete-all-year`
+- **Authentication**: Required (Admin only)
+- **Description**: Delete all shipment records for a specific year (organization-scoped)
+- **Body**: `{ "ano": 2025 }`
+
+#### Response
+```json
+{
+    "message": "All shipments for year 2025 deleted successfully",
+    "deletedCount": 42,
+    "year": 2025
+}
+```
+
+### Delete ALL Shipments (Global Reset)
+- **Endpoint**: `DELETE /envio-brindes/delete-all`
+- **Authentication**: Required (Admin only)
+- **Description**: **DANGER**: Delete ALL shipment records for ALL years and ALL employees (organization-scoped). This completely resets the shipment database.
+
+#### Response
+```json
+{
+    "message": "All shipments deleted successfully",
+    "deletedCount": 150
+}
+```
 
 ## 🏠 CEP (Address Validation) Module
 

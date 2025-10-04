@@ -1,9 +1,52 @@
 # 📋 Recent Updates & Session Summary
 
-> Last Updated: October 4, 2025 - 01:30
-> Status: 🚀 Production deployment fixes & final project organization
+> Last Updated: December 15, 2024 - 14:30
+> Status: 🚀 Enhanced shipment management with delete functionality and date fixes
 
-## 🎯 Session 11: Production Deployment Fixes & Project Organization (Oct 4, 2025)
+## 🎯 Session 12: Shipment Management Enhancements (Dec 15, 2024)
+
+### 🔧 Major Improvements Implemented
+
+**Objective**: Fix date calculation bugs, add delete functionality, and improve code quality
+
+#### Issues Fixed:
+- ✅ **Date Calculation Bugs**: Fixed business days calculation (was using 30 calendar days instead of 7 business days)
+- ✅ **"Today" Comparison Issues**: Enhanced date comparison logic to handle timezone-independent comparisons
+- ✅ **Empty Shipments Pages**: Added comprehensive shipment management with bulk operations
+- ✅ **Portuguese Comments**: Translated all Portuguese comments and documentation to English
+- ✅ **Missing Delete Functionality**: Added complete delete endpoints and UI with confirmation flows
+
+#### Technical Changes:
+```diff
+backend/src/modules/envio-brindes/envio-brindes.service.ts:
+- const gatilhoDate = subDays(birthdayThisYear, 30); // Wrong: 30 calendar days
++ const gatilhoDate = this.businessDaysService.addBusinessDays(birthdayThisYear, -7); // Correct: 7 business days
+
+frontend/src/pages/envios/index.tsx:
+- const ehHoje = startOfDay(today).getTime() === startOfDay(prazoIdeal).getTime(); // Timezone issues
++ const ehHoje = today.getDate() === prazoIdeal.getDate() && 
++                today.getMonth() === prazoIdeal.getMonth() && 
++                today.getFullYear() === prazoIdeal.getFullYear(); // Component-based comparison
+
+backend/src/modules/envio-brindes/envio-brindes.controller.ts:
++ @Delete('delete-all-year')
++ async deleteAllShipmentsForYear(@Body() { ano }: { ano: number }) {
++   return this.envioBrindesService.deleteAllShipmentsForYear(ano, orgId);
++ }
+```
+
+#### New Features Added:
+- **Bulk Delete Operations**: Complete shipment deletion with organization-scoped queries
+- **Enhanced UI Modals**: Action selection (create/delete) with proper confirmation flows  
+- **Date Calculation Fixes**: Proper business day calculations mirroring backend HolidaysService
+- **API Documentation**: Updated with new delete endpoints and fix operations
+
+#### Database Operations Fixed:
+- Fixed seed data to use correct 7 business day calculations
+- Added `fixGatilhoDates` method to correct existing shipment trigger dates
+- Improved date handling with noon-based calculations to avoid DST issues
+
+### 🚀 Previous Session: Production Deployment Fixes (Oct 4, 2025)
 
 ### 🔧 Critical Production Issues Resolved
 

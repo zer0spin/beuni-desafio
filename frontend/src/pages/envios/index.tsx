@@ -14,15 +14,15 @@ import api, { getUser } from '@/lib/api';
 // compute "business days left" for display purposes only. We DO NOT mutate
 // any persisted timestamps; this is purely a UI calculation.
 const FIXED_HOLIDAYS = [
-  '01-01', // Confraternização Universal
+  '01-01', // New Year's Day
   '04-21', // Tiradentes
-  '05-01', // Dia do Trabalho
-  '09-07', // Independência do Brasil
-  '10-12', // Nossa Senhora Aparecida
-  '11-02', // Finados
-  '11-15', // Proclamação da República
-  '11-20', // Consciência Negra (national holiday since 2024)
-  '12-25', // Natal
+  '05-01', // Labor Day
+  '09-07', // Independence Day
+  '10-12', // Our Lady of Aparecida
+  '11-02', // All Souls' Day
+  '11-15', // Proclamation of the Republic
+  '11-20', // Black Awareness Day (national holiday since 2024)
+  '12-25', // Christmas
 ];
 
 // Movable holidays by year, mirroring backend HolidaysService (subset used by UI)
