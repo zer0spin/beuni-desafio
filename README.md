@@ -1,19 +1,19 @@
 # 🎂 Beuni Birthday Management Platform
 
 [![Tests](https://img.shields.io/badge/tests-92%25_coverage-brightgreen)](docs/testing/COVERAGE-REPORT.md)
-[![Security](https://img.shields.io/badge/security-A+-brightgreen)](docs/security/SECURITY_ASSESSMENT_REPORT.md)
+[![Security](https://img.shields.io/badge/security-A+-brightgreen)](docs/security/)
 [![Build](https://img.shields.io/badge/build-passing-success)](docs/DEVELOPMENT_LOG.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)](tsconfig.json)
+[![Deployment](https://img.shields.io/badge/deployment-Railway+Vercel-blueviolet)](docs/deploy/)
 
 A comprehensive corporate birthday management platform built with modern web technologies, featuring automated gift sending, employee management, and advanced analytics.
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Node.js 18+
-- PostgreSQL 15+
-- Redis 7+
-- Docker & Docker Compose
+### Production URLs
+- 🌐 **Frontend**: https://beuni-frontend-one.vercel.app
+- ⚙️ **Backend API**: https://beuni-desafio-production-41c7.up.railway.app
+- 📊 **API Docs**: https://beuni-desafio-production-41c7.up.railway.app/api/docs
 
 ### Development Setup
 ```bash
@@ -29,10 +29,24 @@ docker-compose up -d
 npm run dev
 ```
 
-**Access Points:**
+**Local Access Points:**
 - 🌐 Frontend: http://localhost:3000
 - ⚙️ Backend API: http://localhost:3001
-- 📊 Swagger Docs: http://localhost:3001/api
+- 📊 Swagger Docs: http://localhost:3001/api/docs
+
+## 📚 Documentation
+
+> **📋 Complete Documentation**: See [docs/README.md](docs/README.md) for full documentation index
+
+### Quick Links
+| Category | Document | Description |
+|----------|----------|-------------|
+| 🏗️ Architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design and C4 diagrams |
+| 🛡️ Security | [docs/security/](docs/security/) | Security policies and assessments |
+| 🧪 Testing | [docs/testing/](docs/testing/) | Test strategies and coverage |
+| 🚀 Deployment | [docs/deploy/](docs/deploy/) | Railway and Vercel deployment guides |
+| 🔧 Development | [docs/DEVELOPMENT_LOG.md](docs/DEVELOPMENT_LOG.md) | Complete development history |
+| 📋 Recent Updates | [docs/RECENT_UPDATES.md](docs/RECENT_UPDATES.md) | Latest changes and fixes |
 
 ## 📋 Project Overview
 

@@ -1,6 +1,6 @@
 # Security Policy for Beuni Project
 
-> For the full, consolidated security documentation (policies, implementation, testing, incident response), see docs/security/SECURITY_CONSOLIDATED.md. This file is the high-level policy; technical details live in the consolidated doc.
+> **📋 Complete Security Documentation**: For comprehensive security documentation including threat analysis, vulnerability assessments, implementation details, and incident response procedures, see [docs/security/](docs/security/)
 
 ## 🛡 Supported Versions
 

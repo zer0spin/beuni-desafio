@@ -9,12 +9,53 @@
 - **Caching**: Redis 7
 - **Authentication**: JWT + CSRF Protection
 - **Containerization**: Docker
+- **Deployment**: Railway (Backend) + Vercel (Frontend)
 
 ### Architectural Principles
 - **Multi-Tenancy**: Secure isolation between organizational instances
 - **Scalability**: Microservices-ready design
 - **Performance**: Optimized data flow and caching
 - **Security**: Layered security approach
+
+## 📊 C4 Model Diagrams
+
+### Context Diagram
+```mermaid
+graph TD
+    User[Employee/Admin] --> Beuni[Beuni Platform]
+    Beuni --> HRMS[HR Management System]
+    Beuni --> EmailService[Email Notification Service]
+    Beuni --> CEPService[External CEP Service]
+    HRMS --> Beuni
+```
+
+### Container Diagram
+```mermaid
+graph TD
+    User[Web/Mobile User] --> Frontend[Next.js Frontend - Vercel]
+    Frontend --> Backend[NestJS Backend API - Railway]
+    Backend --> PostgreSQL[(PostgreSQL Database - Railway)]
+    Backend --> Redis[(Redis Cache - Railway)]
+    Backend --> CEPService[External CEP Service]
+    Backend --> EmailService[Email Notification Service]
+```
+
+### Component Diagram (Backend)
+```mermaid
+graph TD
+    AuthModule[Authentication Module]
+    UsersModule[Users Module]
+    ColaboradoresModule[Colaboradores Module]
+    EnvioBrindesModule[Envio Brindes Module]
+    NotificacoesModule[Notificações Module]
+    CepModule[CEP Module]
+    
+    AuthModule --> UsersModule
+    ColaboradoresModule --> AuthModule
+    EnvioBrindesModule --> ColaboradoresModule
+    NotificacoesModule --> ColaboradoresModule
+    CepModule --> ColaboradoresModule
+```
 
 ## 🔍 Component Architecture
 
