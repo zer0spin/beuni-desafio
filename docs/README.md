@@ -47,10 +47,29 @@ beuni-desafio/
 ### 🔒 Security
 | Document | Purpose | Criticality |
 |----------|---------|-------------|
-| [Security Assessment](security/SECURITY_ASSESSMENT_REPORT.md) | Audit results | 🔴 High |
-| [Vulnerability Report](security/vulnerability-report.md) | CVE tracking | 🔴 High |
+| [Security Assessment](security/SECURITY_ASSESSMENT_REPORT.md) | Comprehensive audit | 🔴 High |
+| [Threat Model](security/THREAT_MODEL.md) | STRIDE analysis & attack vectors | 🔴 High |
+| [Vulnerability Report](security/vulnerability-report.md) | Detailed CVE tracking & fixes | 🔴 High |
+| [Security Consolidated](security/SECURITY_CONSOLIDATED.md) | Unified security overview | 🟡 Medium |
+| [Security Fixes Log](security/SECURITY_FIXES_LOG.md) | Applied patches history | 🟡 Medium |
+| [Security Improvements](security/SECURITY_IMPROVEMENTS.md) | Enhancement roadmap | 🟡 Medium |
 | [Threat Hunting](security/threat-hunting-queries.md) | Monitoring queries | 🟡 Medium |
-| [Backend Test Analysis](security/backend-test-analysis-report.md) | Test security | 🟡 Medium |
+| [Backend Test Analysis](security/backend-test-analysis-report.md) | Test security analysis | 🟢 Low |
+
+### 🛠️ Troubleshooting
+| Document | Purpose | Status |
+|----------|---------|--------|
+| [Alpine to Debian Migration](troubleshooting/ALPINE_DEBIAN_MIGRATION.md) | Docker base image fix | ✅ Resolved |
+| [Port Configuration](troubleshooting/PORT_CONFIGURATION.md) | Port binding issues | ✅ Resolved |
+| [Prisma Correction Guide](troubleshooting/PRISMA_CORRECTION_GUIDE.md) | Database connection fix | ✅ Resolved |
+| [URL Copy Manual](troubleshooting/URL_COPY_MANUAL.md) | URL access guide | ✅ Reference |
+
+### 📊 Code Quality
+| Document | Purpose | Status |
+|----------|---------|--------|
+| [Refactoring Guide](REFACTORING.md) | Clean Code & SOLID analysis | ✅ Updated |
+| [Performance Strategy](PERFORMANCE.md) | Optimization recommendations | ✅ Complete |
+| [Accessibility Guide](ACCESSIBILITY.md) | WCAG compliance | ✅ Complete |
 
 ## 📊 Documentation Status
 
@@ -155,6 +174,22 @@ Purpose: Project management and governance
 - 🐛 Troubleshooting: Development Log → API Documentation → Security Reports
 - 📈 Performance: Architecture → Test Reports → Development Log
 - 🔐 Security Review: Security folder → Vulnerability Reports → Threat Hunting
+
+---
+
+## 🧭 Consolidation Notes (Oct 3, 2025)
+
+### Documentation Reorganization
+- ✅ **Removed from root**: `README_NEW.md`, `CHANGELOG_NEW.md`, `DOCUMENTATION_REORGANIZATION_REPORT.md`
+- ✅ **Troubleshooting guides moved**: `ALPINE_TO_DEBIAN_FIX.md` → `docs/troubleshooting/`
+- ✅ **Security docs consolidated**: All in `docs/security/` including new Threat Model
+- ✅ **Matrix agents executed**: Neo (Threat Model), Trinity (Vulnerabilities), Morpheus (Refactoring), Oracle (Documentation)
+
+### New Documentation (Oct 3, 2025)
+- 🆕 `docs/security/THREAT_MODEL.md` - Comprehensive STRIDE analysis
+- 🆕 `docs/troubleshooting/` - Centralized troubleshooting guides
+- 🔄 `docs/REFACTORING.md` - Updated with SOLID analysis & Clean Code principles
+- 🔄 `docs/security/vulnerability-report.md` - Updated vulnerability scan results
 
 ## 📞 Documentation Support
 

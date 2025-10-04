@@ -57,7 +57,7 @@ npm run dev
 ### 📖 Core Documentation
 | Document | Description | Status |
 |----------|-------------|--------|
-| [README.md](README.md) | Project overview and quick start | ✅ Current |
+| [docs/README.md](docs/README.md) | Documentation index | ✅ Current |
 | [CHANGELOG.md](CHANGELOG.md) | Version history and release notes | ✅ Updated |
 | [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Comprehensive system architecture | ✅ Complete |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Development guidelines | ✅ Complete |
@@ -66,6 +66,7 @@ npm run dev
 | Document | Description | Location |
 |----------|-------------|----------|
 | [Development Log](docs/DEVELOPMENT_LOG.md) | Complete development history (PT) | `docs/` |
+| [Recent Updates](docs/RECENT_UPDATES.md) | Latest changes summary | `docs/` |
 | [Setup Guide](SETUP_GUIDE.md) | Detailed installation instructions | Root |
 | [Performance Strategy](docs/PERFORMANCE.md) | Performance optimization guide | `docs/` |
 | [Deployment Guide](docs/DEPLOYMENT.md) | Deployment configurations | `docs/` |
@@ -90,6 +91,7 @@ npm run dev
 | Document | Description | Location |
 |----------|-------------|----------|
 | [API Documentation](docs/API.md) | Detailed API specifications | `docs/` |
+| [Deployment Guide](docs/DEPLOYMENT.md) | Railway & Vercel deployment | `docs/` |
 | [Docker Compose](docs/DOCKER_COMPOSE_ANALYSIS.md) | Container configuration | `docs/` |
 | [Local Development](docs/DEVELOPMENT.md) | Local setup instructions | `docs/` |
 
@@ -160,14 +162,8 @@ npm run test:coverage
 
 ## 🚀 Deployment
 
-### Production Environment
-```bash
-# Build for production
-npm run build
-
-# Start production servers
-docker-compose -f docker-compose.yml up -d
-```
+### Guide
+Veja o guia completo em `docs/DEPLOYMENT.md` (Railway/Vercel, variáveis, portas, seed, troubleshooting).
 
 ### Environment Configuration
 - **Development**: `.env.development`
