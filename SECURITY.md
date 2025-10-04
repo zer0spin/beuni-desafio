@@ -92,7 +92,7 @@ We welcome security researchers and enthusiasts to help improve our project's se
 
 ---
 
-**Last Updated:** 2025-10-02  
+**Last Updated:** 2025-10-04
 **Version:** 1.0.0
 
 🛡️ Security is a shared responsibility

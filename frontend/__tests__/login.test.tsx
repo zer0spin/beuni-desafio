@@ -62,7 +62,7 @@ describe('LoginPage Tests', () => {
   });
 
   const renderLogin = async () => {
-    const LoginPage = (await import('../login')).default;
+    const LoginPage = (await import('../src/pages/login')).default;
     return render(<LoginPage />);
   };
 

@@ -99,7 +99,7 @@ describe('ColaboradoresService', () => {
 
       await expect(
         service.create(dto, organizationId)
-      ).rejects.toThrow('CEP não encontrado');
+      ).rejects.toThrow('ZIP code not found');
     });
 
     it('should create EnvioBrinde for current year', async () => {
@@ -727,7 +727,7 @@ describe('ColaboradoresService', () => {
 
       // Assert
       expect(result).toEqual({
-        message: 'All colaboradores deleted successfully',
+        message: 'All colaboradores and related records deleted successfully',
         deletedCount,
       });
       expect(prisma.colaborador.deleteMany).toHaveBeenCalledWith({
@@ -746,7 +746,7 @@ describe('ColaboradoresService', () => {
 
       // Assert
       expect(result).toEqual({
-        message: 'All colaboradores deleted successfully',
+        message: 'All colaboradores and related records deleted successfully',
         deletedCount: 0,
       });
     });

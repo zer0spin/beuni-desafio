@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
-import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ColaboradoresController } from './colaboradores.controller';
 import { ColaboradoresService } from './colaboradores.service';
 

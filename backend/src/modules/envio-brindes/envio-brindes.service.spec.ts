@@ -76,23 +76,31 @@ describe('EnvioBrindesService', () => {
 
     it('should not create duplicate envio records for same year', async () => {
       // Arrange
+      const currentYear = new Date().getFullYear();
+      const dataNascimento = new Date(1990, 5, 15, 12, 0, 0, 0); // June 15, 1990 at noon
       const mockColaborador = {
         id: 'colab-123',
-        dataNascimento: new Date('1990-06-15'),
+        dataNascimento,
         enviosBrinde: [{
           id: 'envio-existing',
-          anoAniversario: 2024,
+          anoAniversario: currentYear,
           status: 'PENDENTE',
         }],
       };
 
+      const mockDate = new Date(currentYear, 5, 8, 12, 0, 0, 0); // 7 days before birthday
+      vi.setSystemTime(mockDate);
+
       prisma.colaborador.findMany.mockResolvedValue([mockColaborador]);
-      
+      businessDaysService.calculateBusinessDaysBefore.mockReturnValue(mockDate);
+
       // Act
       await service.verificarAniversariosProximos();
 
       // Assert
       expect(prisma.envioBrinde.create).not.toHaveBeenCalled();
+
+      vi.useRealTimers();
     });
 
     it('should handle errors during processing gracefully', async () => {
