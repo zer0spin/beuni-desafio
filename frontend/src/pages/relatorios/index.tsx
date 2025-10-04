@@ -249,7 +249,7 @@ export default function RelatoriosPage() {
       document.body.removeChild(link);
 
       toast.dismiss();
-      toast.success('Report exported successfully!');
+      toast.success('Relatório exportado com sucesso!');
     } catch (error) {
       toast.dismiss();
       toast.error('Erro ao exportar relatório');
@@ -592,11 +592,10 @@ export default function RelatoriosPage() {
                 )}
               </div>
 
-              {/* Status Distribution com Legenda */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h3 className="text-lg font-bold text-beuni-text flex items-center mb-6">
-                  <PieChart className="h-5 w-5 text-beuni-orange-600 mr-2" />
-                  Status Distribution
+              {/* Distribuição de Status com Legenda */}
+              <div className="bg-white rounded-2xl shadow-sm border border-beuni-orange-100 p-6">
+                <h3 className="text-xl font-bold text-beuni-text mb-6 flex items-center">
+                  Distribuição de Status
                 </h3>
                 {totalEnvios === 0 ? (
                   <div className="flex flex-col items-center justify-center h-[200px] text-gray-400">

@@ -102,7 +102,7 @@ export default function CalendarioPage() {
       generateCalendar(colaboradoresFiltrados);
 
     } catch (error) {
-      console.error('Erro ao carregar colaboradores:', error);
+      // Erro já tratado pelo toast
       toast.error('Erro ao carregar dados do calendário. Verifique sua conexão.');
       setColaboradores([]);
       setDiasCalendario([]);
@@ -172,7 +172,7 @@ export default function CalendarioPage() {
 
             return diaAniv === dia && mesAniv === (mes + 1);
           } catch (error) {
-            console.error('Erro ao processar data de nascimento:', c.data_nascimento, error);
+            // Erro ao processar data - ignorar colaborador
             return false;
           }
         });
@@ -200,7 +200,7 @@ export default function CalendarioPage() {
 
       setDiasCalendario(dias);
     } catch (error) {
-      console.error('Erro ao gerar calendário:', error);
+      // Erro já tratado pelo toast
       toast.error('Erro ao gerar calendário');
       setDiasCalendario([]);
     }

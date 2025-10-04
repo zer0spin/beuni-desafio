@@ -74,7 +74,7 @@ export default function Layout({ children }: LayoutProps) {
       const response = await api.get(endpoints.notificacoes);
       setNotifications(response.data.slice(0, 5)); // Apenas as 5 mais recentes para o popup
     } catch (error) {
-      console.error('Erro ao carregar notificações:', error);
+      // Erro silencioso - notificações não são críticas
     }
   };
 

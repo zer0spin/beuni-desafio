@@ -50,7 +50,7 @@ export default function LoginPage() {
       // Atualizar UserContext
       refreshUser();
 
-      toast.success(`Welcome, ${user.nome}!`);
+      toast.success(`Bem-vindo, ${user.nome}!`);
 
       // Marcar login como bem-sucedido para triggerar o useEffect
       setLoginSuccess(true);

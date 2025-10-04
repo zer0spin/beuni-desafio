@@ -155,7 +155,6 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
             },
           });
         } catch (error) {
-          console.error('Erro ao carregar colaborador:', error);
           toast.error('Erro ao carregar dados do colaborador');
         } finally {
           setLoading(false);
@@ -244,7 +243,7 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
           toast.success('CEP encontrado! Endereço preenchido automaticamente');
         }
       } catch (error) {
-        console.error('Erro ao buscar CEP:', error);
+        // Erro já tratado pelo toast
         toast.error('CEP não encontrado. Preencha o endereço manualmente');
         setCepData(null);
 
@@ -307,7 +306,6 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
 
       router.push('/colaboradores');
     } catch (error: any) {
-      console.error('Erro ao processar colaborador:', error);
       const message = mode === 'create' ? 'Erro ao cadastrar colaborador' : 'Erro ao atualizar colaborador';
       toast.error(error.response?.data?.message || message);
     } finally {
@@ -327,7 +325,6 @@ export default function ColaboradorForm({ mode, colaboradorId }: ColaboradorForm
       toast.success('Colaborador excluído com sucesso!');
       router.push('/colaboradores');
     } catch (error: any) {
-      console.error('Erro ao excluir colaborador:', error);
       toast.error(error.response?.data?.message || 'Erro ao excluir colaborador');
     } finally {
       setDeleteLoading(false);

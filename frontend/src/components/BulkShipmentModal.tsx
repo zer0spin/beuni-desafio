@@ -26,12 +26,12 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
     try {
       const response = await api.post(`/envio-brindes/criar-registros-ano/${selectedYear}`);
       
-      toast.success(`Records created for year ${selectedYear}!`);
+      toast.success(`Registros criados para o ano ${selectedYear}!`);
       onSuccess();
       onClose();
       setStep('select');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Error creating records');
+      toast.error(error.response?.data?.message || 'Erro ao criar registros');
       setStep('select');
     } finally {
       setLoading(false);
@@ -45,12 +45,12 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
     try {
       const response = await api.delete('/envio-brindes/delete-all');
       
-      toast.success('All shipment records deleted successfully!');
+      toast.success('Todos os registros de envio deletados com sucesso!');
       onSuccess();
       onClose();
       setStep('select');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Error deleting records');
+      toast.error(error.response?.data?.message || 'Erro ao deletar registros');
       setStep('select');
     } finally {
       setLoading(false);
@@ -64,7 +64,7 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
     try {
       const response = await api.post('/envio-brindes/seed-test-data');
       
-      toast.success('Test data created successfully!');
+      toast.success('Dados de teste criados com sucesso!');
       onSuccess();
       onClose();
       setStep('select');
@@ -221,7 +221,7 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
                   }}
                   className="px-4 py-2 text-red-600 bg-red-50 hover:bg-red-100 rounded-lg font-semibold transition-all border border-red-200"
                 >
-                  Delete All {selectedYear}
+                  Deletar Todos {selectedYear}
                 </button>
                 
                 <div className="flex items-center space-x-3">
@@ -253,10 +253,10 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
                   <Package className="h-8 w-8 text-white" />
                 </div>
                 <h4 className="text-lg font-bold text-beuni-text mb-2">
-                  Confirm Creation
+                  Confirmar Criação
                 </h4>
                 <p className="text-beuni-text/70">
-                  You are about to create shipment records for <strong>all employees</strong> in year <strong>{selectedYear}</strong>.
+                  Você está prestes a criar registros de envio para <strong>todos os colaboradores</strong> no ano <strong>{selectedYear}</strong>.
                 </p>
               </div>
 
@@ -266,14 +266,14 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
                   onClick={() => setStep('select')}
                   className="px-6 py-3 text-beuni-text bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl font-semibold transition-all"
                 >
-                  Back
+                  Voltar
                 </button>
                 <button
                   onClick={handleCreateRecords}
                   disabled={loading}
                   className="px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold rounded-xl hover:from-green-600 hover:to-green-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Creating...' : 'Create Records'}
+                  {loading ? 'Criando...' : 'Criar Registros'}
                 </button>
               </div>
             </>
@@ -287,13 +287,13 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
                   <AlertTriangle className="h-8 w-8 text-white" />
                 </div>
                 <h4 className="text-lg font-bold text-red-800 mb-2">
-                  ⚠️ DANGER: Delete ALL Shipments
+                  ⚠️ PERIGO: Deletar TODOS os Envios
                 </h4>
                 <p className="text-red-700 mb-2">
-                  This action will <strong>permanently delete ALL shipment records</strong> for <strong>ALL YEARS</strong> and <strong>ALL EMPLOYEES</strong>.
+                  Esta ação irá <strong>deletar permanentemente TODOS os registros de envio</strong> de <strong>TODOS OS ANOS</strong> e <strong>TODOS OS COLABORADORES</strong>.
                 </p>
                 <p className="text-red-600 text-sm font-semibold">
-                  This will completely reset your shipment database. This cannot be undone!
+                  Isso irá resetar completamente seu banco de dados de envios. Esta ação não pode ser desfeita!
                 </p>
               </div>
 
@@ -303,14 +303,14 @@ export default function BulkShipmentModal({ isOpen, onClose, onSuccess }: BulkSh
                   onClick={() => setStep('select')}
                   className="px-6 py-3 text-beuni-text bg-beuni-cream hover:bg-beuni-orange-50 rounded-xl font-semibold transition-all"
                 >
-                  Cancel
+                  Cancelar
                 </button>
                 <button
                   onClick={handleDeleteRecords}
                   disabled={loading}
                   className="px-6 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white font-semibold rounded-xl hover:from-red-600 hover:to-red-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Deleting All...' : 'DELETE ALL RECORDS'}
+                  {loading ? 'Deletando Tudo...' : 'DELETAR TODOS OS REGISTROS'}
                 </button>
               </div>
             </>

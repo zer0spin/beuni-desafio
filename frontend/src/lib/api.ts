@@ -114,7 +114,7 @@ export const setAuthToken = (user: any) => {
     // Only store user data (non-sensitive) - token is httpOnly from backend
     Cookies.set('beuni_user', JSON.stringify(user), cookieOptions);
   } catch (error) {
-    console.error('setAuthToken: Error setting user cookie', error);
+    // Erro ao salvar cookie do usuário - será reautenticado
   }
 };
 

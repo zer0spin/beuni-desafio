@@ -100,7 +100,7 @@ export default function Configuracoes() {
       await queryClient.invalidateQueries('userProfile');
       await refetch();
 
-      toast.success('Data updated successfully!');
+      toast.success('Dados atualizados com sucesso!');
       setIsEditing(false);
     } catch (error) {
       toast.error('Error updating data');

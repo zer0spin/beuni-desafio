@@ -54,8 +54,7 @@ export default function ColaboradoresPage() {
         totalPages: colaboradoresResponse.data.totalPages,
       });
     } catch (error) {
-      console.error('Error loading colaboradores:', error);
-      toast.error('Error loading colaboradores');
+      toast.error('Erro ao carregar colaboradores');
     } finally {
       setLoading(false);
     }
@@ -65,12 +64,12 @@ export default function ColaboradoresPage() {
     setDeleteLoading(true);
     try {
       await api.delete(endpoints.colaboradores);
-      toast.success('All colaboradores deleted successfully!');
+      toast.success('Todos os colaboradores deletados com sucesso!');
       setShowDeleteConfirm(false);
       loadColaboradores(1);
       setCurrentPage(1);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Error deleting colaboradores');
+      toast.error(error.response?.data?.message || 'Erro ao deletar colaboradores');
     } finally {
       setDeleteLoading(false);
     }
@@ -147,7 +146,7 @@ export default function ColaboradoresPage() {
                   className="flex items-center px-4 py-3 bg-red-500 text-white font-semibold rounded-xl hover:bg-red-600 transition-all duration-200 shadow-md hover:shadow-lg"
                 >
                   <Trash2 className="h-5 w-5 mr-2" />
-                  Delete All
+                  Deletar Todos
                 </button>
                 <button
                   onClick={() => router.push('/colaboradores/novo')}
@@ -384,11 +383,11 @@ export default function ColaboradoresPage() {
                 <Trash2 className="h-8 w-8 text-red-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                ⚠️ DELETE ALL COLABORADORES
+                ⚠️ DELETAR TODOS OS COLABORADORES
               </h3>
               <p className="text-gray-600 mb-6">
-                This will permanently delete <strong>ALL colaboradores</strong> and <strong>ALL related shipment records</strong>. 
-                This action cannot be undone and will completely reset your database.
+                Isso irá deletar permanentemente <strong>TODOS os colaboradores</strong> e <strong>TODOS os registros de envio relacionados</strong>. 
+                Esta ação não pode ser desfeita e irá resetar completamente seu banco de dados.
               </p>
               
               <div className="flex items-center justify-center space-x-4">
@@ -397,14 +396,14 @@ export default function ColaboradoresPage() {
                   disabled={deleteLoading}
                   className="px-6 py-3 text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-xl font-semibold transition-all disabled:opacity-50"
                 >
-                  Cancel
+                  Cancelar
                 </button>
                 <button
                   onClick={handleDeleteAllColaboradores}
                   disabled={deleteLoading}
                   className="px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {deleteLoading ? 'Deleting...' : 'DELETE ALL'}
+                  {deleteLoading ? 'Deletando...' : 'DELETAR TODOS'}
                 </button>
               </div>
             </div>
