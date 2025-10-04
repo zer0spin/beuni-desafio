@@ -41,7 +41,7 @@ export default function ColaboradoresPage() {
       setLoading(true);
       const [colaboradoresResponse, enviosResponse] = await Promise.all([
         api.get<ColaboradoresResponse>(`${endpoints.colaboradores}?page=${page}&limit=10`),
-        api.get<EnvioBrinde[]>('/api/envio-brindes')
+        api.get<EnvioBrinde[]>(endpoints.enviosBrindes)
       ]);
       
       setColaboradores(colaboradoresResponse.data.colaboradores);
