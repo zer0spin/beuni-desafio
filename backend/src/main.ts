@@ -10,7 +10,6 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { CsrfGuard } from './common/guards/csrf.guard';
 
 async function bootstrap() {
-  console.log('🚀 Beuni Backend v1.0.3 - JWT + PORT FIX + AdminModule');
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
 
@@ -100,11 +99,8 @@ async function bootstrap() {
 
   await app.listen(port, '0.0.0.0');
 
-  // Trigger deploy: AdminModule added for seed endpoint
   console.log('🚀 Beuni Backend API rodando em:', `http://0.0.0.0:${port}`);
   console.log('📚 Documentação Swagger disponível em:', `http://0.0.0.0:${port}/api/docs`);
-  console.log('🔧 AdminModule carregado para endpoints administrativos');
-  console.log('🌍 Ambiente:', process.env.NODE_ENV || 'development');
 }
 
 bootstrap();

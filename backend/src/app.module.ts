@@ -14,7 +14,6 @@ import { CepModule } from './modules/cep/cep.module';
 import { EnvioBrindesModule } from './modules/envio-brindes/envio-brindes.module';
 import { OrganizacoesModule } from './modules/organizacoes/organizacoes.module';
 import { NotificacoesModule } from './modules/notificacoes/notificacoes.module';
-import { AdminModule } from './modules/admin/admin.module';
 
 // Global services
 import { AppController } from './app.controller';
@@ -47,7 +46,6 @@ import { RedisService } from './shared/redis.service';
     EnvioBrindesModule,
     OrganizacoesModule,
     NotificacoesModule,
-    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService, RedisService],
