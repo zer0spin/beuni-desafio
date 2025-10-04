@@ -1,10 +1,10 @@
-# 🚀 Setup Guide - Beuni Dashboard
+# 🚀 Development Setup Guide - Beuni Platform
 
-## 📋 Why does the Prisma error happen every time?
+## 📋 Common Issue: Prisma Database Connection Errors
 
 ### ❌ **The Problem**
 
-When you run `npx prisma migrate deploy` **outside the Docker container** (in PowerShell/CMD on Windows), you see this error:
+When running `npx prisma migrate deploy` **outside the Docker container** (in PowerShell/CMD on Windows), you encounter this error:
 
 ```
 Error: P1001: Can't reach database server at `postgres:5432`
@@ -18,7 +18,7 @@ The `.env` file in the backend contains:
 DATABASE_URL="postgresql://beuni:beuni123@postgres:5432/beuni_db"
 ```
 
-The hostname `postgres:5432` works **only inside the Docker network**. When you run Prisma on **Windows/PowerShell**, it can't resolve this name because:
+The hostname `postgres:5432` works **only inside the Docker network**. When you run Prisma on **Windows/PowerShell**, it cannot resolve this name because:
 
 1. **Inside Docker**: `postgres` = PostgreSQL container name in the internal network
 2. **Outside Docker (Windows)**: `postgres` = unknown hostname ❌
@@ -40,23 +40,23 @@ npx prisma migrate deploy  # ❌ Will fail!
 
 ---
 
-## 🎯 Automatic Setup (Recommended)
+## 🎯 Automated Setup (Recommended)
 
 ### **Windows (PowerShell)**
 
 ```powershell
 # Run the setup script
-.\setup.ps1
+.\scripts\setup\setup.ps1
 ```
 
 ### **Linux/Mac (Bash)**
 
 ```bash
 # Make the script executable
-chmod +x setup.sh
+chmod +x scripts/setup/setup.sh
 
 # Run the script
-./setup.sh
+./scripts/setup/setup.sh
 ```
 
 The script automates:
@@ -71,7 +71,7 @@ The script automates:
 
 ## 🛠️ Manual Setup (Step by Step)
 
-### **1. Start the containers**
+### **1. Start the Containers**
 
 ```powershell
 docker-compose up -d
@@ -85,13 +85,13 @@ Wait ~15 seconds for PostgreSQL to fully initialize.
 docker exec beuni-backend npx prisma generate
 ```
 
-### **3. Apply Migrations**
+### **3. Apply Database Migrations**
 
 ```powershell
 docker exec beuni-backend npx prisma migrate deploy
 ```
 
-### **4. Populate Database**
+### **4. Populate Database with Test Data**
 
 ```powershell
 docker exec beuni-backend npm run prisma:seed
@@ -104,7 +104,7 @@ docker exec beuni-backend npx prisma migrate deploy
 docker exec beuni-backend node -e "require('ts-node/register'); require('./prisma/seed-populated.ts');"
 ```
 
-### **5. Verify Status**
+### **5. Verify Container Status**
 
 ```powershell
 docker ps
@@ -118,13 +118,13 @@ You should see 4 containers running:
 
 ---
 
-## 🌐 Available URLs
+## 🌐 Available Services
 
 | Service | URL | Description |
 |---------|-----|-------------|
 | **Frontend** | http://localhost:3000 | User interface |
-| **Backend** | http://localhost:3001 | REST API |
-| **Swagger** | http://localhost:3001/api/docs | API documentation |
+| **Backend API** | http://localhost:3001 | REST API |
+| **Swagger Docs** | http://localhost:3001/api/docs | API documentation |
 | **PostgreSQL** | localhost:15432 | Database (use DBeaver/pgAdmin) |
 | **Redis** | localhost:6379 | Cache |
 
@@ -138,7 +138,7 @@ Email:    ana.rh@beunidemo.com
 Password: 123456
 ```
 
-### PostgreSQL Connection (DBeaver/pgAdmin)
+### Database Connection (DBeaver/pgAdmin)
 ```
 Host:     localhost
 Port:     15432
@@ -149,44 +149,43 @@ Password: beuni123
 
 ---
 
-## 📝 Useful Commands
+## 📝 Useful Development Commands
 
-### **View real-time logs**
+### **View Real-Time Logs**
 
 ```powershell
-# Backend
+# Backend logs
 docker logs beuni-backend -f
 
-# Frontend
+# Frontend logs
 docker logs beuni-frontend -f
 
-# PostgreSQL
+# Database logs
 docker logs beuni-postgres -f
 ```
 
-### **Stop all containers**
+### **Container Management**
 
 ```powershell
+# Stop all containers
 docker-compose down
-```
 
-### **Stop and remove volumes (clean everything)**
-
-```powershell
+# Stop and remove volumes (clean everything)
 docker-compose down -v
-```
 
-### **Recreate containers from scratch**
-
-```powershell
+# Recreate containers from scratch
 docker-compose down -v
 docker-compose up -d --build
 ```
 
-### **Reset database**
+### **Database Operations**
 
 ```powershell
+# Reset database (WARNING: Deletes all data)
 docker exec beuni-backend npx prisma migrate reset --force
+
+# View database schema
+docker exec beuni-backend npx prisma studio
 ```
 
 ---
@@ -195,7 +194,7 @@ docker exec beuni-backend npx prisma migrate reset --force
 
 ### **Error: "Can't reach database server at postgres:5432"**
 
-**Cause**: You're running Prisma outside the container.
+**Cause**: Running Prisma outside the container.
 
 **Solution**: Use `docker exec` to run inside the container:
 ```powershell
@@ -214,7 +213,7 @@ netstat -ano | findstr :15432
 # Stop local PostgreSQL or change port in docker-compose.yml
 ```
 
-### **Backend unhealthy**
+### **Backend Container Unhealthy**
 
 **Cause**: Migrations not applied or database not populated.
 
@@ -225,7 +224,7 @@ docker exec beuni-backend npm run prisma:seed
 docker restart beuni-backend
 ```
 
-### **Frontend doesn't load CSS**
+### **Frontend Doesn't Load CSS**
 
 **Cause**: Incomplete Next.js build.
 
@@ -234,40 +233,57 @@ docker restart beuni-backend
 docker-compose restart frontend
 ```
 
+### **Redis Connection Errors**
+
+**Cause**: Redis container not running or not ready.
+
+**Solution**:
+```powershell
+# Check Redis status
+docker logs beuni-redis
+
+# Restart Redis
+docker restart beuni-redis
+```
+
 ---
 
 ## 🔄 Development Workflow
 
-### **Daily routine (containers already created)**
+### **Daily Development Routine**
 
 ```powershell
-# Start containers
+# Start containers (if already created)
 docker-compose up -d
 
-# Work normally...
+# Work on development...
 
 # Stop containers (end of day)
 docker-compose down
 ```
 
-### **After Prisma schema changes**
+### **After Prisma Schema Changes**
 
 ```powershell
 # Create new migration
-docker exec beuni-backend npx prisma migrate dev --name your_change
+docker exec beuni-backend npx prisma migrate dev --name your_change_description
 
 # Apply in other environments
 docker exec beuni-backend npx prisma migrate deploy
 ```
 
-### **After git pull with changes**
+### **After Git Pull with Changes**
 
 ```powershell
-# Rebuild containers
+# Rebuild containers with latest changes
 docker-compose up -d --build
 
-# Apply new migrations
+# Apply any new migrations
 docker exec beuni-backend npx prisma migrate deploy
+
+# Update dependencies if needed
+docker exec beuni-backend npm install
+docker exec beuni-frontend npm install
 ```
 
 ---
@@ -300,7 +316,7 @@ The `npm run prisma:seed` command creates:
 
 ---
 
-## 🎯 Next Steps
+## 🎯 Next Steps After Setup
 
 After successful setup:
 
@@ -308,15 +324,16 @@ After successful setup:
 2. ✅ Login with test credentials
 3. ✅ Explore the Dashboard
 4. ✅ Check API documentation at http://localhost:3001/api/docs
-5. ✅ Read `/docs/DEVELOPMENT_LOG.md` to understand the architecture
+5. ✅ Read [Development Log](./DEVELOPMENT_LOG.md) to understand the architecture
 
 ---
 
 ## 📚 Additional Documentation
 
-- **[DEVELOPMENT_LOG.md](docs/DEVELOPMENT_LOG.md)** - Complete development log
-- **[PRD.md](docs/PRD.md)** - Product requirements
-- **[DOCKER_COMPOSE_ANALYSIS.md](docs/DOCKER_COMPOSE_ANALYSIS.md)** - Docker analysis
+- **[Development Log](./DEVELOPMENT_LOG.md)** - Complete development history
+- **[Product Requirements](../project/PRD.md)** - Product requirements document
+- **[Docker Analysis](./DOCKER_COMPOSE_ANALYSIS.md)** - Container setup analysis
+- **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute to the project
 
 ---
 
@@ -324,8 +341,10 @@ After successful setup:
 
 1. Check the logs: `docker logs beuni-backend -f`
 2. Consult the **Troubleshooting** section above
-3. Read the **DEVELOPMENT_LOG.md** for known issues
+3. Read the [Development Log](./DEVELOPMENT_LOG.md) for known issues
+4. Check [Troubleshooting Guide](../TROUBLESHOOTING.md) for comprehensive solutions
 
 ---
 
-**Developed with ❤️ by Claude Code + Marvi**
+**Last Updated**: October 4, 2025  
+**Environment**: Local Development Setup

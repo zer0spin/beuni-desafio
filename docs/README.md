@@ -10,10 +10,10 @@
 
 | Category | Description | Key Documents |
 |----------|-------------|---------------|
-| **📋 Project** | Project overview and requirements | [PRD](./project/PRD.md) • [Organization Summary](./project/PROJECT_ORGANIZATION_SUMMARY.md) |
+| **📋 Project** | Project overview and requirements | [PRD](./project/PRD.md) • [Organization Summary](./project/PROJECT_ORGANIZATION_SUMMARY.md) • [Architecture](./project/ARCHITECTURE.md) |
 | **🚀 Deployment** | Production deployment guides | [Comprehensive Guide](./deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md) |
-| **🔒 Security** | Security analysis and protocols | [Security Overview](./SECURITY.md) • [Trinity Reports](./security/) |
-| **🧪 Testing** | Testing strategies and quality | [Testing Guide](./TESTING.md) • [Quality Docs](./quality/) |
+| **🔒 Security** | Security analysis and protocols | [Security Overview](./security/SECURITY.md) • [Trinity Reports](./security/) |
+| **🧪 Testing** | Testing strategies and quality | [Testing Guide](./testing/TESTING.md) • [Quality Docs](./quality/) |
 | **🛠️ Development** | Development logs and processes | [Development Log](./development/DEVELOPMENT_LOG.md) |
 | **📊 Monitoring** | Performance and monitoring | [Monitoring](./monitoring/MONITORING.md) • [Performance](./monitoring/PERFORMANCE.md) |
 | **🔧 API** | API documentation | [API Reference](./api/API.md) |
@@ -25,25 +25,24 @@
 ```
 docs/
 ├── README.md                           # 📋 This documentation index
-├── ARCHITECTURE.md                     # 🏗️ System architecture overview
-├── SECURITY.md                         # 🔒 High-level security policies
-├── TESTING.md                          # 🧪 Testing strategies
-├── TROUBLESHOOTING.md                  # 🔧 Common issues and solutions
-├── REFACTORING.md                      # ♻️ Refactoring guidelines
-├── RECENT_UPDATES.md                   # 📈 Latest changes and updates
 │
 ├── 📁 project/                         # Project management & requirements
 │   ├── PRD.md                         # Product Requirements Document
+│   ├── ARCHITECTURE.md                # System architecture overview
+│   ├── RECENT_UPDATES.md              # Latest changes and updates
+│   ├── CHANGELOG.md                   # Version history
 │   ├── PROJECT_ORGANIZATION_SUMMARY.md # Organization & cleanup summary
 │   ├── DOCUMENTATION_INDEX.md         # Master documentation index
 │   └── DOCUMENTATION_MIGRATION_LOG.md # Documentation reorganization log
 │
 ├── 📁 deploy/                          # Deployment and infrastructure
 │   ├── COMPREHENSIVE_DEPLOYMENT_GUIDE.md # Complete deployment guide
+│   ├── ENVIRONMENT_URLS.md            # Production and development URLs
 │   ├── VERCEL_REDEPLOY_INSTRUCTIONS.md # Vercel-specific instructions
 │   └── [Other deployment docs]
 │
 ├── 📁 security/                        # Security analysis & protocols
+│   ├── SECURITY.md                    # High-level security policies
 │   ├── TRINITY_FINAL_REPORT.md        # Final security assessment
 │   ├── TRINITY_SECURITY_REPORT.md     # Detailed security analysis
 │   ├── incident-response-playbook.md  # Incident response procedures
@@ -55,10 +54,13 @@ docs/
 │   └── [Other quality docs]
 │
 ├── 📁 testing/                         # Testing documentation
+│   ├── TESTING.md                     # Testing strategies
 │   └── [Testing strategies and guides]
 │
 ├── 📁 development/                     # Development processes
 │   ├── DEVELOPMENT_LOG.md             # Complete development history
+│   ├── SETUP_GUIDE.md                 # Development environment setup
+│   ├── CONTRIBUTING.md                # Contribution guidelines
 │   ├── COMMIT_STRATEGY.md             # Git workflow and commit standards
 │   ├── DOCKER_COMPOSE_ANALYSIS.md     # Container setup analysis
 │   ├── MATRIX_AGENTS_IMPLEMENTATION.md # DevSecOps agents framework
@@ -72,9 +74,11 @@ docs/
 │   └── PERFORMANCE.md                 # Performance optimization
 │
 ├── 📁 troubleshooting/                # Issue resolution
+│   ├── TROUBLESHOOTING.md             # Common issues and solutions
 │   └── [Troubleshooting guides]
 │
 ├── 📁 refactoring/                    # Code improvement
+│   ├── REFACTORING.md                 # Refactoring guidelines
 │   └── [Refactoring documentation]
 │
 └── 📁 legacy/                         # Archived documentation

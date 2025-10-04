@@ -1,26 +1,26 @@
-# 🌐 URLs do Projeto Beuni
+# 🌐 Beuni Project URLs Reference
 
-## 📍 Ambientes
+## 📍 Environments
 
 ### **Production (Railway + Vercel)**
 
 #### Backend (Railway)
-- **URL Pública**: `https://beuni-desafio-production-41c7.up.railway.app`
-- **URL Interna**: `beuni-desafio.railway.internal`
+- **Public URL**: `https://beuni-desafio-production-41c7.up.railway.app`
+- **Internal URL**: `beuni-desafio.railway.internal`
 - **Health Check**: `https://beuni-desafio-production-41c7.up.railway.app/health`
 - **API Docs**: `https://beuni-desafio-production-41c7.up.railway.app/api/docs`
 
 #### Frontend (Vercel)
-- **URL Production**: `https://beuni-frontend-one.vercel.app`
+- **Production URL**: `https://beuni-frontend-one.vercel.app`
 - **API Proxy**: `https://beuni-frontend-one.vercel.app/api/*` → Railway Backend
 
 #### Database (Railway PostgreSQL)
-- **URL Interna**: `postgres.railway.internal:5432`
+- **Internal URL**: `postgres.railway.internal:5432`
 - **Database**: `railway`
 - **Schema**: `public`
 
 #### Redis (Railway)
-- **URL Interna**: `redis.railway.internal:6379`
+- **Internal URL**: `redis.railway.internal:6379`
 
 ---
 
@@ -36,43 +36,43 @@
 - **API Proxy**: `http://localhost:3000/api/*` → `http://localhost:3001`
 
 #### Database (Docker Compose)
-- **Host**: `postgres:5432` (dentro do container)
-- **Host**: `localhost:5432` (do host)
+- **Host**: `postgres:5432` (inside container)
+- **Host**: `localhost:5432` (from host)
 - **Database**: `beuni_db`
 - **User**: `beuni_user`
 
 #### Redis (Docker Compose)
-- **Host**: `redis:6379` (dentro do container)
-- **Host**: `localhost:6379` (do host)
+- **Host**: `redis:6379` (inside container)
+- **Host**: `localhost:6379` (from host)
 
 ---
 
 ## 🔗 CORS Configuration
 
 ### Backend (`main.ts`)
-Aceita requisições de:
-- `http://localhost:3000` (dev local)
+Accepts requests from:
+- `http://localhost:3000` (local dev)
 - `https://beuni-frontend-one.vercel.app` (production)
 - `/^https:\/\/beuni-frontend.*\.vercel\.app$/` (preview deployments)
-- Variável `CORS_ORIGIN` do Railway
+- `CORS_ORIGIN` variable from Railway
 
 ### Frontend Rewrites
 
-#### `next.config.js` (usado em dev e build)
+#### `next.config.js` (used in dev and build)
 ```javascript
-'/api/:path*' → backend Railway ou localhost
+'/api/:path*' → Railway backend or localhost
 ```
 
-#### `vercel.json` (usado APENAS na Vercel)
+#### `vercel.json` (used ONLY on Vercel)
 ```json
 '/api/:path*' → 'https://beuni-desafio-production-41c7.up.railway.app/:path*'
 ```
 
-⚠️ **IMPORTANTE**: Vercel usa `vercel.json` rewrites em produção, sobrepondo `next.config.js`
+⚠️ **IMPORTANT**: Vercel uses `vercel.json` rewrites in production, overriding `next.config.js`
 
 ---
 
-## 🔐 Variáveis de Ambiente
+## 🔐 Environment Variables
 
 ### Railway (Backend Production)
 ```bash
@@ -95,21 +95,21 @@ NEXT_PUBLIC_DEV_MODE=false
 
 ---
 
-## 🧪 Testando as Conexões
+## 🧪 Testing Connections
 
-### Health Check Backend
+### Backend Health Check
 ```bash
 curl https://beuni-desafio-production-41c7.up.railway.app/health
 ```
 
-### Login na API (via Frontend Vercel)
+### API Login (via Vercel Frontend)
 ```bash
 curl -X POST https://beuni-frontend-one.vercel.app/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@beuni.com","senha":"Admin@123"}'
 ```
 
-### Login na API (direto no Railway)
+### API Login (direct Railway)
 ```bash
 curl -X POST https://beuni-desafio-production-41c7.up.railway.app/auth/login \
   -H "Content-Type: application/json" \
@@ -118,35 +118,35 @@ curl -X POST https://beuni-desafio-production-41c7.up.railway.app/auth/login \
 
 ---
 
-## 📝 Notas Importantes
+## 📝 Important Notes
 
-1. **Rewrites na Vercel**: O `vercel.json` SOBREPÕE `next.config.js` em produção
-2. **CORS**: Backend aceita requisições do domínio Vercel configurado
-3. **Database**: Railway usa URL interna `postgres.railway.internal` em produção
-4. **Redis**: Railway usa URL interna `redis.railway.internal` em produção
-5. **JWT**: Secrets diferentes em dev e production
-6. **Ports**: Backend sempre usa porta 3001
+1. **Vercel Rewrites**: `vercel.json` OVERRIDES `next.config.js` in production
+2. **CORS**: Backend accepts requests from configured Vercel domain
+3. **Database**: Railway uses internal URL `postgres.railway.internal` in production
+4. **Redis**: Railway uses internal URL `redis.railway.internal` in production
+5. **JWT**: Different secrets in dev and production environments
+6. **Ports**: Backend always uses port 3001
 
 ---
 
 ## 🔧 Troubleshooting
 
-### Erro 500 no login
-- ✅ Verificar se `CORS_ORIGIN` no Railway inclui domínio Vercel
-- ✅ Verificar se `DATABASE_URL` está correto no Railway
-- ✅ Verificar logs: `railway logs`
+### 500 Error on Login
+- ✅ Check if `CORS_ORIGIN` in Railway includes Vercel domain
+- ✅ Verify `DATABASE_URL` is correct in Railway
+- ✅ Check logs: `railway logs`
 
-### Erro de CORS
-- ✅ Verificar `main.ts` allowedOrigins
-- ✅ Verificar variável `CORS_ORIGIN` no Railway
-- ✅ Verificar se frontend está usando domínio correto
+### CORS Errors
+- ✅ Check `main.ts` allowedOrigins
+- ✅ Verify `CORS_ORIGIN` variable in Railway
+- ✅ Ensure frontend is using correct domain
 
-### Migrate Deploy falha
-- ❌ NÃO usar `.env` local para migrations no Railway
-- ✅ Usar Railway CLI: `railway run npx prisma migrate deploy`
-- ✅ Verificar `DATABASE_URL` no Railway dashboard
+### Migration Deploy Fails
+- ❌ DO NOT use local `.env` for Railway migrations
+- ✅ Use Railway CLI: `railway run npx prisma migrate deploy`
+- ✅ Verify `DATABASE_URL` in Railway dashboard
 
 ---
 
-**Última atualização**: 2025-01-04
-**URLs corretas confirmadas**: ✅
+**Last Updated**: October 4, 2025  
+**URLs Verified**: ✅ All confirmed working

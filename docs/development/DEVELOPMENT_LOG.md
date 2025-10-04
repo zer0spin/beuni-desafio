@@ -204,7 +204,7 @@ This log documents the entire development process of the Beuni platform, from in
 #### **PROBLEM 5: PostgreSQL port conflict**
 - **Error:** Port 5432 already in use by local PostgreSQL
 - **Descoberta:** `netstat -ano | findstr :5432` mostrou PID 2864 ativo
-- **Solução:** Mudança para porta 5433
+- **Solution:** Changed to port 5433
   ```yaml
   ports:
     - "5433:5432"  # Host:Container
@@ -866,23 +866,23 @@ docker-compose build --no-cache backend
 └── 📈 Relatórios (/relatorios) - CSV export
 ```
 
-#### **🎯 PROBLEMAS RESOLVIDOS:**
+#### **🎯 PROBLEMS RESOLVED:**
 
-**Sessão Final - Correções de Cache e APIs:**
-- ❌ **Erro 404** na página de envios (endpoints inexistentes)
-  - ✅ **Solução**: Dados mockados demonstrativos
-- ❌ **Formulário de edição** desatualizado
-  - ✅ **Solução**: CEP auto-fill implementado
-- ❌ **Cache do browser** executando código antigo
-  - ✅ **Solução**: Container restart + timestamp forçado
+**Final Session - Cache and API Fixes:**
+- ❌ **404 Error** on shipments page (non-existent endpoints)
+  - ✅ **Solution**: Mock demonstrative data
+- ❌ **Edit form** outdated
+  - ✅ **Solution**: CEP auto-fill implemented
+- ❌ **Browser cache** running old code
+  - ✅ **Solution**: Container restart + forced timestamp
 
-#### **📈 Métricas Finais:**
+#### **📈 Final Metrics:**
 
-- **Páginas funcionais**: 7/7 (100%)
-- **APIs funcionais**: 15/15 (100%)
-- **Containers saudáveis**: 4/4 (100%)
-- **Funcionalidades CRUD**: 4/4 (100%)
-- **Integração CEP**: 100% funcional
+- **Functional pages**: 7/7 (100%)
+- **Functional APIs**: 15/15 (100%)
+- **Healthy containers**: 4/4 (100%)
+- **CRUD functionalities**: 4/4 (100%)
+- **CEP integration**: 100% functional
 - **Relatórios**: CSV export operacional
 - **Design Beuni**: Aplicado em todas as páginas
 
@@ -1003,24 +1003,24 @@ docker-compose build --no-cache backend
 
 #### **🐛 BUGS CRÍTICOS CORRIGIDOS:**
 
-**BUG #1: Dashboard - Nome dos Colaboradores**
+**BUG #1: Dashboard - Employee Names**
 ```
-❌ Erro: Cannot read properties of undefined (reading 'charAt')
-📍 Arquivo: frontend/src/pages/dashboard.tsx
-🔍 Causa: Código usava person.nome mas API retorna person.nome_completo
-✅ Solução:
-   - Trocado person.nome → person.nome_completo
-   - Adicionado optional chaining: person.nome_completo?.charAt(0)
+❌ Error: Cannot read properties of undefined (reading 'charAt')
+📍 File: frontend/src/pages/dashboard.tsx
+🔍 Cause: Code used person.nome but API returns person.nome_completo
+✅ Solution:
+   - Changed person.nome → person.nome_completo
+   - Added optional chaining: person.nome_completo?.charAt(0)
    - Fallback: person.nome_completo || 'Nome não disponível'
 ```
 
-**BUG #2: Dashboard - Aniversariantes Próximos**
+**BUG #2: Dashboard - Upcoming Birthdays**
 ```
-❌ Erro: Lista vazia mesmo com aniversariantes nos próximos 30 dias
-📍 Arquivo: frontend/src/pages/dashboard.tsx
-🔍 Causa: Lógica de cálculo incorreta + formato de data brasileiro
-✅ Solução:
-   1. Implementado parser de data brasileira (dd/MM/yyyy):
+❌ Error: Empty list even with birthdays in the next 30 days
+📍 File: frontend/src/pages/dashboard.tsx
+🔍 Cause: Incorrect calculation logic + Brazilian date format
+✅ Solution:
+   1. Implemented Brazilian date parser (dd/MM/yyyy):
       const parseBrDate = (dateStr?: string) => {
         if (!dateStr) return null;
         const parts = dateStr.split('/');
@@ -1028,46 +1028,46 @@ docker-compose build --no-cache backend
         return new Date(yyyy, mm - 1, dd);
       };
 
-   2. Cálculo correto de 30 dias:
+   2. Correct 30-day calculation:
       const thirtyDaysFromNow = new Date(today);
       thirtyDaysFromNow.setDate(today.getDate() + 30);
 
-   3. Considera virada de ano:
+   3. Handles year transition:
       return (thisYearBirthday >= today && thisYearBirthday <= thirtyDaysFromNow) ||
              (nextYearBirthday >= today && nextYearBirthday <= thirtyDaysFromNow);
 
    4. Ordenação por data mais próxima
 ```
 
-**BUG #3: Colaboradores - Filtro de Busca**
+**BUG #3: Employees - Search Filter**
 ```
-❌ Erro: Cannot read properties of undefined (reading 'toLowerCase')
-📍 Arquivo: frontend/src/pages/colaboradores/index.tsx
-🔍 Causa: Falta de optional chaining nos filtros
-✅ Solução:
+❌ Error: Cannot read properties of undefined (reading 'toLowerCase')
+📍 File: frontend/src/pages/colaboradores/index.tsx
+🔍 Cause: Missing optional chaining in filters
+✅ Solution:
    - col.nome_completo?.toLowerCase()
    - col.departamento?.toLowerCase()
    - col.cargo?.toLowerCase()
-   - Uso correto de nome_completo em todos os displays
+   - Correct use of nome_completo in all displays
 ```
 
-**BUG #4: Login - Ícone Gift**
+**BUG #4: Login - Gift Icon**
 ```
-❌ Erro: Gift is not defined
-📍 Arquivo: frontend/src/pages/login.tsx
-🔍 Causa: Ícone Gift não importado do lucide-react
-✅ Solução:
+❌ Error: Gift is not defined
+📍 File: frontend/src/pages/login.tsx
+🔍 Cause: Gift icon not imported from lucide-react
+✅ Solution:
    import { Gift } from 'lucide-react';
 ```
 
-**BUG #5: Relatórios - Endpoint 404**
+**BUG #5: Reports - Endpoint 404**
 ```
-❌ Erro: Failed to load resource: the server responded with a status of 404 (Not Found)
+❌ Error: Failed to load resource: the server responded with a status of 404 (Not Found)
        URL: http://localhost:3001/undefined?ano=2025
-📍 Arquivo: frontend/src/pages/relatorios/index.tsx
-🔍 Causa: endpoints.relatorios não definido em frontend/src/lib/api.ts
-✅ Solução: [PENDENTE - Será corrigido na próxima sessão]
-   - Adicionar endpoints.relatorios = '/envio-brindes/estatisticas'
+📍 File: frontend/src/pages/relatorios/index.tsx
+🔍 Cause: endpoints.relatorios not defined in frontend/src/lib/api.ts
+✅ Solution: [PENDING - Will be fixed in next session]
+   - Add endpoints.relatorios = '/envio-brindes/estatisticas'
    - OU implementar mock data temporário
 ```
 
@@ -1205,34 +1205,34 @@ a49a99a fix(git): add image files into gitignore
 9. 🚀 Otimizar imagens com Next/Image
 10. 📱 Melhorar PWA support
 
-#### **💡 LIÇÕES APRENDIDAS:**
+#### **💡 LESSONS LEARNED:**
 
-**1. Type Safety em TypeScript**
-- **Problema:** Uso incorreto de propriedades (`nome` vs `nome_completo`)
-- **Lição:** Sempre consultar `types/index.ts` antes de usar propriedades da API
-- **Solução:** Verificação rigorosa dos tipos e uso de optional chaining
+**1. Type Safety in TypeScript**
+- **Problem:** Incorrect use of properties (`nome` vs `nome_completo`)
+- **Lesson:** Always consult `types/index.ts` before using API properties
+- **Solution:** Strict type checking and use of optional chaining
 
-**2. Data Handling em Formato Brasileiro**
-- **Problema:** Backend retorna datas em dd/MM/yyyy, JavaScript espera yyyy-MM-dd
-- **Lição:** Criar parser unificado e reutilizável
-- **Solução:** Função `parseBrDate()` implementada e documentada
+**2. Data Handling in Brazilian Format**
+- **Problem:** Backend returns dates in dd/MM/yyyy, JavaScript expects yyyy-MM-dd
+- **Lesson:** Create unified and reusable parser
+- **Solution:** `parseBrDate()` function implemented and documented
 
-**3. Optional Chaining é Essencial**
-- **Problema:** Múltiplos erros de `undefined` em produção
-- **Lição:** Nunca assumir que propriedade existe
-- **Solução:** Uso sistemático de `?.` e fallbacks `||`
+**3. Optional Chaining is Essential**
+- **Problem:** Multiple `undefined` errors in production
+- **Lesson:** Never assume a property exists
+- **Solution:** Systematic use of `?.` and fallbacks `||`
 
 **4. Component Reusability**
-- **Problema:** Código duplicado em headers de cada página
-- **Lição:** Criar componente Layout primeiro, depois páginas
-- **Solução:** Layout.tsx reutilizável em todas as páginas autenticadas
+- **Problem:** Duplicated code in headers of each page
+- **Lesson:** Create Layout component first, then pages
+- **Solution:** Reusable Layout.tsx for all authenticated pages
 
 **5. Design System First**
-- **Problema:** Inconsistência visual entre páginas
-- **Lição:** Definir cores, componentes e animações antes de codar
-- **Solução:** Tailwind config + classes customizadas Beuni
+- **Problem:** Visual inconsistency between pages
+- **Lesson:** Define colors, components and animations before coding
+- **Solution:** Tailwind config + custom Beuni classes
 
-#### **🔧 CONFIGURAÇÕES TÉCNICAS:**
+#### **🔧 TECHNICAL CONFIGURATIONS:**
 
 **Tailwind CSS Customizado:**
 ```javascript
