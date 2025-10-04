@@ -8,5 +8,9 @@
     "numReplicas": 1,
     "sleepApplication": false,
     "restartPolicyType": "ON_FAILURE"
+  },
+  "start": "node dist/main.js",
+  "environment": {
+    "NODE_ENV": "production"
   }
 }

@@ -21,8 +21,32 @@
   ],
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://beuni-desafio-production-41c7.up.railway.app/:path*"
+      "source": "/api/auth/:path*",
+      "destination": "https://beuni-desafio-production-41c7.up.railway.app/auth/:path*"
+    },
+    {
+      "source": "/api/colaboradores/:path*",
+      "destination": "https://beuni-desafio-production-41c7.up.railway.app/colaboradores/:path*"
+    },
+    {
+      "source": "/api/cep/:path*",
+      "destination": "https://beuni-desafio-production-41c7.up.railway.app/cep/:path*"
+    },
+    {
+      "source": "/api/envio-brindes/:path*",
+      "destination": "https://beuni-desafio-production-41c7.up.railway.app/envio-brindes/:path*"
+    },
+    {
+      "source": "/api/organizacoes/:path*",
+      "destination": "https://beuni-desafio-production-41c7.up.railway.app/organizacoes/:path*"
+    },
+    {
+      "source": "/api/notificacoes/:path*",
+      "destination": "https://beuni-desafio-production-41c7.up.railway.app/notificacoes/:path*"
+    },
+    {
+      "source": "/api/health",
+      "destination": "https://beuni-desafio-production-41c7.up.railway.app/health"
     }
   ]
 }
