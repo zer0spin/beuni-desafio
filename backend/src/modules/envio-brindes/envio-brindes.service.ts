@@ -562,10 +562,20 @@ export class EnvioBrindesService {
         }
 
         const dataNasc = new Date(colaborador.dataNascimento);
-        const dataGatilho = new Date(ano, dataNasc.getUTCMonth(), dataNasc.getUTCDate() - 30, 12, 0, 0, 0);
+        // Create birthday in the target year at noon local time
+        const aniversario = new Date(
+          ano,
+          dataNasc.getUTCMonth(),
+          dataNasc.getUTCDate(),
+          12, 0, 0, 0
+        );
+        
+        // Calculate 7 business days before birthday
+        const dataGatilho = this.businessDaysService.calculateBusinessDaysBefore(aniversario, 7);
+        
         let dataEnvio = null;
         if (['ENVIADO', 'ENTREGUE'].includes(status)) {
-          dataEnvio = randomDate(dataGatilho, new Date(ano, dataNasc.getUTCMonth(), dataNasc.getUTCDate(), 12, 0, 0, 0));
+          dataEnvio = randomDate(dataGatilho, aniversario);
         }
 
         await this.prisma.envioBrinde.upsert({
@@ -622,11 +632,24 @@ export class EnvioBrindesService {
       });
 
       if (!existeEnvio) {
+        // Calculate birthday in the target year at noon local time
+        const dataNasc = new Date(colaborador.dataNascimento);
+        const aniversario = new Date(
+          ano,
+          dataNasc.getUTCMonth(),
+          dataNasc.getUTCDate(),
+          12, 0, 0, 0
+        );
+        
+        // Calculate 7 business days before birthday
+        const dataGatilho = this.businessDaysService.calculateBusinessDaysBefore(aniversario, 7);
+        
         const novoEnvio = await this.prisma.envioBrinde.create({
           data: {
             colaboradorId: colaborador.id,
             anoAniversario: ano,
             status: 'PENDENTE',
+            dataGatilhoEnvio: dataGatilho,
           },
         });
         registrosCriados.push(novoEnvio);
@@ -637,6 +660,54 @@ export class EnvioBrindesService {
       ano,
       registrosCriados: registrosCriados.length,
       totalColaboradores: colaboradores.length,
+    };
+  }
+
+  /**
+   * Corrigir datas de gatilho existentes usando 7 dias úteis corretos
+   */
+  async fixGatilhoDates(organizationId: string) {
+    const envios = await this.prisma.envioBrinde.findMany({
+      include: { 
+        colaborador: {
+          include: {
+            organizacao: true
+          }
+        }
+      },
+      where: { 
+        anoAniversario: 2025,
+        colaborador: {
+          organizationId
+        }
+      }
+    });
+
+    let corrigidos = 0;
+
+    for (const envio of envios) {
+      const dataNasc = new Date(envio.colaborador.dataNascimento);
+      const aniversario = new Date(
+        envio.anoAniversario,
+        dataNasc.getUTCMonth(),
+        dataNasc.getUTCDate(),
+        12, 0, 0, 0
+      );
+      
+      const novoGatilho = this.businessDaysService.calculateBusinessDaysBefore(aniversario, 7);
+      
+      await this.prisma.envioBrinde.update({
+        where: { id: envio.id },
+        data: { dataGatilhoEnvio: novoGatilho }
+      });
+
+      corrigidos++;
+    }
+    
+    return { 
+      message: 'Datas de gatilho corrigidas com sucesso',
+      enviosCorrigidos: corrigidos,
+      totalEnvios: envios.length 
     };
   }
 }

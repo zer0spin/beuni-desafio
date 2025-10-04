@@ -303,4 +303,17 @@ export class EnvioBrindesController {
     const anoNum = parseInt(ano, 10);
     return this.envioBrindesService.criarRegistrosParaNovoAno(anoNum);
   }
+
+  @Post('fix-gatilho-dates')
+  @ApiOperation({
+    summary: 'Corrigir datas de gatilho existentes',
+    description: 'Recalcula as datas de gatilho para todos os envios usando 7 dias úteis corretos.'
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Datas corrigidas com sucesso',
+  })
+  async fixGatilhoDates(@Request() req) {
+    return this.envioBrindesService.fixGatilhoDates(req.user.organizationId);
+  }
 }

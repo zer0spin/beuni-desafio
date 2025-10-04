@@ -254,7 +254,11 @@ export default function EnviosPage() {
     const idealDate = dataGatilhoNormalized || calculateBusinessDaysBefore(dataAniversario, 7);
     const passouIdeal = idealDate.getTime() < hojeNormalized.getTime();
     const businessDaysUntilIdeal = passouIdeal ? 0 : countBusinessDaysBetween(hojeNormalized, idealDate);
-    const ehHoje = idealDate.getTime() === hojeNormalized.getTime();
+    
+    // More robust comparison for "today" check - compare date components instead of timestamps
+    const ehHoje = idealDate.getFullYear() === hojeNormalized.getFullYear() &&
+                  idealDate.getMonth() === hojeNormalized.getMonth() &&
+                  idealDate.getDate() === hojeNormalized.getDate();
 
     const passouGatilho = dataGatilhoNormalized ? hojeNormalized.getTime() > dataGatilhoNormalized.getTime() : false;
 
