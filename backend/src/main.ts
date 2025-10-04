@@ -97,8 +97,10 @@ async function bootstrap() {
   app.useGlobalGuards(new CsrfGuard(reflector));
   await app.listen(port);
 
+  // Trigger deploy: AdminModule added for seed endpoint
   console.log('🚀 Beuni Backend API rodando em:', `http://localhost:${port}`);
   console.log('📚 Documentação Swagger disponível em:', `http://localhost:${port}/api/docs`);
+  console.log('🔧 AdminModule carregado para endpoints administrativos');
 }
 
 bootstrap();
