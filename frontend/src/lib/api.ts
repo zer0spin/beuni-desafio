@@ -103,8 +103,6 @@ export const apiCall = async <T = any>(
 // Token is now set via httpOnly cookie by the backend (more secure)
 // We only store non-sensitive user data client-side
 export const setAuthToken = (user: any) => {
-  console.log('setAuthToken: Definindo cookie de usuário', { user });
-
   const cookieOptions = {
     expires: 7, // 7 days
     secure: process.env.NODE_ENV === 'production', // HTTPS only in production
@@ -115,9 +113,8 @@ export const setAuthToken = (user: any) => {
   try {
     // Only store user data (non-sensitive) - token is httpOnly from backend
     Cookies.set('beuni_user', JSON.stringify(user), cookieOptions);
-    console.log('setAuthToken: Cookie de usuário definido com sucesso');
   } catch (error) {
-    console.error('setAuthToken: Erro ao definir cookie de usuário', error);
+    console.error('setAuthToken: Error setting user cookie', error);
   }
 };
 

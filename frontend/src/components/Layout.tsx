@@ -46,19 +46,15 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   useEffect(() => {
-    console.log('Layout: user changed:', user);
   }, [user]);
 
   useEffect(() => {
-    console.log('Layout: Verificando autenticação', { isLoading, user: !!user });
     if (!isLoading && !user) {
-      console.log('Layout: Usuário não autenticado, redirecionando para login');
       router.push('/login');
       return;
     }
 
     if (user) {
-      console.log('Layout: Usuário autenticado:', user.nome);
       // Carregar notificações da API
       loadNotifications();
       loadUnreadCount();
@@ -87,7 +83,7 @@ export default function Layout({ children }: LayoutProps) {
       const response = await api.get(endpoints.notificacoesNaoLidas);
       setUnreadCount(response.data.count);
     } catch (error) {
-      console.error('Erro ao carregar contador de notificações:', error);
+      // Error handled by interceptor
     }
   };
 
@@ -97,7 +93,7 @@ export default function Layout({ children }: LayoutProps) {
       setNotifications(notifications.map(n => ({ ...n, lida: true })));
       setUnreadCount(0);
     } catch (error) {
-      console.error('Erro ao marcar notificações como lidas:', error);
+      // Error handled by interceptor
     }
   };
 
