@@ -11,6 +11,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private authService: AuthService,
     private configService: ConfigService,
   ) {
+    const jwtSecret = configService.get<string>('JWT_SECRET');
+
+    if (!jwtSecret) {
+      console.error('❌ CRITICAL: JWT_SECRET is not configured!');
+      throw new Error('JWT_SECRET must be configured');
+    }
+
     super({
       // Support both httpOnly cookie and Authorization header
       jwtFromRequest: (req: any) => {
@@ -23,7 +30,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         return ExtractJwt.fromAuthHeaderAsBearerToken()(req);
       },
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET'),
+      secretOrKey: jwtSecret,
     });
   }
 
