@@ -706,4 +706,61 @@ describe('EnvioBrindesService', () => {
       });
     });
   });
+
+  describe('deleteAllShipments', () => {
+    it('should delete all shipments for organization', async () => {
+      // Arrange
+      const deletedCount = 15;
+      
+      prisma.envioBrinde.deleteMany.mockResolvedValue({ count: deletedCount });
+
+      // Act
+      const result = await service.deleteAllShipments(organizationId);
+
+      // Assert
+      expect(result).toEqual({
+        message: 'All shipments deleted successfully',
+        deletedCount,
+      });
+      expect(prisma.envioBrinde.deleteMany).toHaveBeenCalledWith({
+        where: {
+          colaborador: {
+            organizationId,
+          },
+        },
+      });
+    });
+
+    it('should return zero count when no shipments exist', async () => {
+      // Arrange
+      prisma.envioBrinde.deleteMany.mockResolvedValue({ count: 0 });
+
+      // Act
+      const result = await service.deleteAllShipments(organizationId);
+
+      // Assert
+      expect(result).toEqual({
+        message: 'All shipments deleted successfully',
+        deletedCount: 0,
+      });
+    });
+
+    it('should enforce organization isolation in delete operation', async () => {
+      // Arrange
+      const differentOrgId = 'org-456';
+      prisma.envioBrinde.deleteMany.mockResolvedValue({ count: 5 });
+
+      // Act
+      await service.deleteAllShipments(differentOrgId);
+
+      // Assert
+      expect(prisma.envioBrinde.deleteMany).toHaveBeenCalledWith({
+        where: {
+          colaborador: {
+            organizationId: differentOrgId,
+          },
+        },
+      });
+    });
+  });
 });

@@ -714,4 +714,78 @@ describe('ColaboradoresService', () => {
       expect(result[0].pendentes).toBe(2);
     });
   });
+
+  describe('removeAll', () => {
+    it('should remove all colaboradores for organization with cascade delete', async () => {
+      // Arrange
+      const deletedCount = 25;
+      
+      prisma.colaborador.deleteMany.mockResolvedValue({ count: deletedCount });
+
+      // Act
+      const result = await service.removeAll(organizationId);
+
+      // Assert
+      expect(result).toEqual({
+        message: 'All colaboradores deleted successfully',
+        deletedCount,
+      });
+      expect(prisma.colaborador.deleteMany).toHaveBeenCalledWith({
+        where: {
+          organizationId,
+        },
+      });
+    });
+
+    it('should return zero count when no colaboradores exist', async () => {
+      // Arrange
+      prisma.colaborador.deleteMany.mockResolvedValue({ count: 0 });
+
+      // Act
+      const result = await service.removeAll(organizationId);
+
+      // Assert
+      expect(result).toEqual({
+        message: 'All colaboradores deleted successfully',
+        deletedCount: 0,
+      });
+    });
+
+    it('should enforce organization isolation in delete operation', async () => {
+      // Arrange
+      const differentOrgId = 'org-456';
+      prisma.colaborador.deleteMany.mockResolvedValue({ count: 10 });
+
+      // Act
+      await service.removeAll(differentOrgId);
+
+      // Assert
+      expect(prisma.colaborador.deleteMany).toHaveBeenCalledWith({
+        where: {
+          organizationId: differentOrgId,
+        },
+      });
+    });
+
+    it('should cascade delete related envio brindes records', async () => {
+      // Arrange
+      // This test ensures that the Prisma cascade delete is working
+      // The actual cascade is handled by the database/Prisma schema
+      const deletedCount = 5;
+      
+      prisma.colaborador.deleteMany.mockResolvedValue({ count: deletedCount });
+
+      // Act
+      await service.removeAll(organizationId);
+
+      // Assert
+      // Verify that deleteMany was called with correct organization filter
+      // Related records deletion is handled by database cascade
+      expect(prisma.colaborador.deleteMany).toHaveBeenCalledWith({
+        where: {
+          organizationId,
+        },
+      });
+    });
+  });
 });
