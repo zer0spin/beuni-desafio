@@ -2,7 +2,7 @@
 node_modules/
 */node_modules/
 
-# Images
+# Images (but allow public assets)
 *.jpg
 *.jpeg
 *.png
@@ -10,6 +10,14 @@ node_modules/
 *.svg
 *.ico
 *.webp
+# Allow public static assets
+!frontend/public/**/*.png
+!frontend/public/**/*.jpg
+!frontend/public/**/*.svg
+!frontend/public/**/*.ico
+!backend/public/**/*.png
+!backend/public/**/*.jpg
+!backend/public/**/*.svg
 
 # Artificial Intelligence files
 ai/
