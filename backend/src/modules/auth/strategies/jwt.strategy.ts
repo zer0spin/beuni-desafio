@@ -11,12 +11,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private authService: AuthService,
     private configService: ConfigService,
   ) {
-    const jwtSecret = configService.get<string>('JWT_SECRET');
+    // Use process.env directly to avoid ConfigService timing issues
+    const jwtSecret = process.env.JWT_SECRET || configService.get<string>('JWT_SECRET');
 
     if (!jwtSecret) {
-      console.error('❌ CRITICAL: JWT_SECRET is not configured!');
+      console.error('❌ CRITICAL: JWT_SECRET is not configured in environment!');
+      console.error('Available env vars:', Object.keys(process.env).filter(k => k.includes('JWT')));
       throw new Error('JWT_SECRET must be configured');
     }
+
+    console.log('✅ JWT_SECRET loaded successfully');
 
     super({
       // Support both httpOnly cookie and Authorization header
