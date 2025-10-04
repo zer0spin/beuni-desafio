@@ -18,8 +18,9 @@ export class AdminController {
     }
 
     return new Promise((resolve, reject) => {
-      // Executa via ts-node para usar o script TypeScript já existente
-      exec('node -e "require(\'ts-node/register\'); require(\'./prisma/seed-populated.ts\')"', { cwd: process.cwd() }, (error, stdout, stderr) => {
+      // Executa o script CommonJS diretamente com node
+      const seedPath = 'prisma/seed-populated.cjs';
+      exec(`node ${seedPath}`, { cwd: process.cwd() }, (error, stdout, stderr) => {
         if (error) {
           reject(new HttpException(`Falha ao executar seed: ${stderr || error.message}`, HttpStatus.INTERNAL_SERVER_ERROR));
         } else {
