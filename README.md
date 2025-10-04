@@ -42,11 +42,13 @@ npm run dev
 | Category | Document | Description |
 |----------|----------|-------------|
 | 🏗️ Architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design and C4 diagrams |
-| 🛡️ Security | [docs/security/](docs/security/) | Security policies and assessments |
-| 🧪 Testing | [docs/testing/](docs/testing/) | Test strategies and coverage |
-| 🚀 Deployment | [docs/deploy/](docs/deploy/) | Railway and Vercel deployment guides |
-| 🔧 Development | [docs/DEVELOPMENT_LOG.md](docs/DEVELOPMENT_LOG.md) | Complete development history |
-| 📋 Recent Updates | [docs/RECENT_UPDATES.md](docs/RECENT_UPDATES.md) | Latest changes and fixes |
+| 🛡️ Security | [docs/SECURITY.md](docs/SECURITY.md) | Security overview and policies |
+| 🧪 Testing | [docs/TESTING.md](docs/TESTING.md) | Test strategies and coverage |
+| 🚀 Deployment | [docs/deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md](docs/deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md) | Complete deployment guide |
+| 🔧 Development | [docs/development/DEVELOPMENT_LOG.md](docs/development/DEVELOPMENT_LOG.md) | Complete development history |
+| � API Reference | [docs/api/API.md](docs/api/API.md) | Complete API documentation |
+| �📋 Recent Updates | [docs/RECENT_UPDATES.md](docs/RECENT_UPDATES.md) | Latest changes and fixes |
+| 🔧 Scripts | [scripts/README.md](scripts/README.md) | Automation and deployment scripts |
 
 ## 📋 Project Overview
 
