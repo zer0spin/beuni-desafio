@@ -9,10 +9,10 @@ import type { ColaboradoresResponse, Colaborador } from '@/types';
 
 interface EnvioBrinde {
   id: string;
-  colaborador_id: string;
+  colaboradorId: string;
   status: 'PENDENTE' | 'PRONTO_PARA_ENVIO' | 'ENVIADO' | 'ENTREGUE' | 'CANCELADO';
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export default function ColaboradoresPage() {
@@ -41,11 +41,11 @@ export default function ColaboradoresPage() {
       setLoading(true);
       const [colaboradoresResponse, enviosResponse] = await Promise.all([
         api.get<ColaboradoresResponse>(`${endpoints.colaboradores}?page=${page}&limit=10`),
-        api.get<EnvioBrinde[]>(endpoints.enviosBrindes)
+        api.get<{ envios: EnvioBrinde[] }>(endpoints.enviosBrindes)
       ]);
-      
+
       setColaboradores(colaboradoresResponse.data.colaboradores);
-      setEnviosBrindes(enviosResponse.data || []);
+      setEnviosBrindes(enviosResponse.data.envios || []);
       setStats({
         total: colaboradoresResponse.data.total,
         page: colaboradoresResponse.data.page,
@@ -59,7 +59,7 @@ export default function ColaboradoresPage() {
   };
 
   const getStatusEnvio = (colaboradorId: string) => {
-    const envio = enviosBrindes.find(e => e.colaborador_id === colaboradorId);
+    const envio = enviosBrindes.find(e => e.colaboradorId === colaboradorId);
     return envio?.status || null;
   };
 
