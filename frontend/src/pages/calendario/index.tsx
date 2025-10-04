@@ -73,7 +73,6 @@ export default function CalendarioPage() {
 
       // Verificar se a resposta possui dados válidos
       if (!response.data || !response.data.colaboradores) {
-        console.log('Resposta da API:', response.data);
         setColaboradores([]);
         setDiasCalendario([]);
         setDepartamentos([]);
@@ -81,7 +80,6 @@ export default function CalendarioPage() {
       }
 
       const todosColaboradores = response.data.colaboradores || [];
-      console.log('Colaboradores carregados:', todosColaboradores.length);
 
       // Extrair departamentos únicos
       const departamentosMap = todosColaboradores.map((c: Colaborador) => c.departamento).filter(Boolean) as string[];
@@ -99,7 +97,6 @@ export default function CalendarioPage() {
       }
 
       setColaboradores(colaboradoresFiltrados);
-      console.log('Colaboradores filtrados:', colaboradoresFiltrados.length);
 
       // Gerar calendário
       generateCalendar(colaboradoresFiltrados);
@@ -119,8 +116,6 @@ export default function CalendarioPage() {
     try {
       const ano = dataAtual.getFullYear();
       const mes = dataAtual.getMonth();
-
-      console.log('Gerando calendário para:', ano, mes + 1);
 
       // Primeiro dia do mês e último dia do mês
       const primeiroDia = new Date(ano, mes, 1);
@@ -175,11 +170,7 @@ export default function CalendarioPage() {
               return false;
             }
 
-            const match = diaAniv === dia && mesAniv === (mes + 1);
-            if (match) {
-              console.log('Aniversariante encontrado:', c.nome_completo, `${diaAniv}/${mesAniv}`);
-            }
-            return match;
+            return diaAniv === dia && mesAniv === (mes + 1);
           } catch (error) {
             console.error('Erro ao processar data de nascimento:', c.data_nascimento, error);
             return false;
@@ -207,7 +198,6 @@ export default function CalendarioPage() {
         });
       }
 
-      console.log('Calendário gerado com', dias.length, 'células');
       setDiasCalendario(dias);
     } catch (error) {
       console.error('Erro ao gerar calendário:', error);

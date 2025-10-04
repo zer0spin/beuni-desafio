@@ -525,28 +525,32 @@ export class EnvioBrindesService {
     const anos = [2021, 2022, 2023, 2024, 2025];
     let totalEnvios = 0;
 
+    const statusOptions = ['PENDENTE', 'PRONTO_PARA_ENVIO', 'ENVIADO', 'ENTREGUE', 'CANCELADO'];
+    let statusIndex = 0;
+
     for (const ano of anos) {
       for (const colaborador of colaboradoresCriados) {
         let status: string;
-        const random = Math.random();
 
         if (ano < 2024) {
+          // Anos passados: maioria entregue
+          const random = Math.random();
           if (random < 0.7) status = 'ENTREGUE';
           else if (random < 0.85) status = 'ENVIADO';
           else if (random < 0.95) status = 'CANCELADO';
           else status = 'PRONTO_PARA_ENVIO';
         } else if (ano === 2024) {
+          // 2024: mix de status
+          const random = Math.random();
           if (random < 0.5) status = 'ENTREGUE';
           else if (random < 0.7) status = 'ENVIADO';
           else if (random < 0.85) status = 'PRONTO_PARA_ENVIO';
           else if (random < 0.95) status = 'PENDENTE';
           else status = 'CANCELADO';
         } else {
-          if (random < 0.3) status = 'ENTREGUE';
-          else if (random < 0.5) status = 'ENVIADO';
-          else if (random < 0.7) status = 'PRONTO_PARA_ENVIO';
-          else if (random < 0.9) status = 'PENDENTE';
-          else status = 'CANCELADO';
+          // 2025: distribuição uniforme para todos os status (ciclo round-robin)
+          status = statusOptions[statusIndex % statusOptions.length];
+          statusIndex++;
         }
 
         const dataNasc = new Date(colaborador.dataNascimento);
