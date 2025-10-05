@@ -54,14 +54,15 @@ npm run dev
 ### Quick Links
 | Category | Document | Description |
 |----------|----------|-------------|
-| 🏗️ Architecture | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design and C4 diagrams |
-| 🛡️ Security | [docs/SECURITY.md](docs/SECURITY.md) | Security overview and policies |
-| 🧪 Testing | [docs/TESTING.md](docs/TESTING.md) | Test strategies and coverage |
+| 🏗️ Architecture | [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md) | System design and C4 diagrams |
+| 🛡️ Security | [docs/security/SECURITY.md](docs/security/SECURITY.md) | Security overview and policies |
+| 🧪 Testing | [docs/testing/TESTING.md](docs/testing/TESTING.md) | Test strategies and coverage |
 | 🚀 Deployment | [docs/deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md](docs/deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md) | Complete deployment guide |
-| 🔧 Development | [docs/development/DEVELOPMENT_LOG.md](docs/development/DEVELOPMENT_LOG.md) | Complete development history |
-| 📋 API Reference | [docs/api/API.md](docs/api/API.md) | Complete API documentation |
-| 📋 Recent Updates | [docs/RECENT_UPDATES.md](docs/RECENT_UPDATES.md) | Latest changes and fixes |
-| 🔧 Scripts | [scripts/README.md](scripts/README.md) | Automation and deployment scripts |
+| 🔧 Development | [📁 Dev Docs](docs/development/README.md) • [Setup](docs/development/SETUP_GUIDE.md) • [Contributing](docs/development/CONTRIBUTING.md) | Development guides |
+| 📖 API | [📁 API Docs](docs/api/README.md) • [Reference](docs/api/API.md) • [Global Operations](docs/api/GLOBAL_DELETE_OPERATIONS.md) | API documentation |
+| 📊 Monitoring | [📁 Monitoring Docs](docs/monitoring/README.md) • [Performance](docs/monitoring/PERFORMANCE.md) | Performance and monitoring |
+| ✨ Quality | [📁 Quality Docs](docs/quality/README.md) • [Accessibility](docs/quality/ACCESSIBILITY.md) | Code quality standards |
+| 📋 Recent Updates | [docs/project/RECENT_UPDATES.md](docs/project/RECENT_UPDATES.md) | Latest changes and fixes |
 
 ## 📋 Project Overview
 
@@ -87,49 +88,49 @@ npm run dev
 | Document | Description | Status |
 |----------|-------------|--------|
 | [docs/README.md](docs/README.md) | Documentation index | ✅ Current |
-| [CHANGELOG.md](CHANGELOG.md) | Version history and release notes | ✅ Updated |
-| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | Comprehensive system architecture | ✅ Complete |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Development guidelines | ✅ Complete |
+| [docs/project/CHANGELOG.md](docs/project/CHANGELOG.md) | Version history and release notes | ✅ Updated |
+| [docs/project/ARCHITECTURE.md](docs/project/ARCHITECTURE.md) | Comprehensive system architecture | ✅ Complete |
+| [docs/development/CONTRIBUTING.md](docs/development/CONTRIBUTING.md) | Development guidelines | ✅ Complete |
 
 ### 🔧 Development Documentation
 | Document | Description | Location |
 |----------|-------------|----------|
-| [Development Log](docs/DEVELOPMENT_LOG.md) | Complete development history (PT) | `docs/` |
-| [Recent Updates](docs/RECENT_UPDATES.md) | Latest changes summary | `docs/` |
-| [Setup Guide](SETUP_GUIDE.md) | Detailed installation instructions | Root |
-| [Performance Strategy](docs/PERFORMANCE.md) | Performance optimization guide | `docs/` |
-| [Deployment Guide](docs/DEPLOYMENT.md) | Deployment configurations | `docs/` |
+| [Development Log](docs/development/DEVELOPMENT_LOG.md) | Complete development history (PT) | `docs/development/` |
+| [Recent Updates](docs/project/RECENT_UPDATES.md) | Latest changes summary | `docs/project/` |
+| [Setup Guide](docs/development/SETUP_GUIDE.md) | Detailed installation instructions | `docs/development/` |
+| [Performance Strategy](docs/monitoring/PERFORMANCE.md) | Performance optimization guide | `docs/monitoring/` |
+| [Deployment Guide](docs/deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md) | Deployment configurations | `docs/deploy/` |
 
 ### 🔒 Security Documentation
 | Document | Description | Location |
 |----------|-------------|----------|
-| [Security Assessment](docs/SECURITY.md) | Comprehensive security strategy | `docs/` |
+| [Security Assessment](docs/security/SECURITY.md) | Comprehensive security strategy | `docs/security/` |
 | [Security Policy](SECURITY.md) | Vulnerability reporting | Root |
 | [Threat Model](docs/security/threat-hunting-queries.md) | Security monitoring | `docs/security/` |
-| [Vulnerability Fixes](SECURITY_FIXES_APPLIED.md) | Applied security patches | Root |
+| [Trinity Security Reports](docs/security/TRINITY_FINAL_REPORT.md) | Applied security patches | `docs/security/` |
 
 ### 🧪 Quality Assurance
 | Document | Description | Location |
 |----------|-------------|----------|
-| [Testing Strategy](docs/TESTING.md) | Comprehensive testing approach | `docs/` |
-| [Code Refactoring](docs/REFACTORING.md) | Code quality improvements | `docs/` |
+| [Testing Strategy](docs/testing/TESTING.md) | Comprehensive testing approach | `docs/testing/` |
+| [Code Refactoring](docs/refactoring/REFACTORING.md) | Code quality improvements | `docs/refactoring/` |
 | [Test Coverage](docs/testing/COVERAGE-REPORT.md) | Detailed coverage metrics | `docs/testing/` |
-| [Accessibility Guide](docs/ACCESSIBILITY.md) | Accessibility compliance | `docs/` |
+| [Accessibility Guide](docs/quality/ACCESSIBILITY.md) | Accessibility compliance | `docs/quality/` |
 
 ### 🌐 Technical References
 | Document | Description | Location |
 |----------|-------------|----------|
-| [API Documentation](docs/API.md) | Detailed API specifications | `docs/` |
-| [Deployment Guide](docs/DEPLOYMENT.md) | Railway & Vercel deployment | `docs/` |
-| [Docker Compose](docs/DOCKER_COMPOSE_ANALYSIS.md) | Container configuration | `docs/` |
-| [Local Development](docs/DEVELOPMENT.md) | Local setup instructions | `docs/` |
+| [API Documentation](docs/api/API.md) | Detailed API specifications | `docs/api/` |
+| [Deployment Guide](docs/deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md) | Railway & Vercel deployment | `docs/deploy/` |
+| [Docker Compose](docs/development/DOCKER_COMPOSE_ANALYSIS.md) | Container configuration | `docs/development/` |
+| [Local Development](docs/development/SETUP_GUIDE.md) | Local setup instructions | `docs/development/` |
 
 ### 🤝 Contribution & Support
 | Document | Description | Location |
 |----------|-------------|----------|
-| [Contributing Guidelines](CONTRIBUTING.md) | How to contribute | Root |
-| [Code of Conduct](CODE_OF_CONDUCT.md) | Community standards | Root |
-| [Support](SUPPORT.md) | Getting help | Root |
+| [Contributing Guidelines](docs/development/CONTRIBUTING.md) | How to contribute | `docs/development/` |
+| [Security Policy](SECURITY.md) | Vulnerability reporting | Root |
+| [Documentation Index](docs/README.md) | Complete documentation guide | `docs/` |
 
 ## 🎯 Key Features
 
@@ -192,7 +193,7 @@ npm run test:coverage
 ## 🚀 Deployment
 
 ### Guide
-Veja o guia completo em `docs/DEPLOYMENT.md` (Railway/Vercel, variáveis, portas, seed, troubleshooting).
+See complete guide at [docs/deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md](docs/deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md) (Railway/Vercel, variables, ports, seed, troubleshooting).
 
 ### Environment Configuration
 - **Development**: `.env.development`
@@ -201,7 +202,7 @@ Veja o guia completo em `docs/DEPLOYMENT.md` (Railway/Vercel, variáveis, portas
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guide](docs/development/CONTRIBUTING.md) for details.
 
 ### Development Workflow
 1. Fork the repository
@@ -233,10 +234,10 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## 📞 Support
 
-- **Documentation**: Browse the `docs/` directory
+- **Documentation**: Browse the [docs/](docs/) directory
 - **Issues**: Create GitHub issues for bugs
 - **Security**: See [SECURITY.md](SECURITY.md) for vulnerability reports
-- **Development**: Check [DEVELOPMENT_LOG.md](docs/DEVELOPMENT_LOG.md) for troubleshooting
+- **Development**: Check [DEVELOPMENT_LOG.md](docs/development/DEVELOPMENT_LOG.md) for troubleshooting
 
 ---
 
