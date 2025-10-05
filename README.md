@@ -8,7 +8,7 @@
 
 A comprehensive corporate birthday management platform built with modern web technologies, featuring automated gift sending, employee management, advanced analytics, and enhanced shipment operations.
 
-## 🆕 Latest Updates (December 2024)
+## 🆕 Latest Updates (October 2025)
 
 ### ✨ Enhanced Shipment Management
 - **Bulk Delete Operations**: Complete delete functionality for shipment records with organization-scoped security
@@ -59,8 +59,8 @@ npm run dev
 | 🧪 Testing | [docs/TESTING.md](docs/TESTING.md) | Test strategies and coverage |
 | 🚀 Deployment | [docs/deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md](docs/deploy/COMPREHENSIVE_DEPLOYMENT_GUIDE.md) | Complete deployment guide |
 | 🔧 Development | [docs/development/DEVELOPMENT_LOG.md](docs/development/DEVELOPMENT_LOG.md) | Complete development history |
-| � API Reference | [docs/api/API.md](docs/api/API.md) | Complete API documentation |
-| �📋 Recent Updates | [docs/RECENT_UPDATES.md](docs/RECENT_UPDATES.md) | Latest changes and fixes |
+| 📋 API Reference | [docs/api/API.md](docs/api/API.md) | Complete API documentation |
+| 📋 Recent Updates | [docs/RECENT_UPDATES.md](docs/RECENT_UPDATES.md) | Latest changes and fixes |
 | 🔧 Scripts | [scripts/README.md](scripts/README.md) | Automation and deployment scripts |
 
 ## 📋 Project Overview
