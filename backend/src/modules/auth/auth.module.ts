@@ -16,7 +16,8 @@ import { UsuariosModule } from '../usuarios/usuarios.module';
   imports: [
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'fallback-secret-for-dev',
+      // Require explicit JWT secret from environment; no insecure fallback
+      secret: process.env.JWT_SECRET!,
       signOptions: {
         expiresIn: process.env.JWT_EXPIRES_IN || '7d',
       },

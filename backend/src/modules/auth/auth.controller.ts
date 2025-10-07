@@ -1,4 +1,5 @@
 import { Controller, Post, Body, UseGuards, Get, Request, Patch, UseInterceptors, UploadedFile, BadRequestException, Param, Res, NotFoundException } from '@nestjs/common';
+import { randomBytes } from 'crypto';
 import { ThrottlerGuard, Throttle } from '@nestjs/throttler';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
@@ -83,7 +84,8 @@ export class AuthController {
     });
 
     // CSRF: set non-httpOnly cookie with CSRF token that mirrors server-side token check
-  const csrfToken = Math.random().toString(36).slice(2);
+    // Use cryptographically secure random generator
+    const csrfToken = randomBytes(32).toString('hex');
     response.cookie('csrf_token', csrfToken, {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
@@ -142,8 +144,8 @@ export class AuthController {
       path: '/',
     });
 
-    // CSRF: set token cookie
-  const csrfToken = Math.random().toString(36).slice(2);
+    // CSRF: set token cookie (cryptographically secure)
+    const csrfToken = randomBytes(32).toString('hex');
     response.cookie('csrf_token', csrfToken, {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',

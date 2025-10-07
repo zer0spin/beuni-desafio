@@ -16,18 +16,22 @@ async function bootstrap() {
   // SECURITY: Global exception filter to prevent information disclosure
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  // Security headers with Helmet
+  // Security headers with Helmet (stricter in production)
+  const isProd = process.env.NODE_ENV === 'production';
   app.use(helmet({
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles for Swagger UI
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Required for Swagger UI
+        // Allow inline/eval only in non-production for Swagger UI convenience
+        styleSrc: isProd ? ["'self'"] : ["'self'", "'unsafe-inline'"],
+        scriptSrc: isProd ? ["'self'"] : ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         imgSrc: ["'self'", 'data:', 'https:'],
       },
     },
-    crossOriginEmbedderPolicy: false, // Disable for Swagger UI
-    crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin for Swagger
+    // Enable HSTS in production
+    hsts: isProd ? { maxAge: 31536000, includeSubDomains: true, preload: false } : false,
+    crossOriginEmbedderPolicy: isProd ? true : false,
+    crossOriginResourcePolicy: { policy: isProd ? 'same-origin' : 'cross-origin' },
   }));
 
   // Global validation pipe with class-validator
@@ -73,36 +77,38 @@ async function bootstrap() {
     maxAge: 3600, // Cache preflight requests for 1 hour
   });
 
-  // Swagger/OpenAPI Documentation
-  const config = new DocumentBuilder()
-    .setTitle('Beuni - API de Gestão de Aniversariantes')
-    .setDescription(
-      'API REST para gerenciar colaboradores e automatizar o envio de brindes de aniversário. ' +
-      'Esta API faz parte da plataforma SaaS da Beuni para seus clientes.'
-    )
-    .setVersion('1.0')
-    .addBearerAuth(
-      {
-        type: 'http',
-        scheme: 'bearer',
-        bearerFormat: 'JWT',
-        description: 'Token JWT obtido através do endpoint de login',
-      },
-      'jwt'
-    )
-    .addTag('Auth', 'Autenticação de usuários')
-    .addTag('Colaboradores', 'Gestão de colaboradores e aniversariantes')
-    .addTag('CEP', 'Consulta de endereços via CEP')
-    .addTag('Envio Brindes', 'Gestão de envios de brindes')
-    .addTag('Organizações', 'Gestão de organizações (multi-tenant)')
-    .build();
+  // Swagger/OpenAPI Documentation - disabled in production
+  if (!isProd) {
+    const config = new DocumentBuilder()
+      .setTitle('Beuni - API de Gestão de Aniversariantes')
+      .setDescription(
+        'API REST para gerenciar colaboradores e automatizar o envio de brindes de aniversário. ' +
+        'Esta API faz parte da plataforma SaaS da Beuni para seus clientes.'
+      )
+      .setVersion('1.0')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Token JWT obtido através do endpoint de login',
+        },
+        'jwt'
+      )
+      .addTag('Auth', 'Autenticação de usuários')
+      .addTag('Colaboradores', 'Gestão de colaboradores e aniversariantes')
+      .addTag('CEP', 'Consulta de endereços via CEP')
+      .addTag('Envio Brindes', 'Gestão de envios de brindes')
+      .addTag('Organizações', 'Gestão de organizações (multi-tenant)')
+      .build();
 
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document, {
-    swaggerOptions: {
-      persistAuthorization: true, // Keep auth token after page refresh
-    },
-  });
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document, {
+      swaggerOptions: {
+        persistAuthorization: true,
+      },
+    });
+  }
 
   const port = parseInt(process.env.PORT || '3001', 10);
 
