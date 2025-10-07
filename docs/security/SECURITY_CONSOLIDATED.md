@@ -223,3 +223,17 @@ If you discover a security vulnerability in the Beuni project, please report it 
 *Last Updated: October 3, 2025*  
 *Next Review: October 10, 2025*  
 *Document Owner: Security Team*
+## Atualizações recentes (2025-10-07)
+
+Implementações
+- CSRF fortalecido: token gerado com `crypto.randomBytes(32)` em autenticação.
+- CSP endurecida em produção: remoção de `unsafe-inline/eval` para scripts/estilos.
+- HSTS ativado em produção, reforçando uso de HTTPS.
+- Swagger desabilitado em produção; mantido apenas em desenvolvimento.
+- JWT sem fallback de segredo; `JWT_SECRET` obrigatório pelo ambiente.
+- Remoção de middleware legado (`backend/src/middleware/security.js`) para evitar duplicidade.
+
+Efeitos na postura de segurança
+- Menor superfície de XSS e clickjacking.
+- Cookies seguros com `SameSite=strict` e `secure` em produção, alinhados a HSTS.
+- Maior confiabilidade na gestão de segredos.

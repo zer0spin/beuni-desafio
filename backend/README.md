@@ -106,3 +106,16 @@ Required in `.env`:
 - Write comprehensive tests
 - Keep modules decoupled
 - Use DTOs for data validation
+## Segurança – Atualizações recentes (Out/2025)
+
+- CSRF fortalecido: token emitido com `crypto.randomBytes(32)` em `login` e `register`.
+- Helmet/CSP endurecido em produção: sem `unsafe-inline/eval`; imagens e recursos restritos.
+- HSTS habilitado em produção para reforçar a política de HTTPS.
+- Swagger desabilitado em produção; disponível apenas quando `NODE_ENV !== 'production'`.
+- JWT sem fallback: `JWT_SECRET` deve estar definido no ambiente.
+- Remoção de `middleware/security.js` legado para evitar configuração duplicada.
+
+### Configuração necessária
+- Variáveis de ambiente: `JWT_SECRET`, `CORS_ORIGIN` (lista separada por vírgula), `FRONTEND_URL`.
+- Cookies: `beuni_token` (httpOnly, secure em produção, SameSite=strict), `csrf_token` (não httpOnly, SameSite=strict).
+- CORS: origens estritas via `CORS_ORIGIN` e `FRONTEND_URL`.

@@ -455,3 +455,22 @@ Para reportar vulnerabilidades de segurança, por favor:
 ---
 
 **End of Report** 🔒
+### Atualizações implementadas (2025-10-07)
+
+- CSRF: token gerado com `crypto.randomBytes(32)` (substitui gerador previsível).
+- CSP/Helmet: políticas mais restritas em produção (sem `unsafe-inline/eval`).
+- HSTS: habilitado em produção para reforçar HTTPS.
+- Swagger: desabilitado em produção; manter apenas em ambientes de desenvolvimento.
+- JWT: removido fallback de segredo; `JWT_SECRET` é obrigatório via ambiente.
+- Remoção de middleware legado (`backend/src/middleware/security.js`) para evitar políticas conflitantes.
+
+Checklist (estado após implementação)
+- [x] Cookies `httpOnly` para JWT
+- [x] CSRF double-submit com token imprevisível
+- [x] CORS com origens estritas e `credentials: true`
+- [x] Helmet com CSP restrita em produção
+- [x] HSTS habilitado em produção
+- [x] Validação de entrada com `class-validator`
+- [x] Rate limiting
+- [x] Bcrypt para senhas
+- [x] Prisma com validações e transações

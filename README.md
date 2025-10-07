@@ -255,3 +255,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **⭐ Star this repository if you find it useful!**
+Atualizações de Segurança (Out/2025)
+
+- CSRF: token agora gerado com `crypto.randomBytes(32)` (imprevisível e seguro).
+- Helmet/CSP: políticas mais restritas em produção (sem `unsafe-inline/eval`).
+- HSTS: habilitado em produção para reforçar HTTPS.
+- Swagger: documentação desabilitada em produção; disponível apenas em desenvolvimento.
+- JWT: removido fallback de segredo; `JWT_SECRET` é obrigatório via ambiente.
+- Middleware legado: removido `backend/src/middleware/security.js` para evitar configurações conflitantes.
+
+Notas de configuração
+- Definir `JWT_SECRET`, `CORS_ORIGIN` e `FRONTEND_URL` no ambiente.
+- Em produção, garantir HTTPS para que cookies `secure` funcionem e HSTS seja efetivo.
